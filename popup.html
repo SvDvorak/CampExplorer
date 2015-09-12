@@ -4,7 +4,7 @@
  "browser_action" field in manifest.json contains the "default_popup" key with
  value "popup.html".
  -->
-<html>
+<html ng-app="multiTagApp">
   <head>
     <title>Getting Started Extension's Popup</title>
     <style>
@@ -21,22 +21,27 @@
       }
     </style>
 
-    <!--
-      - JavaScript and HTML must be in separate files: see our Content Security
-      - Policy documentation[1] for details and explanation.
-      -
-      - [1]: https://developer.chrome.com/extensions/contentSecurityPolicy
-     -->
+    <script src="angular.min.js"></script>
     <script src="popup.js"></script>
   </head>
-  <body>
-    Tag: <input type="text" id="newTag">
+  <body ng-controller="tagsController">
+    Tag: <input type="text" ng-model="newTag">
     <br>
-    <input type="submit" id="add" value="Add">
-    <input type="submit" id="search" value="Search">
-    <ul id="tags">
+    <button ng-click="addTag(newTag)">Add</button>
+    <button ng-click="search()">Search</button>
+    <ul>
+      <li ng-repeat="tag in tags">
+        <p>{{tag}}</p>
+        <p ng-click="removeTag(tag)">XXX</p>
+      </li>
     </ul>
-    <ul id="albums">
+    <p>Searches: {{ searchesInProgress }}</p>
+    <ul>
+      <li ng-repeat="album in albums">
+        <p>{{ album.name }}</p>
+        <p>{{ album.artist }}</p>
+        <p>{{ album.link }}</p>
+      </li>
+    </ul>
   </body>
 </html>
-
