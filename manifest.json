@@ -1,0 +1,17 @@
+{
+	"manifest_version": 2,
+
+	"name": "Bandcamp multitag search",
+	"description": "This extension allows you to search bandcamp for albums with multiple specific tags",
+	"version": "1.0",
+
+	"browser_action": {
+		"default_icon": "icon.png",
+		"default_popup": "popup.html",
+		"default_title": "Click to search"
+	},
+	"permissions": [
+		"http://bandcamp.com/",
+		"https://bandcamp.com/"
+	]
+}
