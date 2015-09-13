@@ -10,7 +10,7 @@ var bandcampMultiTag = angular.module('multiTagApp', [])
 bandcampMultiTag.controller('tagsController', function ($scope) {
   $scope.loadingController = true;
 
-  var MaxPages = 10;
+  var MaxPages = 1;
 
   $scope.albums = [];
   $scope.tagAlbums = [];
@@ -29,19 +29,13 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
       $scope.tagAlbums.push(newTagAlbum);
       $scope.searchTag(newTagAlbum);
     }
-    $scope.newTag = "";
+    $scope.newTag = null;
   }
 
   $scope.removeTag = function(tagAlbum) {
     $scope.tagAlbums.splice($scope.tagAlbums.indexOf(tagAlbum), 1);
     $scope.updateAlbumsWithAllTags();
   }
-
-  $scope.$watch(scope => scope.searchesInProgress == 0, (stoppedSearch) => {
-    if(stoppedSearch && !$scope.loadingController) {
-      $scope.updateAlbumsWithAllTags();
-    }
-  });
 
   $scope.updateAlbumsWithAllTags = function() {
     $scope.albums = $scope.getAlbumsWithAllTags();
@@ -58,6 +52,7 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
   }
 
   $scope.searchTag = function(tagAlbum) {
+    $scope.albums = [];
     $scope.searchesInProgress += MaxPages;
 
     for (var page = 1; page <= MaxPages; page++){
@@ -65,35 +60,9 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
         tagAlbum.albums = tagAlbum.albums.concat($scope.htmlToAlbums(responseText));
         $scope.$apply(() => {
           $scope.searchesInProgress -= 1;
+          $scope.updateAlbumsWithAllTags();
         });
       })
-    }
-
-    $scope.loadingController = false;
-  }
-
-  $scope.search = function() {
-    if($scope.tagAlbums.length == 0)
-    {
-      return;
-    }
-
-    $scope.searchesInProgress = $scope.tagAlbums.length * MaxPages;
-    $scope.albums = [];
-
-    tagAlbums = $scope.tags.map(x => { return { tag: x, albums: [] } });
-    for (var tagNumber = 0; tagNumber < $scope.tags.length; tagNumber++) {
-      var tag = $scope.tags[tagNumber];
-      for (var page = 1; page <= MaxPages; page++){
-        $scope.getTagPageAsync(tag, tagNumber, page, (responseText, tagNumber) => {
-          tagAlbums[tagNumber].albums = tagAlbums[tagNumber].albums.concat($scope.htmlToAlbums(responseText));
-          $scope.$apply(() => {
-            $scope.searchesInProgress -= 1;
-          });
-
-          //$scope.updateAlbums($scope.htmlToAlbums(responseText), tagNumber));
-        })
-      }
     }
 
     $scope.loadingController = false;
@@ -102,15 +71,7 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
   $scope.htmlToAlbums = function(html) {
     var q = document.createElement('div');
     q.innerHTML = html;
-    return $scope.parseAlbum(q);
-  }
-
-  $scope.updateAlbums = function(albums, tagNumber) {
-    tagAlbums[tagNumber].albums = tagAlbums[tagNumber].albums.concat(albums);
-    $scope.$apply(() => {
-      $scope.albums = $scope.intersectRecursive(tagAlbums[0].albums, 1);
-      $scope.searchesInProgress -= 1;
-    });
+    return $scope.parseAlbums(q);
   }
 
   $scope.intersect = function(a, b) {
@@ -133,11 +94,11 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
     xhr.send();
   }
 
-  $scope.parseAlbum = function(div) {
-    return [].slice.call(div.querySelectorAll('.item_list > .item')).map($scope.parseAlbumInfo);
+  $scope.parseAlbums = function(div) {
+    return [].slice.call(div.querySelectorAll('.item_list > .item')).map($scope.parseAlbum);
   }
 
-  $scope.parseAlbumInfo = function(albumHtml) {
+  $scope.parseAlbum = function(albumHtml) {
     var imageRegEx = /return 'url\((.+)\)'/;
     var image = imageRegEx.exec(albumHtml.innerHTML)[1];
 

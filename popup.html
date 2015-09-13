@@ -9,22 +9,27 @@
     <title>Bandcamp Multi Tag Search</title>
     <script src="angular.min.js"></script>
     <script src="popup.js"></script>
-    <link rel="stylesheet" href="/style.css" type="text/css" />
+    <link rel="stylesheet" href="spinner.css" type="text/css" />
+    <link rel="stylesheet" href="style.css" type="text/css" />
   </head>
   <body ng-controller="tagsController">
-    Tag: <input type="text" ng-model="newTag">
-    <br>
-    <button ng-click="addTag()">Add</button>
-    <button ng-click="search()">Search</button>
+    <div>
+      <form class="input">
+        <input class="input_tag" type="text" ng-model="newTag" placeholder="Tag..." />
+        <input class="input_add" type="submit" ng-click="addTag()" value="Add" />
+      </form>
+    </div>
     <ul class="tags">
-      <li ng-repeat="tagAlbum in tagAlbums">
-        <div>
-          <p class="tag_name">{{ tagAlbum.tag }}</p>
-          <p class="tag_remove" ng-click="removeTag(tagAlbum)">XXX</p>
-        </div>
+      <li class="tag" ng-repeat="tagAlbum in tagAlbums">
+        <span class="tag_name">{{ tagAlbum.tag }}</span>
+        <span class="tag_remove" ng-click="removeTag(tagAlbum)">X</span>
       </li>
     </ul>
-    <p>Searches: {{ searchesInProgress }}</p>
+    <div class="spinner" ng-show="searchesInProgress != 0">
+      <div class="throbber-loader">
+        Loading…
+      </div>
+    </div>
     <ul class="albums">
       <li class="album" ng-repeat="album in albums">
         <a href="{{ album.link }}" target="_blank">
@@ -34,5 +39,6 @@
         </a>
       </li>
     </ul>
+    <p class="noResults" ng-show="tagAlbums.length != 0 && albums.length == 0 && searchesInProgress == 0">No albums found</p>
   </body>
 </html>
