@@ -10,12 +10,19 @@ var bandcampMultiTag = angular.module('multiTagApp', [])
 bandcampMultiTag.controller('tagsController', function ($scope) {
   $scope.loadingController = true;
 
-  $scope.tags = [];
+  var MaxPages = 2;
+
   $scope.albums = [];
-  $scope.tagAlbums = [ { tag: "ambient", albums: []}, { tag: "electronica", albums: [] }];
+  $scope.tagAlbums = [];
   $scope.searchesInProgress = 0;
 
-  var MaxPages = 1;
+  chrome.storage.local.get({ 'tagAlbums' : [] }, result => {
+    $scope.$apply(() => {
+      console.log(result.tagAlbums);
+      $scope.tagAlbums = result.tagAlbums;
+      $scope.albums = $scope.getAlbumsWithAllTags();
+    });
+  });
 
   $scope.addTag = function() {
     if($scope.tagAlbums.map(x => x.tag).indexOf($scope.newTag) == -1) {
@@ -28,22 +35,27 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
 
   $scope.removeTag = function(tagAlbum) {
     $scope.tagAlbums.splice($scope.tagAlbums.indexOf(tagAlbum), 1);
-    $scope.setAlbumsWithAllTags();
+    $scope.updateAlbumsWithAllTags();
   }
 
   $scope.$watch(scope => scope.searchesInProgress == 0, (stoppedSearch) => {
     if(stoppedSearch && !$scope.loadingController) {
-      $scope.setAlbumsWithAllTags();
+      $scope.updateAlbumsWithAllTags();
     }
   });
 
-  $scope.setAlbumsWithAllTags = function() {
+  $scope.updateAlbumsWithAllTags = function() {
+    $scope.albums = $scope.getAlbumsWithAllTags();
+
+    chrome.storage.local.set({ tagAlbums: $scope.tagAlbums });
+  }
+
+  $scope.getAlbumsWithAllTags = function() {
     if($scope.tagAlbums.length > 0) {
-      $scope.albums = $scope.intersectRecursive($scope.tagAlbums[0].albums, 1);
+      return $scope.intersectRecursive($scope.tagAlbums[0].albums, 1);
     }
-    else {
-      $scope.albums = [];
-    }
+
+    return [];
   }
 
   $scope.searchTag = function(tagAlbum) {
@@ -130,26 +142,11 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
     var imageRegEx = /return 'url\((.+)\)'/;
     var image = imageRegEx.exec(albumHtml.innerHTML)[1];
 
-    var album = {
+    return {
       name: albumHtml.children[0].children[1].innerText,
       artist: albumHtml.children[0].children[2].innerText,
       image: image,
       link: albumHtml.children[0].href
     };
-
-    $scope.loadImageAsync(image, localUrl => $scope.$apply(() => album.image = localUrl));
-
-    return album;
-  }
-
-  $scope.loadImageAsync = function(url, onDone) {
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', url, true);
-    xhr.responseType = 'blob';
-    xhr.onload = function(e) {
-      onDone(window.URL.createObjectURL(this.response));
-    };
-
-    xhr.send();
   }
 });

@@ -15,6 +15,7 @@
 		"default_title": "Click to search"
 	},
 	"permissions": [
+		"storage",
 		"http://bandcamp.com/",
 		"https://bandcamp.com/",
 		"https://*.bcbits.com/"
