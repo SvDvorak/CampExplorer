@@ -18,10 +18,34 @@ ul {
 	list-style-type: none;
 }
 
-.tag_name {
-	display: inline-block;
+.albums {
+	padding-left: 40px;
+	padding-right: 40px;
 }
 
-.tag_remove {
-	display: inline-block;	
+.album {
+	padding-bottom: 30px;
+}
+
+.album a {
+	text-decoration: none;
+	color: #408294;
+}
+
+.album a:visited {
+	color: #408294;
+}
+
+.album a:hover {
+	text-decoration: underline;
+}
+
+.album p {
+	font-size: 15px;
+	margin-top: 0px;
+	margin-bottom: 5px;
+}
+
+.album_name {
+	font-weight: bold;
 }

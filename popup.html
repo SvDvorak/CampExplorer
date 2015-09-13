@@ -25,9 +25,9 @@
       </li>
     </ul>
     <p>Searches: {{ searchesInProgress }}</p>
-    <ul>
-      <li ng-repeat="album in albums">
-        <a href="{{ album.link }}">
+    <ul class="albums">
+      <li class="album" ng-repeat="album in albums">
+        <a href="{{ album.link }}" target="_blank">
           <img ng-src="{{ album.image }}" />
           <p class="album_name">{{ album.name }}</p>
           <p class="album_artist">{{ album.artist }}</p>

@@ -10,7 +10,7 @@ var bandcampMultiTag = angular.module('multiTagApp', [])
 bandcampMultiTag.controller('tagsController', function ($scope) {
   $scope.loadingController = true;
 
-  var MaxPages = 2;
+  var MaxPages = 10;
 
   $scope.albums = [];
   $scope.tagAlbums = [];
@@ -18,7 +18,6 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
 
   chrome.storage.local.get({ 'tagAlbums' : [] }, result => {
     $scope.$apply(() => {
-      console.log(result.tagAlbums);
       $scope.tagAlbums = result.tagAlbums;
       $scope.albums = $scope.getAlbumsWithAllTags();
     });
