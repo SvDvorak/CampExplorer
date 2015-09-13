@@ -8,8 +8,11 @@ var bandcampMultiTag = angular.module('multiTagApp', [])
 ]);
 
 bandcampMultiTag.controller('tagsController', function ($scope) {
-  $scope.tags = ["ambient", "electronica"];
+  $scope.loadingController = true;
+
   $scope.albums = [];
+  $scope.tagAlbums = [ { tag: "ambient", albums: []}, { tag: "electronica", albums: [] }];
+  $scope.searchesInProgress = 0;
 
   var MaxPages = 1;
 
@@ -24,7 +27,18 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
     $scope.tags.splice($scope.tags.indexOf(tag), 1);
   }
 
-  $scope.search = function(tag) {
+  $scope.$watch(scope => scope.searchesInProgress == 0, (stoppedSearch) => {
+    if(stoppedSearch && !$scope.loadingController) {
+      $scope.albums = $scope.intersectRecursive(tagAlbums[0].albums, 1);
+    }
+  });
+
+  $scope.search = function() {
+    if($scope.tags.length == 0)
+    {
+      return;
+    }
+
     $scope.searchesInProgress = $scope.tags.length * MaxPages;
     $scope.albums = [];
 
@@ -34,9 +48,18 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
     for (var tagNumber = 0; tagNumber < $scope.tags.length; tagNumber++) {
       var tag = $scope.tags[tagNumber];
       for (var page = 1; page <= MaxPages; page++){
-        $scope.getTagPageAsync(tag, tagNumber, page, (responseText, tagNumber) => $scope.updateAlbums($scope.htmlToAlbums(responseText), tagNumber));
+        $scope.getTagPageAsync(tag, tagNumber, page, (responseText, tagNumber) => {
+          tagAlbums[tagNumber].albums = tagAlbums[tagNumber].albums.concat($scope.htmlToAlbums(responseText));
+          $scope.$apply(() => {
+            $scope.searchesInProgress -= 1;
+          });
+
+          //$scope.updateAlbums($scope.htmlToAlbums(responseText), tagNumber));
+        })
       }
     }
+
+    $scope.loadingController = false;
   }
 
   $scope.htmlToAlbums = function(html) {
