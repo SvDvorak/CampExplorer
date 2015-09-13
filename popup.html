@@ -6,7 +6,7 @@
  -->
 <html ng-app="multiTagApp">
   <head>
-    <title>Bandcamp Multi Tag Search</title>
+    <title>Bandcamp Tag Search</title>
     <script src="angular.min.js"></script>
     <script src="popup.js"></script>
     <link rel="stylesheet" href="spinner.css" type="text/css" />
@@ -32,7 +32,7 @@
     </div>
     <ul class="albums">
       <li class="album" ng-repeat="album in albums">
-        <a href="{{ album.link }}" target="_blank">
+        <a href="{{ album.link }}" target="_blank" title="{{ album.name }}">
           <img ng-src="{{ album.image }}" />
           <p class="album_name">{{ album.name }}</p>
           <p class="album_artist">{{ album.artist }}</p>
