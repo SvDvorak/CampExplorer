@@ -10,6 +10,7 @@ var bandcampMultiTag = angular.module('multiTagApp', [])
 bandcampMultiTag.controller('tagsController', function ($scope) {
   $scope.loadingController = true;
 
+  $scope.tags = [];
   $scope.albums = [];
   $scope.tagAlbums = [ { tag: "ambient", albums: []}, { tag: "electronica", albums: [] }];
   $scope.searchesInProgress = 0;
@@ -17,34 +18,59 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
   var MaxPages = 1;
 
   $scope.addTag = function() {
-    if($scope.tags.indexOf($scope.newTag) == -1) {
-      $scope.tags.push($scope.newTag);
+    if($scope.tagAlbums.map(x => x.tag).indexOf($scope.newTag) == -1) {
+      var newTagAlbum = { tag: $scope.newTag, albums: [] };
+      $scope.tagAlbums.push(newTagAlbum);
+      $scope.searchTag(newTagAlbum);
     }
     $scope.newTag = "";
   }
 
-  $scope.removeTag = function(tag) {
-    $scope.tags.splice($scope.tags.indexOf(tag), 1);
+  $scope.removeTag = function(tagAlbum) {
+    $scope.tagAlbums.splice($scope.tagAlbums.indexOf(tagAlbum), 1);
+    $scope.setAlbumsWithAllTags();
   }
 
   $scope.$watch(scope => scope.searchesInProgress == 0, (stoppedSearch) => {
     if(stoppedSearch && !$scope.loadingController) {
-      $scope.albums = $scope.intersectRecursive(tagAlbums[0].albums, 1);
+      $scope.setAlbumsWithAllTags();
     }
   });
 
+  $scope.setAlbumsWithAllTags = function() {
+    if($scope.tagAlbums.length > 0) {
+      $scope.albums = $scope.intersectRecursive($scope.tagAlbums[0].albums, 1);
+    }
+    else {
+      $scope.albums = [];
+    }
+  }
+
+  $scope.searchTag = function(tagAlbum) {
+    $scope.searchesInProgress += MaxPages;
+
+    for (var page = 1; page <= MaxPages; page++){
+      $scope.getTagPageAsync(tagAlbum.tag, page, responseText => {
+        tagAlbum.albums = tagAlbum.albums.concat($scope.htmlToAlbums(responseText));
+        $scope.$apply(() => {
+          $scope.searchesInProgress -= 1;
+        });
+      })
+    }
+
+    $scope.loadingController = false;
+  }
+
   $scope.search = function() {
-    if($scope.tags.length == 0)
+    if($scope.tagAlbums.length == 0)
     {
       return;
     }
 
-    $scope.searchesInProgress = $scope.tags.length * MaxPages;
+    $scope.searchesInProgress = $scope.tagAlbums.length * MaxPages;
     $scope.albums = [];
 
     tagAlbums = $scope.tags.map(x => { return { tag: x, albums: [] } });
-    var items1 = [];
-    var items2 = [];
     for (var tagNumber = 0; tagNumber < $scope.tags.length; tagNumber++) {
       var tag = $scope.tags[tagNumber];
       for (var page = 1; page <= MaxPages; page++){
@@ -81,18 +107,18 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
   }
 
   $scope.intersectRecursive = function(currentAlbums, index) {
-    if(index == tagAlbums.length) {
+    if(index == $scope.tagAlbums.length) {
       return currentAlbums;
     }
 
-    return $scope.intersectRecursive($scope.intersect(currentAlbums, tagAlbums[index].albums), index+1);
+    return $scope.intersectRecursive($scope.intersect(currentAlbums, $scope.tagAlbums[index].albums), index+1);
   }
 
-  $scope.getTagPageAsync = function(tag, tagNumber, page, onDone) {
+  $scope.getTagPageAsync = function(tag, page, onDone) {
     var xhr = new XMLHttpRequest();
     xhr.open('GET', 'https://bandcamp.com/tag/' + tag + '?page=' + page, true);
     console.log("request for " + tag + " on page " + page)
-    xhr.onreadystatechange = () => xhr.readyState == 4 && xhr.status == 200 && onDone(xhr.responseText, tagNumber);
+    xhr.onreadystatechange = () => xhr.readyState == 4 && xhr.status == 200 && onDone(xhr.responseText);
     xhr.send();
   }
 
@@ -125,9 +151,5 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
     };
 
     xhr.send();
-  }
-
-  $scope.getAlbumsWithAllTags = function(tagAlbums) {
-    return intersect(tagAlbums[0], tagAlbums[1]);
   }
 });

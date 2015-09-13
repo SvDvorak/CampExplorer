@@ -18,10 +18,10 @@
     <button ng-click="addTag()">Add</button>
     <button ng-click="search()">Search</button>
     <ul class="tags">
-      <li ng-repeat="tag in tags">
+      <li ng-repeat="tagAlbum in tagAlbums">
         <div>
-          <p class="tag_name">{{tag}}</p>
-          <p class="tag_remove" ng-click="removeTag(tag)">XXX</p>
+          <p class="tag_name">{{ tagAlbum.tag }}</p>
+          <p class="tag_remove" ng-click="removeTag(tagAlbum)">XXX</p>
         </div>
       </li>
     </ul>
