@@ -6,41 +6,32 @@
  -->
 <html ng-app="multiTagApp">
   <head>
-    <title>Getting Started Extension's Popup</title>
-    <style>
-      body {
-        font-family: "Segoe UI", "Lucida Grande", Tahoma, sans-serif;
-        font-size: 100%;
-      }
-      #status {
-        /* avoid an excessively wide status text */
-        white-space: pre;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        max-width: 400px;
-      }
-    </style>
-
+    <title>Bandcamp Multi Tag Search</title>
     <script src="angular.min.js"></script>
     <script src="popup.js"></script>
+    <link rel="stylesheet" href="/style.css" type="text/css" />
   </head>
   <body ng-controller="tagsController">
     Tag: <input type="text" ng-model="newTag">
     <br>
-    <button ng-click="addTag(newTag)">Add</button>
+    <button ng-click="addTag()">Add</button>
     <button ng-click="search()">Search</button>
-    <ul>
+    <ul class="tags">
       <li ng-repeat="tag in tags">
-        <p>{{tag}}</p>
-        <p ng-click="removeTag(tag)">XXX</p>
+        <div>
+          <p class="tag_name">{{tag}}</p>
+          <p class="tag_remove" ng-click="removeTag(tag)">XXX</p>
+        </div>
       </li>
     </ul>
     <p>Searches: {{ searchesInProgress }}</p>
     <ul>
       <li ng-repeat="album in albums">
-        <p>{{ album.name }}</p>
-        <p>{{ album.artist }}</p>
-        <p>{{ album.link }}</p>
+        <a href="{{ album.link }}">
+          <img ng-src="{{ album.image }}" />
+          <p class="album_name">{{ album.name }}</p>
+          <p class="album_artist">{{ album.artist }}</p>
+        </a>
       </li>
     </ul>
   </body>

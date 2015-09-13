@@ -1,35 +1,48 @@
-var bandcampMultiTag = angular.module('multiTagApp', []);
+var bandcampMultiTag = angular.module('multiTagApp', [])
+.config([
+  '$compileProvider',
+  function ($compileProvider) {
+      //  Default imgSrcSanitizationWhitelist: /^\s*((https?|ftp|file|blob):|data:image\/)/
+      $compileProvider.imgSrcSanitizationWhitelist(/^\s*((https?|ftp|file|blob|chrome-extension):|data:image\/)/);
+  }
+]);
 
 bandcampMultiTag.controller('tagsController', function ($scope) {
-  $scope.tags = [];
+  $scope.tags = ["ambient", "electronica"];
   $scope.albums = [];
 
-  var MaxPages = 2;
+  var MaxPages = 1;
 
-  $scope.addTag = function(tag) {
-    $scope.tags.push(tag);
+  $scope.addTag = function() {
+    if($scope.tags.indexOf($scope.newTag) == -1) {
+      $scope.tags.push($scope.newTag);
+    }
+    $scope.newTag = "";
   }
 
   $scope.removeTag = function(tag) {
     $scope.tags.splice($scope.tags.indexOf(tag), 1);
   }
 
-  $scope.search = function() {
-    $scope.searchesInProgress = $scope.tags.length * (MaxPages - 1);
+  $scope.search = function(tag) {
+    $scope.searchesInProgress = $scope.tags.length * MaxPages;
     $scope.albums = [];
-
-    var htmlToDiv = html => { var q = document.createElement('div'); q.innerHTML = html; return q;};
-    var htmlToAlbums = ii => $scope.parseAlbum(htmlToDiv(ii));
 
     tagAlbums = $scope.tags.map(x => { return { tag: x, albums: [] } });
     var items1 = [];
     var items2 = [];
     for (var tagNumber = 0; tagNumber < $scope.tags.length; tagNumber++) {
       var tag = $scope.tags[tagNumber];
-      for (var page = 1; page < MaxPages; page++){
-        $scope.getTagPage(tag, tagNumber, page, (responseText, tagNumber) => $scope.updateAlbums(htmlToAlbums(responseText), tagNumber));
+      for (var page = 1; page <= MaxPages; page++){
+        $scope.getTagPageAsync(tag, tagNumber, page, (responseText, tagNumber) => $scope.updateAlbums($scope.htmlToAlbums(responseText), tagNumber));
       }
     }
+  }
+
+  $scope.htmlToAlbums = function(html) {
+    var q = document.createElement('div');
+    q.innerHTML = html;
+    return $scope.parseAlbum(q);
   }
 
   $scope.updateAlbums = function(albums, tagNumber) {
@@ -52,7 +65,7 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
     return $scope.intersectRecursive($scope.intersect(currentAlbums, tagAlbums[index].albums), index+1);
   }
 
-  $scope.getTagPage = function(tag, tagNumber, page, onDone) {
+  $scope.getTagPageAsync = function(tag, tagNumber, page, onDone) {
     var xhr = new XMLHttpRequest();
     xhr.open('GET', 'https://bandcamp.com/tag/' + tag + '?page=' + page, true);
     console.log("request for " + tag + " on page " + page)
@@ -68,35 +81,30 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
     var imageRegEx = /return 'url\((.+)\)'/;
     var image = imageRegEx.exec(albumHtml.innerHTML)[1];
 
-    return {
+    var album = {
       name: albumHtml.children[0].children[1].innerText,
       artist: albumHtml.children[0].children[2].innerText,
-      image: image[1],
+      image: image,
       link: albumHtml.children[0].href
     };
+
+    $scope.loadImageAsync(image, localUrl => $scope.$apply(() => album.image = localUrl));
+
+    return album;
+  }
+
+  $scope.loadImageAsync = function(url, onDone) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
+    xhr.responseType = 'blob';
+    xhr.onload = function(e) {
+      onDone(window.URL.createObjectURL(this.response));
+    };
+
+    xhr.send();
   }
 
   $scope.getAlbumsWithAllTags = function(tagAlbums) {
     return intersect(tagAlbums[0], tagAlbums[1]);
   }
-});
-
-document.addEventListener('DOMContentLoaded', function() {
-  //searchForAlbumsWithTags();
-  
-  /*document.getElementById('add').addEventListener('click', () =>
-  {
-    var newTagName = document.getElementById('newTag').value;
-    tags.push(newTagName);
-    var tagElement = document.createElement('div');
-    tagElement.innerText = newTagName + " ";
-
-    var removeTag = document.createElement('a');
-    removeTag.innerText = "x ";
-    removeTag.addEventListener('click', () => tagElement.removeChild(tagElement));
-
-    tagElement.appendChild(removeTag);
-    //document.getElementById('tags').appendChild(tagElement);
-  });*/
-  //document.getElementById('search').addEventListener('click', searchForAlbumsWithTags);
 });

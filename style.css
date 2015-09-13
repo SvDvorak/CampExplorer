@@ -1,0 +1,27 @@
+@font-face { font-family: LiberationSans; src: url('chrome-extension://__MSG_@@extension_id__/fonts/LiberationSans-Regular.ttf'); } 
+@font-face { font-family: LiberationSans; font-weight: bold; src: url('chrome-extension://__MSG_@@extension_id__/fonts/LiberationSans-Bold.ttf');}
+
+body {
+	font-family: "Helvetica Neue", LiberationSans, Arial, sans-serif;
+	font-size: 100%;
+}
+
+#status {
+	/* avoid an excessively wide status text */
+	white-space: pre;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	max-width: 400px;
+}
+
+ul {
+	list-style-type: none;
+}
+
+.tag_name {
+	display: inline-block;
+}
+
+.tag_remove {
+	display: inline-block;	
+}
