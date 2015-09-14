@@ -3,6 +3,8 @@ This repository contains the code for the Bandcamp tag search Chrome extension. 
 
 ![Bandcamp tag search](http://i.imgur.com/IAnsx3i.png)
 
+Implemented by scraping the search results of multiple Bandcamp tag searches and filters out albums that do not have all tags.
+
 ##Usage
 Just type in and add the tags you want matching albums for. Click on the album to jump to its page.
 If you want to check out multiple found albums I recommend you wait until the search finishes so the extension doesn't have to search again when you reopen it.
