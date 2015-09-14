@@ -16,21 +16,33 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
   $scope.tagAlbums = [];
   $scope.searchesInProgress = 0;
 
-  chrome.storage.local.get({ 'tagAlbums' : [] }, result => {
+  chrome.storage.local.get({ 'tagAlbums' : [], isSearching : false }, result => {
     $scope.$apply(() => {
-      $scope.tagAlbums = result.tagAlbums;
-      $scope.albums = $scope.getAlbumsWithAllTags();
+      if(result.isSearching) {
+        console.log(result.tagAlbums);
+        for (var i = 0; i < result.tagAlbums.length; i++) {
+          $scope.addTag(result.tagAlbums[i].tag);
+        };
+      }
+      else {
+        $scope.tagAlbums = result.tagAlbums;
+        $scope.albums = $scope.getAlbumsWithAllTags();
+      }
     });
   });
 
-  $scope.addTag = function() {
+  $scope.addInputTag = function() {
     var newTag = $scope.newTag.replace(" ", "-");
-    if($scope.tagAlbums.map(x => x.tag).indexOf(newTag) == -1) {
-      var newTagAlbum = { tag: newTag, albums: [] };
+    $scope.addTag(newTag);
+    $scope.newTag = null;
+  }
+
+  $scope.addTag = function(tag) {
+    if($scope.tagAlbums.map(x => x.tag).indexOf(tag) == -1) {
+      var newTagAlbum = { tag: tag, albums: [] };
       $scope.tagAlbums.push(newTagAlbum);
       $scope.searchTag(newTagAlbum);
     }
-    $scope.newTag = null;
   }
 
   $scope.removeTag = function(tagAlbum) {
@@ -63,6 +75,7 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
           $scope.searchesInProgress -= 1;
           $scope.updateAlbumsWithAllTags();
         });
+        chrome.storage.local.set({ isSearching: $scope.searchesInProgress > 0 });
       })
     }
 
@@ -90,7 +103,6 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
   $scope.getTagPageAsync = function(tag, page, onDone) {
     var xhr = new XMLHttpRequest();
     xhr.open('GET', 'https://bandcamp.com/tag/' + tag + '?page=' + page, true);
-    console.log("request for " + tag + " on page " + page)
     xhr.onreadystatechange = () => xhr.readyState == 4 && xhr.status == 200 && onDone(xhr.responseText);
     xhr.send();
   }
