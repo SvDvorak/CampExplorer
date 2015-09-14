@@ -2,8 +2,10 @@
 	"manifest_version": 2,
 
 	"name": "Bandcamp Tag Search",
+	"short_name": "TagSearch",
 	"description": "Allows you to search Bandcamp for albums with multiple tags",
-	"version": "1.0",
+	"version": "1.0.1",
+	"author": "Andreas Wilcox",
 
 	"web_accessible_resources": [
 	    "fonts/*.*"
