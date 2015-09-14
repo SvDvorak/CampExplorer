@@ -10,7 +10,7 @@ var bandcampMultiTag = angular.module('multiTagApp', [])
 bandcampMultiTag.controller('tagsController', function ($scope) {
   $scope.loadingController = true;
 
-  var MaxPages = 1;
+  var MaxPages = 10;
 
   $scope.albums = [];
   $scope.tagAlbums = [];
@@ -24,8 +24,9 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
   });
 
   $scope.addTag = function() {
-    if($scope.tagAlbums.map(x => x.tag).indexOf($scope.newTag) == -1) {
-      var newTagAlbum = { tag: $scope.newTag, albums: [] };
+    var newTag = $scope.newTag.replace(" ", "-");
+    if($scope.tagAlbums.map(x => x.tag).indexOf(newTag) == -1) {
+      var newTagAlbum = { tag: newTag, albums: [] };
       $scope.tagAlbums.push(newTagAlbum);
       $scope.searchTag(newTagAlbum);
     }

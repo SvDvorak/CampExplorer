@@ -21,7 +21,7 @@
     </div>
     <ul class="tags">
       <li class="tag" ng-repeat="tagAlbum in tagAlbums">
-        <span class="tag_name">{{ tagAlbum.tag }}</span>
+        <a href="https://bandcamp.com/tag/{{ tagAlbum.tag }}" target="_blank" class="tag_name">{{ tagAlbum.tag }}</a>
         <span class="tag_remove" ng-click="removeTag(tagAlbum)">X</span>
       </li>
     </ul>
@@ -31,7 +31,7 @@
       </div>
     </div>
     <ul class="albums">
-      <li class="album" ng-repeat="album in albums">
+      <li class="album" ng-repeat="album in albums track by $index">
         <a href="{{ album.link }}" target="_blank" title="{{ album.name }}">
           <img ng-src="{{ album.image }}" />
           <p class="album_name">{{ album.name }}</p>

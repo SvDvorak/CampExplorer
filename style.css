@@ -10,6 +10,7 @@ body {
 	font-size: 100%;
 	margin: 5px;
 	margin-bottom: 0px;
+	background: #FAFAFA;
 }
 
 #status {
@@ -27,15 +28,15 @@ body {
 }
 
 	.input_tag {
+		width: 80%;
+		height: 100%;
 		box-sizing: border-box;
 		padding: 5px;
-		height: 100%;
-		width: 80%;
 	}
 
 	.input_add {
-		height: 100%;
 		width: 20%;
+		height: 100%;
 		background: #538E9F;
 		color: white;
 		border: none;
@@ -60,6 +61,19 @@ ul {
 	padding: 10px 0px;
 	font-size: 12px;
 }
+
+	.tag_name {
+		color: #408294;
+		text-decoration: none;
+	}
+
+	.tag_name:visited {
+		color: #408294;
+	}
+
+	.tag_name:hover {
+		text-decoration: underline;
+	}
 
 .tag_remove {
 	float: right;
