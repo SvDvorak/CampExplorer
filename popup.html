@@ -11,6 +11,7 @@
     <script src="popup.js"></script>
     <link rel="stylesheet" href="spinner.css" type="text/css" />
     <link rel="stylesheet" href="style.css" type="text/css" />
+    <link rel="stylesheet" href="/octicons/octicons.css">
   </head>
   <body ng-controller="tagsController">
     <div>
@@ -25,10 +26,14 @@
         <span class="tag_remove" ng-click="removeTag(tagAlbum)">X</span>
       </li>
     </ul>
-    <div class="spinner" ng-show="searchesInProgress != 0">
+    <div class="spinner" ng-show="searchesInProgress > 0">
       <div class="throbber-loader">
         Loading…
       </div>
+      <span class="octicon octicon-issue-opened"
+        ng-show="retryCount > 0"
+        data-toggle="tooltip"
+        title="Too many searches in a short while, results will take longer to load"></span>
     </div>
     <ul class="albums">
       <li class="album" ng-repeat="album in albums track by $index">
@@ -39,6 +44,6 @@
         </a>
       </li>
     </ul>
-    <p class="noResults" ng-show="tagAlbums.length != 0 && albums.length == 0 && searchesInProgress == 0">No albums found</p>
+    <p class="noResults" ng-show="tagAlbums.length != 0 && albums.length == 0 && searchesInProgress <= 0">No albums found</p>
   </body>
 </html>

@@ -1,6 +1,9 @@
 @font-face { font-family: LiberationSans; src: url('chrome-extension://__MSG_@@extension_id__/fonts/LiberationSans-Regular.ttf'); } 
 @font-face { font-family: LiberationSans; font-weight: bold; src: url('chrome-extension://__MSG_@@extension_id__/fonts/LiberationSans-Bold.ttf');}
 
+/* Angular Bootstrap fixes */
+.nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
+
 html {
 	width: 394px;
 }
@@ -88,6 +91,14 @@ ul {
 .spinner {
 	padding-top: 10px;
 	text-align: center;
+	position: relative;
+}
+
+.octicon-issue-opened {
+	color: #FFA366;
+	position: absolute;
+	text-align: center;
+	padding-left: 10px;
 }
 
 .albums {

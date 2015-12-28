@@ -8,7 +8,8 @@
 	"author": "Andreas Wilcox",
 
 	"web_accessible_resources": [
-	    "fonts/*.*"
+	    "fonts/*.*",
+	    "octicons/*.*"
 	],
 	"browser_action": {
 		"default_icon": "icon19.png",

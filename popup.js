@@ -15,6 +15,7 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
   $scope.albums = [];
   $scope.tagAlbums = [];
   $scope.searchesInProgress = 0;
+  $scope.retryCount = 0;
 
   chrome.storage.local.get({ 'tagAlbums' : [], isSearching : false }, result => {
     $scope.$apply(() => {
@@ -101,9 +102,29 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
   }
 
   $scope.getTagPageAsync = function(tag, page, onDone) {
+    $scope.retryCount = 0;
+    $scope.getTagPageAsyncRecursive(tag, page, 1, onDone);
+  }
+
+  $scope.getTagPageAsyncRecursive = function(tag, page, tries, onDone) {
     var xhr = new XMLHttpRequest();
     xhr.open('GET', 'https://bandcamp.com/tag/' + tag + '?page=' + page, true);
-    xhr.onreadystatechange = () => xhr.readyState == 4 && xhr.status == 200 && onDone(xhr.responseText);
+    xhr.onreadystatechange = () =>
+      {
+        if(xhr.readyState == 4 && xhr.status == 200) {
+          onDone(xhr.responseText)
+        }
+        else if(xhr.readyState == 4 && (xhr.status == 503 || xhr.status == 0)) {
+          $scope.retryCount = Math.max($scope.retryCount, tries);
+          if($scope.retryCount > 4) {
+            $scope.searchesInProgress -= 1;
+          }
+          else {
+            setTimeout(() => $scope.getTagPageAsyncRecursive(tag, page, tries + 1, onDone), 3500 + tries*tries*2000);
+          }
+        }
+      }
+
     xhr.send();
   }
 

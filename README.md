@@ -14,5 +14,8 @@ If you want to check out multiple found albums I recommend you wait until the se
 - Missing albums - The tag search on Bandcamp is limited to 400 albums per tag so some albums might not be found.
 
 ##Release Notes
-Version 1.0.0
+1.0.1
+- Fixed app not handling 503 (Service unavailable) errors which occurs when searching bandcamp too often. App now retries multiple times with a longer timeout for each try. A graphical icon next to the search spinner indicates when this is happening.
+
+1.0.0
 - Initial release
