@@ -15,6 +15,9 @@ If you want to check out multiple found albums I recommend you wait until the se
 - Missing albums - The tag search on Bandcamp is limited to 400 albums per tag so some albums might not be found.
 
 ##Release Notes
+1.0.3
+- Fixed rare error when having multiple tags
+
 1.0.2
 - Changed Bandcamp throttling message.
 

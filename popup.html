@@ -21,7 +21,7 @@
       </form>
     </div>
     <ul class="tags">
-      <li class="tag" ng-repeat="tagAlbum in tagAlbums">
+      <li class="tag" ng-repeat="tagAlbum in tagAlbums track by tagAlbum.tag">
         <a href="https://bandcamp.com/tag/{{ tagAlbum.tag }}" target="_blank" class="tag_name">{{ tagAlbum.tag }}</a>
         <span class="tag_remove" ng-click="removeTag(tagAlbum)">X</span>
       </li>
