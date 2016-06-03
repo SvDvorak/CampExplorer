@@ -1,12 +1,19 @@
 
-var albums = {}
+var albums = []
 
 module.exports = {
-    getAlbumsByTag: function () {
-        return albums;
+    getAlbumsByTag: function (tag) {
+    	if(tag in albums)
+    	{
+	        return [ albums[tag] ];
+	    }
+	    else
+	    {
+	    	return [];
+	    }
     },
 
-    setAlbumsForTag: function (tag, newAlbums) {
-        albums = newAlbums;
+    setAlbumForTag: function (tag, newAlbum) {
+        albums[tag] = newAlbum;
     }
 };

@@ -6,11 +6,10 @@ module.exports = {
         var express = require("express");
         var app = express();
 
-        //Lets define a port we want to listen to
         const PORT=8079; 
 
-        app.get("/", function(request, res) {
-            var albums = bandcampApi.getAlbumsByTag("");
+        app.get("/v1/tags/:tag", function(request, res) {
+            var albums = bandcampApi.getAlbumsByTag(request.params.tag);
             res.setHeader("Content-Type", "application/json");
             res.status(200);
             res.send(JSON.stringify(albums));

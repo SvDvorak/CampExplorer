@@ -1,1 +1,1 @@
-require('./server').start();
+require('./server').start(require("./bandcamp-fake"));
