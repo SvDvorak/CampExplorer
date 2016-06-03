@@ -1,0 +1,34 @@
+{
+  "name": "BandcampMultitagPlugin",
+  "version": "1.1.0",
+  "description": "Service to search Bandcamp using multiple tags",
+  "main": "angular.min.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/SvDvorak/BandcampMultitagSearch.git"
+  },
+  "keywords": [
+    "Bandcamp",
+    "search",
+    "tags"
+  ],
+  "author": "Andreas Wilcox",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/SvDvorak/BandcampMultitagSearch/issues"
+  },
+  "homepage": "https://github.com/SvDvorak/BandcampMultitagSearch",
+  "dependencies": {
+    "express": "^4.13.4",
+    "xmlhttprequest": "^1.8.0"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-less": "^3.1.0",
+    "gulp-livereload": "^3.8.1",
+    "jasmine": "^2.4.1"
+  }
+}
