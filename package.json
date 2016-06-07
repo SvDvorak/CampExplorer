@@ -22,7 +22,10 @@
   },
   "homepage": "https://github.com/SvDvorak/BandcampMultitagSearch",
   "dependencies": {
+    "body-parser": "^1.15.1",
     "express": "^4.13.4",
+    "request": "^2.72.0",
+    "request-promise": "^3.0.0",
     "xmlhttprequest": "^1.8.0"
   },
   "devDependencies": {

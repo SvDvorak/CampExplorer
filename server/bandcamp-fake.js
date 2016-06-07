@@ -1,19 +1,21 @@
 
-var albums = []
+module.exports = BandcampFake = function() {
+    this.albums = [];
+}
 
-module.exports = {
-    getAlbumsByTag: function (tag) {
-    	if(tag in albums)
-    	{
-	        return [ albums[tag] ];
-	    }
-	    else
-	    {
-	    	return [];
-	    }
+BandcampFake.prototype = {
+    getAlbumsForTag: function (tag) {
+        if(tag in this.albums)
+        {
+            return this.albums[tag];
+        }
+        else
+        {
+            return [];
+        }
     },
 
-    setAlbumForTag: function (tag, newAlbum) {
-        albums[tag] = newAlbum;
+    setAlbumsForTag: function (tag, tagAlbums) {
+        this.albums[tag] = tagAlbums;
     }
 };

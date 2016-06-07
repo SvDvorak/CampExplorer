@@ -1,4 +1,4 @@
-function Album(name, artist, image, link) {
+module.exports = Album = function(name, artist, image, link) {
   this.name = name;
   this.artist = artist;
   this.image = image;
@@ -14,5 +14,3 @@ Album.prototype.toString = function() {
       "  " + this.link;
   return ret;
 }
-
-module.exports = Album;

@@ -1,15 +1,18 @@
 var server = require("../server/server");
-var bandcampFake = require("../server/bandcamp-fake");
+var BandcampFake = require("../server/bandcamp-fake");
+var Cache = require("../server/album-cache");
 var Album = require("../api-types");
-
-var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+var localRequest = require("./local-request");
 
 describe("Server with cache", function() {
     beforeEach(function(done) {
-        server.start(bandcampFake);
-        setTimeout(function() {
-            done();
-        });
+        bandcamp = new BandcampFake();
+        var cache = new Cache(bandcamp);
+        server.start(cache, done);
+    });
+
+    afterEach(function(done) {
+        server.stop(done);
     });
 
     it("returns complete album", function(done) {
@@ -19,29 +22,46 @@ describe("Server with cache", function() {
             "www.imagelink.com",
             "www.albumlink.com");
 
-        bandcampFake.setAlbumForTag("tag", album);
+        bandcamp.setAlbumsForTag("tag", [ album ]);
 
-        requestAlbumsWithTag("tag", function(responseText) {
-            var albumsResponse = JSON.parse(responseText);
-            expect(albumsResponse.length).toBe(1);
-            var actualAlbum = albumsResponse[0];
-            expect(actualAlbum.name).toBe("Album name");
-            expect(actualAlbum.artist).toBe("Artist name");
-            expect(actualAlbum.image).toBe("www.imagelink.com");
-            expect(actualAlbum.link).toBe("www.albumlink.com");
+        localRequest([ "tag" ], function(albums) {
+            expect(albums.length).toBe(1);
+            var singleAlbum = albums[0];
+            expect(singleAlbum.name).toBe("Album name");
+            expect(singleAlbum.artist).toBe("Artist name");
+            expect(singleAlbum.image).toBe("www.imagelink.com");
+            expect(singleAlbum.link).toBe("www.albumlink.com");
             done();
-        });
+        }, function() { done(false); });
     });
 
-    var requestAlbumsWithTag = function(tag, onResponse) {
-        var xhr = new XMLHttpRequest();
-        xhr.open("GET", "http://localhost:8079/v1/tags/" + tag, true);
-        xhr.onreadystatechange = function() {
-            if(xhr.readyState == 4 && xhr.status == 200) {
-                onResponse(xhr.responseText);
-            }
-        }
+    it("returns albums with all requested tags", function(done) {
 
-        xhr.send();
+        bandcamp.setAlbumsForTag("tag1", [
+            linkOnlyAlbum("AllTagsAlbum"),
+            linkOnlyAlbum("SingleTagAlbum")
+            ]);
+
+        bandcamp.setAlbumsForTag("tag2", [
+            linkOnlyAlbum("AllTagsAlbum"),
+            ]);
+
+
+        localRequest([ "tag1", "tag2" ], function(albums) {
+            expect(albums.length).toBe(1);
+            expect(albums[0].link).toBe("AllTagsAlbum");
+            done();
+        }, function() { done(false); });
+
+    });
+
+    it("returns tags format incorrect when tags malformed", function(done) {
+        localRequest({ },
+            function() { done() },
+            function() { done(false) })
+    }, 1000);
+
+    var linkOnlyAlbum = function(linkText) {
+        return new Album("", "", "", linkText);
     }
 });
