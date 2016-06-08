@@ -11,8 +11,9 @@ module.exports = function(tags, onResponse, onFailure) {
     };
 
     request(options, function(error, response, data) {
-        if(error) {
-            onFailure(error);
+        if(response.statusCode != 200) {
+            onFailure(data.error, response.statusCode);
+            return;
         }
 
         onResponse(data);

@@ -1,4 +1,3 @@
-var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 var request = require("request");
 var fs = require('fs');
 
@@ -71,40 +70,3 @@ function requestAlbumsPage(options)
 }
 
 requestAlbumsPage(options);
-
-var requestAlbumsWithTag = function(tag, page, onResponse) {
-    /*var xhr = createRequestObject();
-    xhr.onreadystatechange = function() {
-    	console.log("State " + xhr.readyState + " Status " + xhr.status);
-        if(xhr.readyState != 4)
-        {
-            return;
-        }
-
-        if(xhr.status == 200) {
-            onResponse(JSON.parse(xhr.responseText));
-        }
-        else if(xhr.status != 0)
-        {
-            onFailure(false);
-        }
-    }
-
-    var parameters =
-    {
-    	"s": "top",
-		"p": page,
-		"t": tag
-	};
-
-    xhr.send(JSON.stringify(parameters));*/
-}
-
-var createRequestObject = function() {
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", "https://bandcamp.com/api/discover/2/get");
-    xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-
-    return xhr;
-}
-

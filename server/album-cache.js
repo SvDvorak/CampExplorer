@@ -22,6 +22,10 @@ Cache.prototype = {
 
         return foundAlbums;
     },
+    hasCached: function(tags) {
+        var api = this.albumApi;
+        return tags.every(function(tag) { return api.getAlbumsForTag(tag).length > 0; });
+    }
 };
 
 function group(list, prop) {  

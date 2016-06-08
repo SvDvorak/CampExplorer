@@ -32,7 +32,7 @@ describe("Server with cache", function() {
             expect(singleAlbum.image).toBe("www.imagelink.com");
             expect(singleAlbum.link).toBe("www.albumlink.com");
             done();
-        }, function() { done(false); });
+        }, function() { done.fail("Should not fail to get albums for request"); });
     });
 
     it("returns albums with all requested tags", function(done) {
@@ -51,15 +51,29 @@ describe("Server with cache", function() {
             expect(albums.length).toBe(1);
             expect(albums[0].link).toBe("AllTagsAlbum");
             done();
-        }, function() { done(false); });
-
+        }, function() { done.fail("Should not fail to get albums for request"); });
     });
 
     it("returns tags format incorrect when tags malformed", function(done) {
         localRequest({ },
-            function() { done() },
-            function() { done(false) })
-    }, 1000);
+            function() { done.fail("Request with malformed data should not return successfully"); },
+            function(error, status) {
+                expect(status).toBe(400);
+                expect(error).toBe("Unable to parse request data");
+                done();
+            });
+    });
+
+    it("returns tag not cached when requested uncached tag", function(done) {
+        localRequest(
+            [ "tag" ],
+            function(data) { done.fail("Request for uncached tag should return as error"); },
+            function(error, status) {
+                expect(status).toBe(400);
+                expect(error).toBe("Tag not cached, try again later");
+                done();
+            });
+    });
 
     var linkOnlyAlbum = function(linkText) {
         return new Album("", "", "", linkText);

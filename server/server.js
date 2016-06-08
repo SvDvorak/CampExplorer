@@ -14,7 +14,14 @@ module.exports = {
             if(request.body.constructor !== Array)
             {
                 res.status(400);
-                res.send();
+                res.send({ error: "Unable to parse request data" });
+                return;
+            }
+
+            if(!albumCache.hasCached(request.body))
+            {
+                res.status(400);
+                res.send({ error: "Tag not cached, try again later" });
                 return;
             }
 
