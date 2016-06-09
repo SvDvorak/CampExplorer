@@ -75,27 +75,29 @@ describe("Server with cache", function() {
 
         localRequest({ },
             function() { done.fail("Request with malformed data should not return successfully"); },
-            function(error, status) {
+            function(data, status) {
                 expect(status).toBe(400);
-                expect(error).toBe("Unable to parse request data");
+                expect(data.error).toBe("Unable to parse request data");
                 done();
             });
     });
 
     it("returns tag not cached when requesting uncached tag, caches and returns tag albums on subsequent request", function(done) {
-        bandcamp.setAlbumsForTag("tag", [
+        bandcamp.setAlbumsForTag("musicTag", [
             linkOnlyAlbum("Album")
             ]);
 
-        localRequest([ "tag" ],
+        localRequest([ "musicTag" ],
             function(data) { done.fail("Request for uncached tag should return as error"); },
-            function(error, status) {
+            function(errorData, status) {
                 expect(status).toBe(400);
-                expect(error).toBe("Tag not cached, try again later");
+                expect(errorData.error).toBe("Tags not cached, try again later");
+                expect(errorData.code).toBe("NOT_CACHED");
+                expect(errorData.data).toEqual([ "musicTag" ]);
                 done();
             });
 
-        localRequest([ "tag" ], function(albums) {
+        localRequest([ "musicTag" ], function(albums) {
             expect(albums[0].link).toBe("Album");
             done();
         }, requestShouldNotFail(done));

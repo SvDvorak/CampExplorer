@@ -60,13 +60,13 @@ describe("Album cache", function() {
     	expect(actualAlbums).toEqual([ expectedAlbum ]);
     });
 
-    it("has cached tag when bandcamp has results for tag", function() {
-        setAlbumsForTag("tag", [ new Album("Album") ]);
-
-    	expect(sut.hasCached([ "tag" ])).toBe(true);
+    it("returns uncached for tags not already cached", function() {
+    	expect(sut.filterUncached([ "tag" ])).toEqual([ "tag" ]);
     });
 
-    it("does not have cached tag when bandcamp has no results for tag", function() {
-    	expect(sut.hasCached([ "tag" ])).toBe(false);
+    it("returns empty when all tags are cached", function() {
+        setAlbumsForTag("tag", [ new Album("Album") ]);
+
+        expect(sut.filterUncached([ "tag" ])).toEqual([ ]);
     });
 });

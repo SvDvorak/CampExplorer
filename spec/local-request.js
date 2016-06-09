@@ -12,7 +12,7 @@ module.exports = function(tags, onResponse, onFailure) {
 
     request(options, function(error, response, data) {
         if(response.statusCode != 200) {
-            onFailure(data.error, response.statusCode);
+            onFailure(data, response.statusCode);
             return;
         }
 

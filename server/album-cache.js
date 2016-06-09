@@ -18,9 +18,9 @@ Cache.prototype = {
             .filter(function(x) { return x.length == tags.length; })
             .map(function(x) { return x[0] });
     },
-    hasCached: function(tags) {
+    filterUncached: function(tags) {
         var albums = this.albums;
-        return tags.every(function(tag) { return tag in albums; });
+        return tags.filter(function(tag) { return !(tag in albums); });
     },
 };
 

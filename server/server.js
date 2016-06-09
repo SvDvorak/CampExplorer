@@ -18,10 +18,15 @@ module.exports = {
                 return;
             }
 
-            if(!albumCache.hasCached(request.body))
+            var uncached = albumCache.filterUncached(request.body);
+            if(uncached.length > 0)
             {
                 res.status(400);
-                res.send({ error: "Tag not cached, try again later" });
+                res.send({
+                    error: "Tags not cached, try again later",
+                    code: "NOT_CACHED",
+                    data: uncached
+                });
                 updater.queueTags(request.body);
                 return;
             }
