@@ -1,19 +1,26 @@
 var server = require("../server/server");
 var BandcampFake = require("../server/bandcamp-fake");
 var Cache = require("../server/album-cache");
+var CacheUpdater = require("../server/cache-updater");
 var Album = require("../api-types");
 var localRequest = require("./local-request");
 
-var requestShouldNotFail = function(done) { return function() { done.fail("Should not fail to get albums for request"); } }
+var requestShouldNotFail = function(done) { return function(data, error) {
+    done.fail("Should not fail to get albums for request.\n" +
+        "Error: " + error + "\n" +
+        "Data: " + data);
+} }
 
 describe("Server with cache", function() {
     var bandcamp;
     var cache;
+    var updater;
 
     beforeEach(function(done) {
         bandcamp = new BandcampFake();
-        cache = new Cache(bandcamp);
-        server.start(cache, done);
+        cache = new Cache();
+        updater = new CacheUpdater(cache, bandcamp);
+        server.start(cache, updater, done);
     });
 
     afterEach(function(done) {
@@ -28,7 +35,7 @@ describe("Server with cache", function() {
             "www.albumlink.com");
 
         bandcamp.setAlbumsForTag("tag", [ album ]);
-        cache.updateTags(["tag"]);
+        updater.queueTags(["tag"]);
 
         localRequest([ "tag" ], function(albums) {
             expect(albums.length).toBe(1);
@@ -51,7 +58,7 @@ describe("Server with cache", function() {
             linkOnlyAlbum("AllTagsAlbum"),
             ]);
 
-        cache.updateTags(["tag1", "tag2"]);
+        updater.queueTags(["tag1", "tag2"]);
 
         localRequest([ "tag1", "tag2" ], function(albums) {
             expect(albums.length).toBe(1);

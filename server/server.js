@@ -1,12 +1,10 @@
 var server;
-var albumCache;
 
 module.exports = {
-    start: function (newAlbumCache, startedCallback) {
+    start: function (albumCache, updater, startedCallback) {
         var express = require("express");
         var bodyParser = require("body-parser");
         var app = express();
-        albumCache = newAlbumCache;
 
         const PORT=8079; 
 
@@ -24,7 +22,7 @@ module.exports = {
             {
                 res.status(400);
                 res.send({ error: "Tag not cached, try again later" });
-                albumCache.updateTags(request.body);
+                updater.queueTags(request.body);
                 return;
             }
 

@@ -1,7 +1,7 @@
 
-module.exports = Cache = function (albumApi) {
-    this.albumApi = albumApi;
+module.exports = Cache = function () {
     this.albums = { };
+    this.inProgress = [];
 };
 
 Cache.prototype = {
@@ -19,21 +19,9 @@ Cache.prototype = {
             .map(function(x) { return x[0] });
     },
     hasCached: function(tags) {
-        var api = this.albumApi;
         var albums = this.albums;
         return tags.every(function(tag) { return tag in albums; });
     },
-    updateTags: function(tags) {
-        var api = this.albumApi;
-        var albums = this.albums;
-        tags
-            .filter(function(tag) { return !(tag in albums || api.inProgress.indexOf(tag) != -1); })
-            .forEach(function(tag) {
-                api.getAlbumsForTag(tag, function(newAlbums) {
-                    albums[tag] = newAlbums
-                });
-        });
-    }
 };
 
 function flatten(list) {
