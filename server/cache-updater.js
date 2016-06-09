@@ -25,6 +25,7 @@ CacheUpdater.prototype = {
                 cache.albums[tag] = newAlbums;
                 updater.removeFromQueue(tag);
                 updater.inProgress = undefined;
+                updater.log("Finished " + tag);
 
                 updater.runUpdate();
             });

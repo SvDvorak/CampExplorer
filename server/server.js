@@ -27,7 +27,7 @@ module.exports = {
                     code: "NOT_CACHED",
                     data: uncached
                 });
-                updater.queueTags(request.body);
+                updater.queueTags(uncached);
                 return;
             }
 
