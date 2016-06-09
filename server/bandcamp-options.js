@@ -1,4 +1,4 @@
-module.exports = function(tag, page) {
+module.exports = createOptions = function(tag, page) {
 	var options = {
 	method: "POST",
 	uri: "https://bandcamp.com/api/discover/2/get",

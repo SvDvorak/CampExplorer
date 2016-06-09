@@ -1,10 +1,12 @@
 var server;
+var albumCache;
 
 module.exports = {
-    start: function (albumCache, startedCallback) {
+    start: function (newAlbumCache, startedCallback) {
         var express = require("express");
         var bodyParser = require("body-parser");
         var app = express();
+        albumCache = newAlbumCache;
 
         const PORT=8079; 
 
@@ -22,6 +24,7 @@ module.exports = {
             {
                 res.status(400);
                 res.send({ error: "Tag not cached, try again later" });
+                albumCache.updateTags(request.body);
                 return;
             }
 
@@ -32,12 +35,11 @@ module.exports = {
         });
 
         server = app.listen(PORT, function(){
-            console.log("Server listening on: http://localhost:%s", PORT);
             startedCallback();
         });
       },
 
     stop: function(stoppedCallback) {
         server.close(stoppedCallback);
-    }
+    },
 };

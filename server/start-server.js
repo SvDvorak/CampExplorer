@@ -1,9 +1,9 @@
 var Cache = require("./album-cache");
-var bandcampApi = require("../server/bandcamp-fake");
+var BandcampApi = require("../server/bandcamp");
 
-var cache = new Cache(bandcampApi);
+var cache = new Cache(new BandcampApi());
 
 require('./server')
 	.start(
 		cache,
-		function() { });
+		function() { console.log("Server listening on: http://localhost")});
