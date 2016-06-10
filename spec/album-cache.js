@@ -1,10 +1,8 @@
 var Cache = require("../server/album-cache");
-var BandcampFake = require("../server/bandcamp-fake");
 var Album = require("../api-types");
 
 describe("Album cache", function() {
 	var sut;
-	var bandcamp;
 	var disusedAlbum;
 	var disusedTag
 

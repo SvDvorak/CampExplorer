@@ -1,51 +1,81 @@
 var request = require("request");
-var createOptions = require("./bandcamp-options");
+var options = require("./bandcamp-options");
 var Album = require("../api-types");
 
 module.exports = Bandcamp = function() {
 }
 
-var TagRequest = function(tag, callback) {
+var AlbumsRequest = function(tag, successCallback, errorCallback) {
 	this.albums = [];
 	this.tag = tag;
-	this.callback = callback;
+	this.successCallback = successCallback;
+	this.errorCallback = errorCallback;
 	this.page = 0;
 	this.maxIndex = 1;
+	this.errorCount = 0;
 }
 
 Bandcamp.prototype = {
-    getAlbumsForTag: function (tag, callback) {
-    	this.getAlbumsForTagRecursive(new TagRequest(tag, callback));
+    getAlbumsForTag: function (tag, successCallback, errorCallback) {
+    	this.getAlbumsForTagRecursive(new AlbumsRequest(tag, successCallback, errorCallback));
     },
 
-    getAlbumsForTagRecursive: function (tagRequest) {
-    	var options = createOptions(tagRequest.tag, tagRequest.page);
+    getAlbumsForTagRecursive: function (albumsRequest) {
+    	var albumsOptions = options.createAlbumsOptions(albumsRequest.tag, albumsRequest.page);
 		var api = this;
 
-        request(options, function(error, response, data) {
-			if(error) {
-				return console.error("read failed on page " + data.args.p + " with error: " + error);
-			}
+        request(albumsOptions, function(error, response, data) {
+			if(error || response.statusCode != 200) {
 
-			if(response.statusCode != 200)
-			{
-				console.log("not status 200");
+				if(response.statusCode == 503 && albumsRequest.errorCount < 3)
+				{
+					albumsRequest.errorCount += 1;
+					setTimeout(
+						function() { api.getAlbumsForTagRecursive(albumsRequest); },
+						100);
+					return;
+				}
+
+				console.error("Album retrieval failed on page " + albumsRequest.page +
+					"\nStatuscode: " + response.statusCode +
+					"\nError: " + error);
+
+				albumsRequest.errorCallback();
 				return;
 			}
 
-			tagRequest.albums = tagRequest.albums.concat(
+			albumsRequest.errorCount = 0;
+			albumsRequest.albums = albumsRequest.albums.concat(
 				data.items.map(function(x) { return api.convertToAlbum(x); }));
-			tagRequest.maxIndex = Math.ceil(data.total_count/48.0);
-			tagRequest.page += 1;
+			albumsRequest.maxIndex = Math.ceil(data.total_count/48.0);
+			albumsRequest.page += 1;
 
-			if(tagRequest.page > tagRequest.maxIndex)
+			if(albumsRequest.page > albumsRequest.maxIndex)
 			{
-				tagRequest.callback(tagRequest.albums);
+				albumsRequest.successCallback(albumsRequest.albums);
 			}
 			else
 			{
-				api.getAlbumsForTagRecursive(tagRequest);
+				api.getAlbumsForTagRecursive(albumsRequest);
 			}
+		});
+    },
+
+    getTagsForAlbum: function(album, successCallback) {
+    	var tagsOptions = options.createTagsOptions(album.bandId, album.albumId);
+		var api = this;
+
+        request(tagsOptions, function(error, response, data) {
+			if(error || response.statusCode != 200) {
+				console.error("Unable to get tags for " + album +
+					"\nStatuscode: " + response.statusCode +
+					"\nError: " + error);
+
+				return;
+			}
+
+			var tagNames = data.tags.map(function(tag) { return tag.norm_name; });
+			successCallback(tagNames);
 		});
     },
 
@@ -55,7 +85,9 @@ Bandcamp.prototype = {
 			bandcampAlbum.primary_text,
 			bandcampAlbum.secondary_text,
 			"https://f4.bcbits.com/img/a" + bandcampAlbum.art_id + "_11.jpg",
-			"https://" + albumUrl.subdomain + ".bandcamp.com/album/" + albumUrl.slug);
+			"https://" + albumUrl.subdomain + ".bandcamp.com/album/" + albumUrl.slug,
+			bandcampAlbum.band_id,
+			bandcampAlbum.id);
 
 		return album;
 	}

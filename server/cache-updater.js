@@ -11,7 +11,7 @@ module.exports = CacheUpdater = function(cache, albumApi, log) {
 }
 
 CacheUpdater.prototype = { 
-	runUpdate: function() {
+	runUpdate: function(onTagAlbumsUpdated) {
 		var updater = this;
 		var cache = this.cache;
 		var albumApi = this.albumApi;
@@ -27,17 +27,26 @@ CacheUpdater.prototype = {
                 updater.inProgress = undefined;
                 updater.log("Finished " + tag);
 
+            	if(onTagAlbumsUpdated != undefined)
+            	{
+            		onTagAlbumsUpdated(newAlbums);
+            	}
+
                 updater.runUpdate();
+            }, function() {
+                updater.inProgress = undefined;
+
+            	updater.runUpdate();
             });
         }
 	},
 
-	queueTags: function(tags) {
+	queueTags: function(tags, onTagAlbumsUpdated) {
 		var updater = this;
 		updater.queue = updater.queue.concat(
 			tags.filter(function(tag) { return updater.queue.indexOf(tag) == -1; }));
 
-		this.runUpdate();
+		this.runUpdate(onTagAlbumsUpdated);
 	},
 
     removeFromQueue: function(tag) {

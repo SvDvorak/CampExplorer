@@ -32,7 +32,9 @@ describe("Server with cache", function() {
             "Album name",
             "Artist name",
             "www.imagelink.com",
-            "www.albumlink.com");
+            "www.albumlink.com",
+            "123456789",
+            "987654321");
 
         bandcamp.setAlbumsForTag("tag", [ album ]);
         updater.queueTags(["tag"]);
@@ -44,6 +46,8 @@ describe("Server with cache", function() {
             expect(singleAlbum.artist).toBe("Artist name");
             expect(singleAlbum.image).toBe("www.imagelink.com");
             expect(singleAlbum.link).toBe("www.albumlink.com");
+            expect(singleAlbum.bandId).toBe("123456789");
+            expect(singleAlbum.albumId).toBe("987654321");
             done();
         }, requestShouldNotFail(done));
     });
@@ -104,6 +108,8 @@ describe("Server with cache", function() {
     });
 
     var linkOnlyAlbum = function(linkText) {
-        return new Album("", "", "", linkText);
+        var album = new Album();
+        album.link = linkText;
+        return album;
     }
 });

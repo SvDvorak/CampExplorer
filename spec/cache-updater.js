@@ -6,14 +6,16 @@ describe("Cache updater", function() {
 	var cache;
 	var sut;
 	var dataReturnedCallback;
+	var errorCallback;
 	var tagsRequested = [];
 
 	beforeEach(function() {
 		tagsRequested = [];
 		bandcamp = {
-			getAlbumsForTag: function(tag, callback) {
+			getAlbumsForTag: function(tag, success, error) {
 				tagsRequested.push(tag);
-				dataReturnedCallback = callback;
+				dataReturnedCallback = success;
+				errorCallback = error;
 		}};
     	cache = { albums: {} };
 		sut = new CacheUpdater(cache, bandcamp, function(text) { });
@@ -29,6 +31,13 @@ describe("Cache updater", function() {
 		sut.queueTags(["tag"]);
 		sut.runUpdate();
 		sut.runUpdate();
+
+		expect(tagsRequested.length).toBe(1);
+	});
+
+	it("ignores tags that have already been cached", function() {
+		sut.queueTags(["tag"]);
+		sut.queueTags(["tag"]);
 
 		expect(tagsRequested.length).toBe(1);
 	});
@@ -66,5 +75,22 @@ describe("Cache updater", function() {
 		dataReturnedCallback();
 
 		expect(tagsRequested).toEqual(tags1.concat(tags2));
+	});
+
+	it("calls tag albums updated event", function() {
+		var tags = [ "tag" ]
+		var callbackCalled = false;
+		sut.queueTags(tags, function(albums) { callbackCalled = true; });
+		dataReturnedCallback([ "Album" ]);
+
+		expect(callbackCalled).toBe(true);
+	});
+
+	it("retries updating when request fails", function() {
+		sut.queueTags([ "tag1" ]);
+
+		errorCallback();
+
+		expect(tagsRequested).toEqual([ "tag1", "tag1" ]);
 	});
 });

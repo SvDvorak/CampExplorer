@@ -11,3 +11,7 @@ bandcamp.getAlbumsForTag("sweden", function(albums) {
 		    console.log("The file was saved!");
 		});
 });
+
+bandcamp.getTagsForAlbum({ "bandId": 130700501, "albumId": 3087966927 }, function(tags) {
+	console.log(tags);
+});

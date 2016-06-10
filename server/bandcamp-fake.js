@@ -23,4 +23,8 @@ BandcampFake.prototype = {
     setAlbumsForTag: function (tag, tagAlbums) {
         this.albums[tag] = tagAlbums;
     },
+
+    getTagsForAlbum: function (album, callback) {
+        callback(album.tags || []);
+    }
 };
