@@ -29,7 +29,7 @@ describe("Server performance", function() {
         updater.queueTags(["pop", "rock"]);
 
     	localRequest([ "pop", "rock" ], function(albums) {
-            expect(albums.length).toBe(499);
+            expect(albums.length).toBe(50);
             done();
         }, function() { done(false); });
     }, 300);

@@ -106,6 +106,22 @@ describe("Server with cache", function() {
         }, requestShouldNotFail(done));
     });
 
+    it("returns a maximum of 50 albums", function(done) {
+        var albums = [];
+        for(i = 0; i < 500; i++)
+        {
+            albums.push(linkOnlyAlbum("Album" + i));
+        }
+
+        bandcamp.setAlbumsForTag("tag", albums);
+        updater.queueTags([ "tag" ]);
+
+        localRequest([ "tag" ], function(albums) {
+            expect(albums.length).toBe(50);
+            done();
+        }, requestShouldNotFail(done));
+    });
+
     var linkOnlyAlbum = function(linkText) {
         var album = new Album();
         album.link = linkText;

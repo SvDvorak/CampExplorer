@@ -39,7 +39,10 @@ module.exports = {
                 return;
             }
 
-            var albums = albumCache.getAlbumsByTags(request.body);
+            var albums = albumCache
+                .getAlbumsByTags(request.body)
+                .slice(0, 50);
+
             res.setHeader("Content-Type", "application/json");
             res.setHeader("Access-Control-Allow-Origin", "*");
             res.status(200);
