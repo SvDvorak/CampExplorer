@@ -11,7 +11,7 @@
     <script src="popup.js"></script>
     <link rel="stylesheet" href="spinner.css" type="text/css" />
     <link rel="stylesheet" href="style.css" type="text/css" />
-    <link rel="stylesheet" href="../octicons/octicons.css">
+    <link rel="stylesheet" href="octicons/octicons.css">
   </head>
   <body ng-controller="tagsController">
     <div>
@@ -21,9 +21,9 @@
       </form>
     </div>
     <ul class="tags">
-      <li class="tag" ng-repeat="tagAlbum in tagAlbums track by tagAlbum.tag">
-        <a href="https://bandcamp.com/tag/{{ tagAlbum.tag }}" target="_blank" class="tag_name">{{ tagAlbum.tag }}</a>
-        <span class="tag_remove" ng-click="removeTag(tagAlbum)">X</span>
+      <li class="tag" ng-repeat="tag in tags">
+        <a href="https://bandcamp.com/tag/{{ tag }}" target="_blank" class="tag_name">{{ tag }}</a>
+        <span class="tag_remove" ng-click="removeTag(tag)">X</span>
       </li>
     </ul>
     <div class="spinner" ng-show="searchesInProgress > 0">
@@ -44,6 +44,6 @@
         </a>
       </li>
     </ul>
-    <p class="noResults" ng-show="tagAlbums.length != 0 && albums.length == 0 && searchesInProgress <= 0">No albums found</p>
+    <p class="noResults" ng-show="tags.length != 0 && albums.length == 0 && searchesInProgress <= 0">No albums found</p>
   </body>
 </html>
