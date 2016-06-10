@@ -1,18 +1,19 @@
 var bandcampMultiTag = angular.module('multiTagApp', [])
-.config([
-  	'$compileProvider',
-  	function ($compileProvider) {
-      	//  Default imgSrcSanitizationWhitelist: /^\s*((https?|ftp|file|blob):|data:image\/)/
-      	$compileProvider.imgSrcSanitizationWhitelist(/^\s*((https?|ftp|file|blob|chrome-extension):|data:image\/)/);
-  }
+    .config([
+    	'$compileProvider',
+    	function ($compileProvider) {
+        	//  Default imgSrcSanitizationWhitelist: /^\s*((https?|ftp|file|blob):|data:image\/)/
+        	$compileProvider.imgSrcSanitizationWhitelist(/^\s*((https?|ftp|file|blob|chrome-extension):|data:image\/)/);
+    }
 ]);
 
 bandcampMultiTag.controller('tagsController', function ($scope) {
-  	$scope.albums = [];
-  	$scope.searchesInProgress = 0;
-  	$scope.retryCount = 0;
+    $scope.albums = [];
+  	$scope.isSearching = false;
+  	$scope.retryTime = 5;
 
   	$scope.tags = [];
+    $scope.uncachedTags = [];
 
   	$scope.addInputTag = function() {
   	    var newTag = $scope.newTag.replace(" ", "-");
@@ -36,22 +37,37 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
   	};
 
   	$scope.searchTags = function() {
+        $scope.isSearching = true;
     		$scope.makeRequest($scope.tags, function(albums) {
             $scope.$apply(() => {
-            $scope.albums = albums;
+                $scope.uncachedTags = [];
                 $scope.albums = albums;
+                $scope.isSearching = false;
             });
     		});
   	};
 
   	$scope.makeRequest = function(tags, onDone) {
-  		var xhr = new XMLHttpRequest();
+    		var xhr = new XMLHttpRequest();
   	    xhr.open("POST", "http://localhost:8079/v1/albums", true);
   	    xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
   	    xhr.onreadystatechange = () => {
-  	        if(xhr.readyState == 4 && xhr.status == 200) {
-  	        	onDone(JSON.parse(xhr.responseText));
+            if(xhr.readyState != 4) {
+                return;
+            }
+
+  	        if(xhr.status == 200) {
+  	        	  onDone(JSON.parse(xhr.responseText));
   	        }
+            else if(xhr.status == 202) {
+                $scope.$apply(() => {
+                  $scope.uncachedTags = JSON.parse(xhr.responseText).data;
+                });
+
+                setTimeout(() => {
+                    $scope.makeRequest(tags, onDone);
+                }, $scope.retryTime*1000);
+            }
   	    }
 
   	    xhr.send(JSON.stringify(tags));

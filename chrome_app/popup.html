@@ -26,14 +26,14 @@
         <span class="tag_remove" ng-click="removeTag(tag)">X</span>
       </li>
     </ul>
-    <div class="spinner" ng-show="searchesInProgress > 0">
+    <div class="spinner" ng-show="isSearching">
       <div class="throbber-loader">
         Loading…
       </div>
       <span class="octicon octicon-issue-opened"
-        ng-show="retryCount > 0"
+        ng-show="uncachedTags.length > 0"
         data-toggle="tooltip"
-        title="Bandcamp is throttling searches, results may take longer to find"></span>
+        title="{{ uncachedTags }} are being cached on server, will retry every {{ retryTime }} seconds"></span>
     </div>
     <ul class="albums">
       <li class="album" ng-repeat="album in albums track by $index">

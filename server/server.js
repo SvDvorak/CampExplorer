@@ -30,10 +30,9 @@ module.exports = {
             var uncached = albumCache.filterUncached(request.body);
             if(uncached.length > 0)
             {
-                res.status(400);
+                res.status(202);
                 res.send({
                     error: "Tags not cached, try again later",
-                    code: "NOT_CACHED",
                     data: uncached
                 });
                 updater.queueTags(uncached);

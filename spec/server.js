@@ -94,9 +94,8 @@ describe("Server with cache", function() {
         localRequest([ "musicTag" ],
             function(data) { done.fail("Request for uncached tag should return as error"); },
             function(errorData, status) {
-                expect(status).toBe(400);
+                expect(status).toBe(202);
                 expect(errorData.error).toBe("Tags not cached, try again later");
-                expect(errorData.code).toBe("NOT_CACHED");
                 expect(errorData.data).toEqual([ "musicTag" ]);
                 done();
             });
