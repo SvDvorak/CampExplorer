@@ -37,7 +37,6 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
 
   	$scope.searchTags = function() {
     		$scope.makeRequest($scope.tags, function(albums) {
-            console.log(albums);
             $scope.$apply(() => {
             $scope.albums = albums;
                 $scope.albums = albums;
