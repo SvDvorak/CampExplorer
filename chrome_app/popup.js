@@ -19,6 +19,12 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
   	$scope.retryTime = 5;
   	$scope.tags = [];
 
+    chrome.storage.local.get({ 'lastUsedTags' : [] }, result => {
+        $scope.$apply(() => {
+            result.lastUsedTags.forEach(x => { $scope.addTag(x); });
+        });
+    });
+
   	$scope.addInputTag = function() {
   	    var newTag = $scope.newTag.replace(" ", "-");
   	    $scope.addTag(newTag);
@@ -42,6 +48,7 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
 
   	$scope.searchTags = function() {
         $scope.isSearching = true;
+        chrome.storage.local.set({ lastUsedTags: $scope.tags.map(x => x.name) });
     		$scope.makeRequest($scope.tags.map(x => x.name), function(albums) {
             $scope.$apply(() => {
                 $scope.albums = albums;
