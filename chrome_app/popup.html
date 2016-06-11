@@ -22,7 +22,8 @@
     </div>
     <ul class="tags">
       <li class="tag" ng-repeat="tag in tags">
-        <a href="https://bandcamp.com/tag/{{ tag }}" target="_blank" class="tag_name">{{ tag }}</a>
+        <a href="https://bandcamp.com/tag/{{ tag.name }}" target="_blank" class="tag_name">{{ tag.name }}</a>
+        <span class="tag_caching" ng-show="tag.isCaching">- not cached</span>
         <span class="tag_remove" ng-click="removeTag(tag)">X</span>
       </li>
     </ul>
@@ -31,9 +32,10 @@
         Loading…
       </div>
       <span class="octicon octicon-issue-opened"
-        ng-show="uncachedTags.length > 0"
+        ng-show="isCachingTags"
         data-toggle="tooltip"
-        title="{{ uncachedTags }} are being cached on server, will retry every {{ retryTime }} seconds"></span>
+        title="Tags are being cached on server, will retry every {{ retryTime }} seconds">
+      </span>
     </div>
     <ul class="albums">
       <li class="album" ng-repeat="album in albums track by $index">

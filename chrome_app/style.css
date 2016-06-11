@@ -78,6 +78,10 @@ ul {
 		text-decoration: underline;
 	}
 
+.tag_caching {
+	display: inline;
+}
+
 .tag_remove {
 	float: right;
 	color: #FFA366;

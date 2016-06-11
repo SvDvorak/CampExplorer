@@ -7,13 +7,17 @@ var bandcampMultiTag = angular.module('multiTagApp', [])
     }
 ]);
 
+function Tag(name) {
+    this.name = name;
+    this.isCaching = false;
+}
+
 bandcampMultiTag.controller('tagsController', function ($scope) {
     $scope.albums = [];
   	$scope.isSearching = false;
+    $scope.isCachingTags = false;
   	$scope.retryTime = 5;
-
   	$scope.tags = [];
-    $scope.uncachedTags = [];
 
   	$scope.addInputTag = function() {
   	    var newTag = $scope.newTag.replace(" ", "-");
@@ -22,8 +26,8 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
    	};
 
    	$scope.addTag = function(tag) {
-  	    if($scope.tags.indexOf(tag) == -1) {
-    	      $scope.tags.push(tag);
+  	    if($scope.tags.map(x => x.name).indexOf(tag) == -1) {
+    	      $scope.tags.push(new Tag(tag));
     	      $scope.searchTags();
   	    }
   	};
@@ -38,10 +42,11 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
 
   	$scope.searchTags = function() {
         $scope.isSearching = true;
-    		$scope.makeRequest($scope.tags, function(albums) {
+    		$scope.makeRequest($scope.tags.map(x => x.name), function(albums) {
             $scope.$apply(() => {
-                $scope.uncachedTags = [];
                 $scope.albums = albums;
+                $scope.isCachingTags = false;
+                $scope.tags.forEach(x => x.isCaching = false);
                 $scope.isSearching = false;
             });
     		});
@@ -60,8 +65,15 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
   	        	  onDone(JSON.parse(xhr.responseText));
   	        }
             else if(xhr.status == 202) {
+                var uncachedTags = JSON.parse(xhr.responseText).data;
                 $scope.$apply(() => {
-                  $scope.uncachedTags = JSON.parse(xhr.responseText).data;
+                  $scope.isCachingTags = true;
+                  uncachedTags.forEach(tag => {
+                      var matchingIndex = $scope.tags.map(x => x.name).indexOf(tag);
+                      if(matchingIndex != -1) {
+                          $scope.tags[matchingIndex].isCaching = true;
+                      }
+                  })
                 });
 
                 setTimeout(() => {
