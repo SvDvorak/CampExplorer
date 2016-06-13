@@ -14,4 +14,4 @@ require("./server")
 		function() { console.log("Server listening on: http://localhost")});
 
 var seeder = new Seeder(updater, bandcamp);
-seeder.seed("svensk");
+//seeder.seed("svensk");

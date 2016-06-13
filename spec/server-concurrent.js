@@ -1,5 +1,5 @@
 var server = require("../server/server");
-var BandcampFake = require("../server/bandcamp-fake");
+var BandcampFake = require("./bandcamp-fake");
 var Cache = require("../server/album-cache");
 var CacheUpdater = require("../server/cache-updater");
 var Album = require("../api-types");

@@ -29,7 +29,7 @@
         The only downside is that it relies on tags having been cached already so any tag not previously searched for will take while longer (up to a minute).
         </br></br>
         The interface will show which tag is being cached and you don't need to leave the app open while it caches, you can close and come back to it if you want to.</p>
-        <span ng-click="showVersionChanges = false" class="close_changes">Close</span>
+        <span ng-click="showVersionChanges = false" class="close_changes">Gotcha</span>
       </div>
     </div>
     <div ng-show="showReviewSuggestionNow" class="review">
@@ -51,15 +51,12 @@
         <span class="tag_remove" ng-click="removeTag(tag)">X</span>
       </li>
     </ul>
+    <p ng-show="serverUnreachable" class="server_message">Sorry, unable to reach server at the moment, will keep on retrying</p>
+    <p ng-show="isCachingTags" class="server_message">Tags are being cached on server, will retry every {{ retryTime }} seconds</p>
     <div class="spinner" ng-show="isSearching">
       <div class="throbber-loader">
         Loading…
       </div>
-      <span class="octicon octicon-issue-opened"
-        ng-show="isCachingTags"
-        data-toggle="tooltip"
-        title="Tags are being cached on server, will retry every {{ retryTime }} seconds">
-      </span>
     </div>
     <ul class="albums">
       <li class="album" ng-repeat="album in albums track by $index">

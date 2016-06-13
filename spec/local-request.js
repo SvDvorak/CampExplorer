@@ -11,11 +11,11 @@ module.exports = function(tags, onResponse, onFailure) {
     };
 
     request(options, function(error, response, data) {
-        if(response.statusCode != 200) {
-            onFailure(data, response.statusCode);
+        if(response.statusCode == 200) {
+            onResponse(data);
             return;
         }
 
-        onResponse(data);
+        onFailure(data, response.statusCode);
     });
 }

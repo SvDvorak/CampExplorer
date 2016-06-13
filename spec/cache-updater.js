@@ -1,4 +1,4 @@
-var BandcampFake = require("../server/bandcamp-fake");
+var BandcampFake = require("./bandcamp-fake");
 var CacheUpdater = require("../server/cache-updater");
 
 describe("Cache updater", function() {

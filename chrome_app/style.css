@@ -128,7 +128,6 @@ ul {
 
 .tag {
 	border-bottom: 1px solid #EFEFEF;
-	color: #264E59;
 	padding: 10px 0px;
 	font-size: 12px;
 }
@@ -146,19 +145,20 @@ ul {
 		text-decoration: underline;
 	}
 
-.tag_caching {
-	display: inline;
-}
+	.tag_caching {
+		color: #264E59;
+		display: inline;
+	}
 
-.tag_remove {
-	float: right;
-	color: #FFA366;
-	cursor: pointer;
-}
+	.tag_remove {
+		float: right;
+		color: #FFA366;
+		cursor: pointer;
+	}
 
-.tag_remove:hover {
-	color: #FF6600;
-}
+	.tag_remove:hover {
+		color: #FF6600;
+	}
 
 .spinner {
 	padding-top: 10px;
@@ -166,11 +166,10 @@ ul {
 	position: relative;
 }
 
-.octicon-issue-opened {
-	color: #FFA366;
-	position: absolute;
-	text-align: center;
-	padding-left: 10px;
+.server_message {
+	color: #264E59;
+	margin: 0px;
+	padding: 5px 10px;
 }
 
 .albums {

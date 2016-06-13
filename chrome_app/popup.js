@@ -76,7 +76,6 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
 
     function showVersionChangeIfUpgraded() {
         var currentVersion = chrome.app.getDetails().version;
-        console.log("Version " + currentVersion);
         var previousVersion = localStorage['version']
         if (currentVersion != previousVersion) {
             if (typeof previousVersion != 'undefined') {
@@ -108,10 +107,18 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
   	};
 
   	$scope.makeRequest = function(tags, requestId, onDone) {
+        var retryCall = () => {
+            setTimeout(() => {
+                $scope.makeRequest(tags, requestId, onDone);
+            }, $scope.retryTime*1000);
+        };
+
         var xhr = new XMLHttpRequest();
         xhr.open("POST", "http://localhost:8079/v1/albums", true);
         xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         xhr.onreadystatechange = () => {
+            $scope.$apply(() => { $scope.serverUnreachable = false });
+
             if(xhr.readyState != 4 || requestId != $scope.latestRequestId) {
                 return;
             }
@@ -121,26 +128,32 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
             }
             else if(xhr.status == 202) {
                 var uncachedTags = JSON.parse(xhr.responseText).data;
-                $scope.markUncachedTags(uncachedTags);
+                $scope.$apply(() => {
+                  $scope.albums = [];
+                  $scope.markUncachedTags(uncachedTags);
+                });
 
-                setTimeout(() => {
-                    $scope.makeRequest(tags, requestId, onDone);
-                }, $scope.retryTime*1000);
+                retryCall();
             }
+        }
+        xhr.onerror = () => {
+            console.log("Whut");
+            $scope.$apply(() => { $scope.serverUnreachable = true });
+            retryCall();
         }
 
         xhr.send(JSON.stringify(tags));
   	};
 
     $scope.markUncachedTags = function(uncachedTags) {
-        $scope.$apply(() => {
-          $scope.isCachingTags = true;
-          uncachedTags.forEach(tag => {
-              var matchingIndex = $scope.tags.map(x => x.name).indexOf(tag);
-              if(matchingIndex != -1) {
-                  $scope.tags[matchingIndex].isCaching = true;
-              }
-          })
-        });
+        $scope.isCachingTags = true;
+        $scope.tags.forEach(tag => { tag.isCaching = false });
+        
+        uncachedTags.forEach(tag => {
+            var matchingIndex = $scope.tags.map(x => x.name).indexOf(tag);
+            if(matchingIndex != -1) {
+                $scope.tags[matchingIndex].isCaching = true;
+            }
+        })
     };
 });

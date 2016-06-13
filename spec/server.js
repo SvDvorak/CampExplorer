@@ -1,5 +1,5 @@
 var server = require("../server/server");
-var BandcampFake = require("../server/bandcamp-fake");
+var BandcampFake = require("./bandcamp-fake");
 var Cache = require("../server/album-cache");
 var CacheUpdater = require("../server/cache-updater");
 var Album = require("../api-types");
@@ -97,7 +97,6 @@ describe("Server with cache", function() {
                 expect(status).toBe(202);
                 expect(errorData.error).toBe("Tags not cached, try again later");
                 expect(errorData.data).toEqual([ "musicTag" ]);
-                done();
             });
 
         localRequest([ "musicTag" ], function(albums) {
