@@ -24,6 +24,43 @@ body {
 	max-width: 400px;
 }
 
+.review {
+	margin: -5px -5px 0px -5px;
+	padding: 5px 15px;
+	background: #E4E7EA;
+}
+
+	.review_text {
+		font-size: 13px;
+		color: #264E59;
+	}
+
+	.review span {
+		color: #264E59;
+		margin-left: 15px;
+		font-size: 14px;
+		cursor: pointer;
+	}
+
+	.review span:hover {
+		text-decoration: underline;
+	}
+
+	.review a:hover {
+		text-decoration: underline;
+	}
+
+	.review a:visited {
+		color: #264E59;
+	}
+
+	.go_review {
+		color: #264E59;
+		font-size: 14px;
+		text-decoration: none;
+	}
+
+
 .input {
 	margin: 10px 10px;
 	position: relative;

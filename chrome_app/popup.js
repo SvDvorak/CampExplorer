@@ -19,10 +19,20 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
   	$scope.retryTime = 5;
   	$scope.tags = [];
     $scope.latestRequestId = 0;
+    $scope.userSearchCount = 0;
+    $scope.canShowReviewSuggestion = true;
+    $scope.showReviewSuggestionNow = false;
+    $scope.reviewSuggestionSearchCount = 50;
 
-    chrome.storage.local.get({ 'lastUsedTags' : [] }, result => {
-        $scope.$apply(() => {
-            result.lastUsedTags.forEach(x => { $scope.addTag(x); });
+    chrome.storage.local.get({
+          "lastUsedTags" : [],
+          "userSearchCount" : 0,
+          "canShowReviewSuggestion" : true
+        }, result => {
+            $scope.userSearchCount = result.userSearchCount;
+            $scope.canShowReviewSuggestion = result.canShowReviewSuggestion;
+            $scope.$apply(() => {
+                result.lastUsedTags.forEach(x => { $scope.addTag(x); });
         });
     });
 
@@ -30,6 +40,7 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
   	    var newTag = $scope.newTag.replace(" ", "-");
   	    $scope.addTag(newTag);
   	    $scope.newTag = null;
+        $scope.updateUserSearchCount();
    	};
 
    	$scope.addTag = function(tag) {
@@ -39,6 +50,17 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
   	    }
   	};
 
+    $scope.updateUserSearchCount = function() {
+        $scope.userSearchCount += 1;
+        chrome.storage.local.set({ userSearchCount: $scope.userSearchCount });
+
+        if($scope.canShowReviewSuggestion &&
+          $scope.userSearchCount % $scope.reviewSuggestionSearchCount == 0)
+        {
+            $scope.showReviewSuggestionNow = true;
+        }
+    };
+
    	$scope.removeTag = function(tag) {
         var i = $scope.tags.indexOf(tag);
         if(i != -1) {
@@ -46,6 +68,15 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
         }
         $scope.searchTags();
   	};
+
+    $scope.remindLater = function() {
+        $scope.showReviewSuggestionNow = false;
+    };
+
+    $scope.neverShowSuggestion = function() {
+        $scope.canShowReviewSuggestion = false;
+        chrome.storage.local.set({ canShowReviewSuggestion: false });
+    };
 
   	$scope.searchTags = function() {
         $scope.isSearching = true;
@@ -64,7 +95,7 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
     		});
   	};
 
-  	$scope.makeRequest = function(tags, onDone, onCaching) {
+  	$scope.makeRequest = function(tags, onDone) {
         $scope.latestRequestId += 1;
         var currentRequestId = $scope.latestRequestId;
 
@@ -90,7 +121,7 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
         }
 
         xhr.send(JSON.stringify(tags));
-  	}
+  	};
 
     $scope.markUncachedTags = function(uncachedTags) {
         $scope.$apply(() => {
@@ -102,5 +133,5 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
               }
           })
         });
-    }
+    };
 });

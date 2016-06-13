@@ -14,6 +14,12 @@
     <link rel="stylesheet" href="octicons/octicons.css">
   </head>
   <body ng-controller="tagsController">
+    <div ng-show="showReviewSuggestionNow" class="review">
+        <p class="review_text">Heya, wouldn't you like to review this awesome app?<p>
+        <a href="https://chrome.google.com/webstore/detail/bandcamp-tag-search/fkkbhcpcpapcgcfjmllgibbnalmpbjcm" target="_blank" class="go_review" ng-click="neverShowSuggestion()">Sure</a>
+        <span ng-click="remindLater()" class="remind_me">Maybe later</span>
+        <span ng-click="neverShowSuggestion()" class="never_suggest">Nope</span>
+    </div>
     <div>
       <form class="input">
         <input class="input_tag" type="text" ng-model="newTag" placeholder="Tag..." />
