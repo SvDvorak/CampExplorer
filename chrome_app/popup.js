@@ -79,13 +79,12 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
     };
 
   	$scope.searchTags = function() {
+        $scope.latestRequestId += 1;
+        var requestId = $scope.latestRequestId;
+
         $scope.isSearching = true;
         chrome.storage.local.set({ lastUsedTags: $scope.tags.map(x => x.name) });
-    		$scope.makeRequest($scope.tags.map(x => x.name), function(requestId, albums) {
-            if(requestId != $scope.latestRequestId) {
-                return;
-            }
-
+    		$scope.makeRequest($scope.tags.map(x => x.name), requestId, function(albums) {
             $scope.$apply(() => {
                 $scope.albums = albums;
                 $scope.isCachingTags = false;
@@ -95,27 +94,24 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
     		});
   	};
 
-  	$scope.makeRequest = function(tags, onDone) {
-        $scope.latestRequestId += 1;
-        var currentRequestId = $scope.latestRequestId;
-
+  	$scope.makeRequest = function(tags, requestId, onDone) {
         var xhr = new XMLHttpRequest();
         xhr.open("POST", "http://localhost:8079/v1/albums", true);
         xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         xhr.onreadystatechange = () => {
-            if(xhr.readyState != 4) {
+            if(xhr.readyState != 4 || requestId != $scope.latestRequestId) {
                 return;
             }
 
             if(xhr.status == 200) {
-                onDone(currentRequestId, JSON.parse(xhr.responseText));
+                onDone(JSON.parse(xhr.responseText));
             }
             else if(xhr.status == 202) {
                 var uncachedTags = JSON.parse(xhr.responseText).data;
                 $scope.markUncachedTags(uncachedTags);
 
                 setTimeout(() => {
-                    $scope.makeRequest(tags, onDone);
+                    $scope.makeRequest(tags, requestId, onDone);
                 }, $scope.retryTime*1000);
             }
         }
