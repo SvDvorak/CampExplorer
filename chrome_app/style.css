@@ -24,6 +24,37 @@ body {
 	max-width: 400px;
 }
 
+.version_changes {
+	margin: -5px -5px 0px -5px;
+	padding: 5px 15px 13px 15px;
+	background: #E4E7EA;
+}
+
+	.version_header {
+		font-size: 16px;
+		color: #264E59;
+	}
+
+	.version_text {
+		font-size: 13px;
+		color: #264E59;
+	}
+
+	.version_changes span {
+		color: #264E59;
+		font-size: 14px;
+		margin-bottom: 15px;
+		cursor: pointer;
+	}
+
+	.version_changes span:hover {
+		text-decoration: underline;
+	}
+
+	.ignore_changes {
+		margin-left: 15px;
+	}
+
 .review {
 	margin: -5px -5px 0px -5px;
 	padding: 5px 15px;

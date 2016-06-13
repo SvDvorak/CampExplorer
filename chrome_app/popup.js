@@ -1,9 +1,9 @@
 var bandcampMultiTag = angular.module('multiTagApp', [])
     .config([
-    	'$compileProvider',
-    	function ($compileProvider) {
-        	//  Default imgSrcSanitizationWhitelist: /^\s*((https?|ftp|file|blob):|data:image\/)/
-        	$compileProvider.imgSrcSanitizationWhitelist(/^\s*((https?|ftp|file|blob|chrome-extension):|data:image\/)/);
+      '$compileProvider',
+      function ($compileProvider) {
+          //  Default imgSrcSanitizationWhitelist: /^\s*((https?|ftp|file|blob):|data:image\/)/
+          $compileProvider.imgSrcSanitizationWhitelist(/^\s*((https?|ftp|file|blob|chrome-extension):|data:image\/)/);
     }
 ]);
 
@@ -14,11 +14,14 @@ function Tag(name) {
 
 bandcampMultiTag.controller('tagsController', function ($scope) {
     $scope.albums = [];
-  	$scope.isSearching = false;
+    $scope.isSearching = false;
     $scope.isCachingTags = false;
-  	$scope.retryTime = 5;
-  	$scope.tags = [];
+    $scope.retryTime = 5;
+    $scope.tags = [];
     $scope.latestRequestId = 0;
+
+    $scope.showVersionChangesQuestion = false;
+
     $scope.userSearchCount = 0;
     $scope.canShowReviewSuggestion = true;
     $scope.showReviewSuggestionNow = false;
@@ -35,6 +38,8 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
                 result.lastUsedTags.forEach(x => { $scope.addTag(x); });
         });
     });
+
+    showVersionChangeIfUpgraded();
 
   	$scope.addInputTag = function() {
   	    var newTag = $scope.newTag.replace(" ", "-");
@@ -69,9 +74,17 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
         $scope.searchTags();
   	};
 
-    $scope.remindLater = function() {
-        $scope.showReviewSuggestionNow = false;
-    };
+    function showVersionChangeIfUpgraded() {
+        var currentVersion = chrome.app.getDetails().version;
+        console.log("Version " + currentVersion);
+        var previousVersion = localStorage['version']
+        if (currentVersion != previousVersion) {
+            if (typeof previousVersion != 'undefined') {
+                $scope.showVersionChangesQuestion = true;
+            }
+            localStorage['version'] = currentVersion;
+        }
+    }
 
     $scope.neverShowSuggestion = function() {
         $scope.canShowReviewSuggestion = false;
