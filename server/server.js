@@ -49,6 +49,11 @@ module.exports = {
             res.send(JSON.stringify(albums));
         });
 
+        app.get("/debug/tagcount", function(request, res) {
+            res.status(200);
+            res.send(JSON.stringify(Object.keys(albumCache.albums).length));
+        });
+
         server = app.listen(PORT, function(){
             startedCallback();
         });
