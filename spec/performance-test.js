@@ -2,6 +2,7 @@ var server = require("../server/server");
 var BandcampFake = require("./bandcamp-fake");
 var Cache = require("../server/album-cache");
 var CacheUpdater = require("../server/cache-updater");
+var Recacher = require("../server/re-cacher");
 var PopAlbums = require("./albums-pop");
 var RockAlbums = require("./albums-rock");
 var localRequest = require("./local-request");
@@ -16,7 +17,8 @@ describe("Server performance", function() {
         bandcamp = new BandcampFake();
         cache = new Cache();
         updater = new CacheUpdater(cache, bandcamp);
-        server.start(cache, updater, done);
+        recacher = new Recacher(cache, updater);
+        server.start(cache, updater, recacher, done);
     });
 
     afterEach(function(done) {
@@ -32,5 +34,5 @@ describe("Server performance", function() {
             expect(albums.length).toBe(50);
             done();
         }, function() { done(false); });
-    }, 300);
+    }, 100);
 });

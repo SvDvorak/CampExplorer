@@ -1,5 +1,3 @@
-var server;
-
 var allowCrossDomain = function(req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'POST');
@@ -9,10 +7,15 @@ var allowCrossDomain = function(req, res, next) {
 }
 
 module.exports = {
-    start: function (albumCache, updater, startedCallback) {
+    server: {},
+    recacher: {},
+
+    start: function (albumCache, updater, recacher, startedCallback) {
         var express = require("express");
         var bodyParser = require("body-parser");
         var app = express();
+        this.recacher = recacher;
+        this.isRunning = true;
 
         const PORT=8079; 
 
@@ -54,12 +57,15 @@ module.exports = {
             res.send(JSON.stringify(Object.keys(albumCache.albums).length));
         });
 
-        server = app.listen(PORT, function(){
+        this.server = app.listen(PORT, function(){
+            recacher.start();
             startedCallback();
         });
-      },
+    },
 
     stop: function(stoppedCallback) {
-        server.close(stoppedCallback);
+        this.isRunning = false;
+        this.server.close(stoppedCallback);
+        this.recacher.stop();
     },
 };

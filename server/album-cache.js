@@ -1,7 +1,6 @@
 
 module.exports = Cache = function () {
     this.albums = { };
-    this.inProgress = [];
 };
 
 Cache.prototype = {

@@ -2,6 +2,7 @@ var server = require("../server/server");
 var BandcampFake = require("./bandcamp-fake");
 var Cache = require("../server/album-cache");
 var CacheUpdater = require("../server/cache-updater");
+var Recacher = require("../server/re-cacher");
 var Album = require("../api-types");
 var localRequest = require("./local-request");
 
@@ -20,7 +21,8 @@ describe("Server with cache", function() {
         bandcamp = new BandcampFake();
         cache = new Cache();
         updater = new CacheUpdater(cache, bandcamp);
-        server.start(cache, updater, done);
+        var recacher = new Recacher(cache, updater);
+        server.start(cache, updater, recacher, done);
     });
 
     afterEach(function(done) {
