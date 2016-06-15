@@ -8,14 +8,13 @@ Cache.prototype = {
         var api = this.albumApi;
         var albums = this.albums;
 
-        var flattenedAlbums = flatten(tags.map(function(tag) { return albums[tag] || [] }));
-
-        return values(
-                group(
-                    flattenedAlbums,
-                    "link"))
-            .filter(function(x) { return x.length == tags.length; })
-            .map(function(x) { return x[0] });
+        return tags
+          .map(function(tag) { return albums[tag] || [] })
+          .BCflatten()
+          .BCgroup("link")
+          .BCvalues()
+          .filter(function(x) { return x.length == tags.length; })
+          .map(function(x) { return x[0] });
     },
     filterUncached: function(tags) {
         var albums = this.albums;
@@ -23,19 +22,21 @@ Cache.prototype = {
     },
 };
 
-function flatten(list) {
+Array.prototype.BCflatten = function() {
     return []
         .concat
-        .apply([], list);
-}
+        .apply([], this);
+};
 
-function values(list) {
+Object.prototype.BCvalues = function() {
+    var list = this;
     return Object.keys(list).map(function (key) {
         return list[key];
     });
 }
 
-function group(list, prop) {  
+Array.prototype.BCgroup = function(prop) {  
+  var list = this;
   return list.reduce(function(grouped, item) {
       var key = item[prop];
       grouped[key] = grouped[key] || [];

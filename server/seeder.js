@@ -19,9 +19,3 @@ Seeder.prototype = {
 		});
 	}
 };
-
-function flatten(list) {
-    return []
-        .concat
-        .apply([], list);
-}
