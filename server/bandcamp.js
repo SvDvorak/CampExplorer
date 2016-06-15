@@ -32,7 +32,7 @@ Bandcamp.prototype = {
 					albumsRequest.errorCount += 1;
 					setTimeout(
 						function() { api.getAlbumsForTagRecursive(albumsRequest); },
-						100);
+						100*albumsRequest.errorCount);
 					return;
 				}
 
@@ -62,13 +62,26 @@ Bandcamp.prototype = {
     },
 
     getTagsForAlbum: function(album, successCallback) {
-    	var tagsOptions = options.createTagsOptions(album.bandId, album.albumId);
+    	this.getTagsForAlbumRecursive(album, successCallback, 0);
+    },
+
+    getTagsForAlbumRecursive: function(album, successCallback, retryCount) {
+		var tagsOptions = options.createTagsOptions(album.bandId, album.albumId);
 		var api = this;
 
         request(tagsOptions, function(error, response, data) {
 			if(error || response.statusCode != 200) {
+	    		if(response != undefined && response.statusCode == 503 && retryCount < 3)
+	    		{
+	    			setTimeout(function() {
+	    				api.getTagsForAlbum(album, successCallback, retryCount + 1);
+	    			}, 100*retryCount);
+	    			return;
+	    		}
+
+				var statusCode = response != undefined ? response.statusCode : "undefined";
 				console.error("Unable to get tags for " + album +
-					"\nStatuscode: " + response.statusCode +
+					"\nStatuscode: " + statusCode +
 					"\nError: " + error);
 
 				return;
