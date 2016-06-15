@@ -1,33 +1,20 @@
-var server = require("../server/server");
-var BandcampFake = require("./bandcamp-fake");
-var Cache = require("../server/album-cache");
-var CacheUpdater = require("../server/cache-updater");
-var Recacher = require("../server/re-cacher");
+var TestServer = require("./test-server");
 var Album = require("../api-types");
 var localRequest = require("./local-request");
-var config = require("./config");
-
-var requestShouldNotFail = function(done) { return function(data, error) {
-    done.fail("Should not fail to get albums for request.\n" +
-        "Error: " + error + "\n" +
-        "Data: " + data);
-} }
+var requestShouldNotFail = require("./request-should-not-fail");
 
 describe("Server with cache", function() {
+    var testServer;
     var bandcamp;
-    var cache;
-    var updater;
 
     beforeEach(function(done) {
-        bandcamp = new BandcampFake();
-        cache = new Cache();
-        updater = new CacheUpdater(cache, bandcamp);
-        var recacher = new Recacher(cache, updater);
-        server.start(config, cache, updater, recacher, done);
+        testServer = new TestServer();
+        bandcamp = testServer.bandcamp;
+        testServer.start(done);
     });
 
     afterEach(function(done) {
-        server.stop(done);
+        testServer.stop(done);
     });
 
     it("returns complete album", function(done) {
@@ -40,7 +27,7 @@ describe("Server with cache", function() {
             "987654321");
 
         bandcamp.setAlbumsForTag("tag", [ album ]);
-        updater.updateTags(["tag"]);
+        localRequest(["tag"]);
 
         localRequest([ "tag" ], function(albums) {
             expect(albums.length).toBe(1);
@@ -65,7 +52,7 @@ describe("Server with cache", function() {
             linkOnlyAlbum("AllTagsAlbum"),
             ]);
 
-        updater.updateTags(["tag1", "tag2"]);
+        localRequest(["tag1", "tag2"]);
 
         localRequest([ "tag1", "tag2" ], function(albums) {
             expect(albums.length).toBe(1);
@@ -116,7 +103,7 @@ describe("Server with cache", function() {
         }
 
         bandcamp.setAlbumsForTag("tag", albums);
-        updater.updateTags([ "tag" ]);
+        localRequest([ "tag" ]);
 
         localRequest([ "tag" ], function(albums) {
             expect(albums.length).toBe(50);

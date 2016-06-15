@@ -1,7 +1,6 @@
 var request = require("request");
 var config = require("./config");
 
-
 module.exports = function(tags, onResponse, onFailure) {
     var options =
     {
@@ -12,11 +11,20 @@ module.exports = function(tags, onResponse, onFailure) {
     };
 
     request(options, function(error, response, data) {
-        if(response.statusCode == 200) {
-            onResponse(data);
+        if(response == undefined) {
+            console.log("refused connection");
             return;
         }
 
-        onFailure(data, response.statusCode);
+        if(response.statusCode == 200) {
+            if(onResponse != undefined) {
+                onResponse(data);
+            }
+            return;
+        }
+
+        if(onFailure != undefined) {
+            onFailure(data, response.statusCode);
+        }
     });
 }

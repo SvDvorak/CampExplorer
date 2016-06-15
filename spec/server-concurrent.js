@@ -1,42 +1,28 @@
-var server = require("../server/server");
-var BandcampFake = require("./bandcamp-fake");
-var Cache = require("../server/album-cache");
-var CacheUpdater = require("../server/cache-updater");
-var Recacher = require("../server/re-cacher");
+var TestServer = require("./test-server");
 var Album = require("../api-types");
 var localRequest = require("./local-request");
-var config = require("./config");
-
-var requestShouldNotFail = function(done) { return function(data, error) {
-    done.fail("Should not fail to get albums for request.\n" +
-        "Error: " + error + "\n" +
-        "Data: " + data);
-} }
+var requestShouldNotFail = require("./request-should-not-fail");
 
 describe("Concurrent tag caching server", function() {
+    var testServer;
     var bandcamp;
-    var cache;
-    var updater;
-    var recacher;
 
     beforeEach(function(done) {
-        bandcamp = new BandcampFake();
+        testServer = new TestServer();
+        bandcamp = testServer.bandcamp;
         bandcamp.delay = 1;
-        cache = new Cache();
-        updater = new CacheUpdater(cache, bandcamp);
-        recacher = new Recacher(cache, updater);
-        server.start(config, cache, updater, recacher, done);
+        testServer.start(done);
     });
 
     afterEach(function(done) {
-        server.stop(done);
+        testServer.stop(done);
     });
 
     it("only caches tag once when new request asks for tag in progress of update", function(done) {
         bandcamp.setAlbumsForTag("tag", [ new Album("Album") ]);
 
-        updater.updateTags(["tag"]);
-        updater.updateTags(["tag"]);
+        localRequest(["tag"]);
+        localRequest(["tag"]);
 
         setTimeout(function() {
             localRequest([ "tag" ], function(albums) {
@@ -44,72 +30,23 @@ describe("Concurrent tag caching server", function() {
                 expect(albums[0].name).toBe("Album");
                 done();
             }, requestShouldNotFail(done));
-        }, 10);
+        }, 70);
     });
 
     it("queues up tags to be updated and processes them in order", function(done) {
         bandcamp.setAlbumsForTag("tag1", [ new Album("Album1") ]);
         bandcamp.setAlbumsForTag("tag2", [ new Album("Album2") ]);
 
-        updater.updateTags(["tag1", "tag2"]);
-
-        expect(updater.queue).toEqual([ "tag1", "tag2" ])
+        localRequest(["tag1", "tag2"], function() { }, function(data, responseCode) {
+            expect(data.data).toEqual([ "tag1", "tag2" ]);
+        });
 
         setTimeout(function() {
+            expect(bandcamp.tagsRequested).toEqual([ "tag1", "tag2" ]);
 	        localRequest([ "tag2" ], function(albums) {
 	            expect(albums[0].name).toBe("Album2");
 	            done();
 	        }, requestShouldNotFail(done));
-        }, 20);
-    });
-});
-
-describe("Recaching server", function() {
-    var bandcamp;
-    var cache;
-    var updater;
-    var recacher;
-
-    beforeEach(function(done) {
-        bandcamp = new BandcampFake();
-        bandcamp.delay = 1;
-        cache = new Cache();
-        updater = new CacheUpdater(cache, bandcamp);
-        recacher = new Recacher(cache, updater);
-        recacher.cacheDelay = 0.001;
-        server.start(config, cache, updater, recacher, done);
-    });
-
-    afterEach(function(done) {
-        if(server.isRunning) {
-            server.stop(done);
-        }
-        else {
-            done();
-        }
-    });
-
-    it("recaches tags when idle", function(done) {
-        bandcamp.setAlbumsForTag("tag", [ new Album("Album1") ]);
-
-        updater.updateTags(["tag"]);
-
-        setTimeout(function() {
-            expect(bandcamp.tagsRequested.length).toBe(2);
-            done();
-        }, 20);
-    });
-
-    it("stops recaching when stopping server", function(done) {
-        server.stop(function() {
-            bandcamp.setAlbumsForTag("tag", [ new Album("Album1") ]);
-
-            updater.updateTags(["tag"]);
-
-            setTimeout(function() {
-                expect(bandcamp.tagsRequested.length).toBe(1);
-                done();
-            }, 20);
-        });
+        }, 70);
     });
 });
