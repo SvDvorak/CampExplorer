@@ -50,8 +50,9 @@
         <span class="tag_remove" ng-click="removeTag(tag)">X</span>
       </li>
     </ul>
-    <p ng-show="serverUnreachable" class="server_message">Sorry, unable to reach server at the moment, will keep on retrying</p>
-    <p ng-show="isCachingTags" class="server_message">Tags are being cached on server, will retry every {{ retryTime }} seconds</p>
+    <p ng-show="serverUnreachable" class="server_message">Sorry, unable to reach server at the moment
+      <br>Retrying...</p>
+    <p ng-show="isCachingTags" class="server_message">Caching tags on server<br>Will retry every {{ retryTime }} seconds</p>
     <div class="spinner" ng-show="isSearching">
       <div class="throbber-loader">
         Loading…

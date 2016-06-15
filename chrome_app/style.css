@@ -168,6 +168,7 @@ ul {
 
 .server_message {
 	color: #264E59;
+	text-align: center;
 	margin: 0px;
 	padding: 5px 10px;
 }
