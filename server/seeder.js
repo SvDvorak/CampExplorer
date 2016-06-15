@@ -10,10 +10,10 @@ Seeder.prototype = {
 	seed: function(tag) {
 		var seeder = this;
 
-		seeder.updater.queueTags([ tag ], function(newAlbums) {
+		seeder.updater.updateTags([ tag ], function(newAlbums) {
 			newAlbums.forEach(function(album) {
 				seeder.bandcampApi.getTagsForAlbum(album, function(tags) {
-					seeder.updater.queueTags(tags);
+					seeder.updater.updateTags(tags);
 				});
 			});
 		});

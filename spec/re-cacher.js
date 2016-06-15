@@ -14,7 +14,7 @@ describe("Recacher", function() {
         updater = {
             calledUpdates: [],
             queue: [],
-            queueTags: function(tags) {
+            updateTags: function(tags) {
                 this.calledUpdates = this.calledUpdates.concat(tags);
             } };
 

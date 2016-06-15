@@ -1,11 +1,12 @@
 var request = require("request");
+var config = require("./config");
 
 
 module.exports = function(tags, onResponse, onFailure) {
     var options =
     {
         method: "POST",
-        uri: "http://localhost:8079/v1/albums",
+        uri: "http://localhost:" + config.port + "/v1/albums",
         headers: { "Content-Type": "application/json;charset=UTF-8" },
         json: tags
     };

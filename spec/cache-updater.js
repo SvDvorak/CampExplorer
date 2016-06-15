@@ -21,42 +21,31 @@ describe("Cache updater", function() {
 		sut = new CacheUpdater(cache, bandcamp, function(text) { });
     });
 
-	it("does nothing when queue is empty", function() {
-		sut.runUpdate();
+	it("does nothing when tags are empty", function() {
+		sut.updateTags([]);
 
 		expect(tagsRequested.length).toBe(0);
 	});
 
-	it("ignores run calls when update already in progress", function() {
-		sut.queueTags(["tag"]);
-		sut.runUpdate();
-		sut.runUpdate();
-
-		expect(tagsRequested.length).toBe(1);
-	});
-
-	it("ignores tags that have already been cached", function() {
-		sut.queueTags(["tag"]);
-		sut.queueTags(["tag"]);
+	it("ignores tags that are already queued", function() {
+		sut.updateTags(["tag"]);
+		sut.updateTags(["tag"]);
 
 		expect(tagsRequested.length).toBe(1);
 	});
 
 	it("removes tag from queue when finished updating", function() {
-		sut.queueTags(["tag"]);
-
-		sut.runUpdate();
-		sut.runUpdate();
-		sut.runUpdate();
+		sut.updateTags(["tag"]);
+		sut.updateTags([]);
+		sut.updateTags([]);
 
 		expect(tagsRequested.length).toBe(1);
 	});
 
 	it("rewrites queue when adding to empty queue", function() {
 		var tags = [ "tag1", "tag2" ]
-		sut.queueTags(tags);
+		sut.updateTags(tags);
 
-		sut.runUpdate();
 		dataReturnedCallback();
 
 		expect(tagsRequested).toEqual(tags);
@@ -64,12 +53,11 @@ describe("Cache updater", function() {
 
 	it("adds to queue when adding to populated queue", function() {
 		var tags1 = [ "tag1", "tag2" ]
-		sut.queueTags(tags1);
+		sut.updateTags(tags1);
 
 		var tags2 = [ "tag3", "tag4" ]
-		sut.queueTags(tags2);
+		sut.updateTags(tags2);
 
-		sut.runUpdate();
 		dataReturnedCallback();
 		dataReturnedCallback();
 		dataReturnedCallback();
@@ -80,14 +68,14 @@ describe("Cache updater", function() {
 	it("calls tag albums updated event", function() {
 		var tags = [ "tag" ]
 		var callbackCalled = false;
-		sut.queueTags(tags, function(albums) { callbackCalled = true; });
+		sut.updateTags(tags, function(albums) { callbackCalled = true; });
 		dataReturnedCallback([ "Album" ]);
 
 		expect(callbackCalled).toBe(true);
 	});
 
 	it("retries updating when request fails", function() {
-		sut.queueTags([ "tag1" ]);
+		sut.updateTags([ "tag1" ]);
 
 		errorCallback();
 

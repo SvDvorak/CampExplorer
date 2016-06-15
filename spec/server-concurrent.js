@@ -5,6 +5,7 @@ var CacheUpdater = require("../server/cache-updater");
 var Recacher = require("../server/re-cacher");
 var Album = require("../api-types");
 var localRequest = require("./local-request");
+var config = require("./config");
 
 var requestShouldNotFail = function(done) { return function(data, error) {
     done.fail("Should not fail to get albums for request.\n" +
@@ -24,7 +25,7 @@ describe("Concurrent tag caching server", function() {
         cache = new Cache();
         updater = new CacheUpdater(cache, bandcamp);
         recacher = new Recacher(cache, updater);
-        server.start(cache, updater, recacher, done);
+        server.start(config, cache, updater, recacher, done);
     });
 
     afterEach(function(done) {
@@ -34,8 +35,8 @@ describe("Concurrent tag caching server", function() {
     it("only caches tag once when new request asks for tag in progress of update", function(done) {
         bandcamp.setAlbumsForTag("tag", [ new Album("Album") ]);
 
-        updater.queueTags(["tag"]);
-        updater.queueTags(["tag"]);
+        updater.updateTags(["tag"]);
+        updater.updateTags(["tag"]);
 
         setTimeout(function() {
             localRequest([ "tag" ], function(albums) {
@@ -50,7 +51,7 @@ describe("Concurrent tag caching server", function() {
         bandcamp.setAlbumsForTag("tag1", [ new Album("Album1") ]);
         bandcamp.setAlbumsForTag("tag2", [ new Album("Album2") ]);
 
-        updater.queueTags(["tag1", "tag2"]);
+        updater.updateTags(["tag1", "tag2"]);
 
         expect(updater.queue).toEqual([ "tag1", "tag2" ])
 
@@ -76,7 +77,7 @@ describe("Recaching server", function() {
         updater = new CacheUpdater(cache, bandcamp);
         recacher = new Recacher(cache, updater);
         recacher.cacheDelay = 0.001;
-        server.start(cache, updater, recacher, done);
+        server.start(config, cache, updater, recacher, done);
     });
 
     afterEach(function(done) {
@@ -91,7 +92,7 @@ describe("Recaching server", function() {
     it("recaches tags when idle", function(done) {
         bandcamp.setAlbumsForTag("tag", [ new Album("Album1") ]);
 
-        updater.queueTags(["tag"]);
+        updater.updateTags(["tag"]);
 
         setTimeout(function() {
             expect(bandcamp.tagsRequested.length).toBe(2);
@@ -103,7 +104,7 @@ describe("Recaching server", function() {
         server.stop(function() {
             bandcamp.setAlbumsForTag("tag", [ new Album("Album1") ]);
 
-            updater.queueTags(["tag"]);
+            updater.updateTags(["tag"]);
 
             setTimeout(function() {
                 expect(bandcamp.tagsRequested.length).toBe(1);

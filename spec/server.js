@@ -5,6 +5,7 @@ var CacheUpdater = require("../server/cache-updater");
 var Recacher = require("../server/re-cacher");
 var Album = require("../api-types");
 var localRequest = require("./local-request");
+var config = require("./config");
 
 var requestShouldNotFail = function(done) { return function(data, error) {
     done.fail("Should not fail to get albums for request.\n" +
@@ -22,7 +23,7 @@ describe("Server with cache", function() {
         cache = new Cache();
         updater = new CacheUpdater(cache, bandcamp);
         var recacher = new Recacher(cache, updater);
-        server.start(cache, updater, recacher, done);
+        server.start(config, cache, updater, recacher, done);
     });
 
     afterEach(function(done) {
@@ -39,7 +40,7 @@ describe("Server with cache", function() {
             "987654321");
 
         bandcamp.setAlbumsForTag("tag", [ album ]);
-        updater.queueTags(["tag"]);
+        updater.updateTags(["tag"]);
 
         localRequest([ "tag" ], function(albums) {
             expect(albums.length).toBe(1);
@@ -64,7 +65,7 @@ describe("Server with cache", function() {
             linkOnlyAlbum("AllTagsAlbum"),
             ]);
 
-        updater.queueTags(["tag1", "tag2"]);
+        updater.updateTags(["tag1", "tag2"]);
 
         localRequest([ "tag1", "tag2" ], function(albums) {
             expect(albums.length).toBe(1);
@@ -115,7 +116,7 @@ describe("Server with cache", function() {
         }
 
         bandcamp.setAlbumsForTag("tag", albums);
-        updater.queueTags([ "tag" ]);
+        updater.updateTags([ "tag" ]);
 
         localRequest([ "tag" ], function(albums) {
             expect(albums.length).toBe(50);

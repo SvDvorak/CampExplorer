@@ -13,6 +13,9 @@ function Tag(name) {
 }
 
 bandcampMultiTag.controller('tagsController', function ($scope) {
+    $scope.adress = "163.172.155.121";
+    $scope.port = 8079;
+
     $scope.albums = [];
     $scope.isSearching = false;
     $scope.isCachingTags = false;
@@ -114,7 +117,7 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
         };
 
         var xhr = new XMLHttpRequest();
-        xhr.open("POST", "http://localhost:8079/v1/albums", true);
+        xhr.open("POST", "http://" + $scope.adress + ":" + $scope.port + "/v1/albums", true);
         xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         xhr.onreadystatechange = () => {
             $scope.$apply(() => { $scope.serverUnreachable = false });

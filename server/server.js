@@ -10,14 +10,12 @@ module.exports = {
     server: {},
     recacher: {},
 
-    start: function (albumCache, updater, recacher, startedCallback) {
+    start: function (config, albumCache, updater, recacher, startedCallback) {
         var express = require("express");
         var bodyParser = require("body-parser");
         var app = express();
         this.recacher = recacher;
         this.isRunning = true;
-
-        const PORT=8079; 
 
         app.use(bodyParser.json());
         app.use(allowCrossDomain);
@@ -38,7 +36,7 @@ module.exports = {
                     error: "Tags not cached, try again later",
                     data: uncached
                 });
-                updater.queueTags(uncached);
+                updater.updateTags(uncached);
                 return;
             }
 
@@ -57,7 +55,7 @@ module.exports = {
             res.send(JSON.stringify(Object.keys(albumCache.albums).length));
         });
 
-        this.server = app.listen(PORT, function(){
+        this.server = app.listen(config.port, function(){
             recacher.start();
             startedCallback();
         });

@@ -6,21 +6,21 @@ describe("Seeder", function() {
 	var bandcamp;
 	var cache;
 	var seeder;
-	var queuedTags;
-	var queueCallback;
+	var updatedTags;
+	var updateCallback;
 	var tagsCallback;
 
 	beforeEach(function() {
-		queuedTags = [];
-		queueCallback = function() { };
+		updatedTags = [];
+		updateCallback = function() { };
 		tagsCallback = function() { };
 
 		bandcamp = { getTagsForAlbum: function(album, callback) {
 			tagsCallback = callback;
 		}};
-		updater = { queueTags: function(tags, callback) {
-			queuedTags = queuedTags.concat(tags);
-			queueCallback = callback;
+		updater = { updateTags: function(tags, callback) {
+			updatedTags = updatedTags.concat(tags);
+			updateCallback = callback;
 		}};
 		seeder = new Seeder(updater, bandcamp)
 	});
@@ -29,18 +29,18 @@ describe("Seeder", function() {
 		return cache.albums[tag].map(function(album) { return album.name; });
 	}
 
-	it("should queue initial tag", function() {
+	it("should update initial tag", function() {
 		seeder.seed("pop");
 
-		expect(queuedTags).toEqual([ "pop" ]);
+		expect(updatedTags).toEqual([ "pop" ]);
 	});
 
-	it("should for each initial tag album result queue their tags too", function() {
+	it("should for each initial tag album result update their tags too", function() {
 		seeder.seed("pop");
 
-		queueCallback([ { name: "PopAlbum" } ]);
+		updateCallback([ { name: "PopAlbum" } ]);
 		tagsCallback([ "rock", "metal", "ambient" ]);
 
-		expect(queuedTags).toEqual([ "pop", "rock", "metal", "ambient" ])
+		expect(updatedTags).toEqual([ "pop", "rock", "metal", "ambient" ])
 	});
 });

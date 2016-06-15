@@ -22,6 +22,7 @@
   	},
 	"permissions": [
 		"storage",
+		"http://163.172.155.121",
 		"http://bandcamp.com/",
 		"https://bandcamp.com/",
 		"https://*.bcbits.com/"

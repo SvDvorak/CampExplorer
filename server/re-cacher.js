@@ -29,7 +29,7 @@ Recacher.prototype = {
 		{
 			var tagToCache = tags[this.tagIndex];
 
-			this.updater.queueTags([ tagToCache ]);
+			this.updater.updateTags([ tagToCache ]);
 
 			this.tagIndex += 1;
 			if(this.tagIndex >= tags.length) {
