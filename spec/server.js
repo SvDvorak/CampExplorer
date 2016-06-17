@@ -2,6 +2,7 @@ var TestServer = require("./test-server");
 var Album = require("../api-types");
 var localRequest = require("./local-request");
 var requestShouldNotFail = require("./request-should-not-fail");
+var generateAlbums = require("./generate-albums");
 
 describe("Server with cache", function() {
     var testServer;
@@ -96,11 +97,7 @@ describe("Server with cache", function() {
     });
 
     it("returns a maximum of 50 albums", function(done) {
-        var albums = [];
-        for(i = 0; i < 500; i++)
-        {
-            albums.push(linkOnlyAlbum("Album" + i));
-        }
+        var albums = generateAlbums(500)
 
         bandcamp.setAlbumsForTag("tag", albums);
         localRequest([ "tag" ]);

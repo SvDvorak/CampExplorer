@@ -1,6 +1,8 @@
 var Cache = require("../server/album-cache");
 var CacheUpdater = require("../server/cache-updater");
 var Seeder = require("../server/seeder");
+var generateAlbums = require("./generate-albums");
+require("../server/extensions");
 
 describe("Seeder", function() {
 	var bandcamp;
@@ -16,13 +18,13 @@ describe("Seeder", function() {
 		tagsCallback = function() { };
 
 		bandcamp = { getTagsForAlbum: function(album, callback) {
-			tagsCallback = callback;
+			tagsCallback[album] = callback;
 		}};
-		updater = { updateTags: function(tags, callback) {
+		updater = { updateUncachedTags: function(tags, callback) {
 			updatedTags = updatedTags.concat(tags);
 			updateCallback = callback;
 		}};
-		seeder = new Seeder(updater, bandcamp)
+		seeder = new Seeder(updater, bandcamp, function() { });
 	});
 
 	var getAlbumNamesFor = function(tag) {
@@ -35,12 +37,35 @@ describe("Seeder", function() {
 		expect(updatedTags).toEqual([ "pop" ]);
 	});
 
-	it("should for each initial tag album result update their tags too", function() {
+	it("should for each initial tag album result update their tags consecutively too", function() {
 		seeder.seed("pop");
 
-		updateCallback([ { name: "PopAlbum" } ]);
-		tagsCallback([ "rock", "metal", "ambient" ]);
+		var album1 = { name: "PopAlbum1" };
+		var album2 = { name: "PopAlbum2" };
 
-		expect(updatedTags).toEqual([ "pop", "rock", "metal", "ambient" ])
+		updateCallback([ album1, album2 ]);
+		expect(updatedTags).toEqual([ "pop" ])
+		tagsCallback[album1]([ "rock", "ambient" ]);
+		expect(updatedTags).toEqual([ "pop" ])
+		tagsCallback[album2]([ "metal", "ambient" ]);
+
+		expect(updatedTags).toEqual([ "pop", "rock", "ambient", "metal", "ambient" ])
+	});
+
+	it("should only get tags for 50 albums", function() {
+		var callbacks = 0;
+
+		bandcamp.getTagsForAlbum = function(album, callback) {
+			callbacks += 1;
+			callback([ album.name ]);
+		};
+
+		var albums = generateAlbums(500);
+
+		seeder.seed("tag");
+
+		updateCallback(albums);
+
+		expect(callbacks).toBe(50);
 	});
 });

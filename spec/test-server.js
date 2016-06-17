@@ -6,10 +6,11 @@ var Recacher = require("../server/re-cacher");
 var config = require("./config");
 
 module.exports = TestServer = function() {
+    var noLog = function() { };
     this.bandcamp = new BandcampFake();
     this.cache = new Cache();
-    this.updater = new CacheUpdater(this.cache, this.bandcamp);
-    this.recacher = new Recacher(this.cache, this.updater);
+    this.updater = new CacheUpdater(this.cache, this.bandcamp, noLog);
+    this.recacher = new Recacher(this.cache, this.updater, noLog);
 };
 
 TestServer.prototype = {

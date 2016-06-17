@@ -5,10 +5,19 @@ var Recacher = require("../server/re-cacher");
 var Seeder = require("./seeder");
 var config = require("./config");
 
+var logFunction = function(text) { console.log(new Date().toISOString() + ": " + text) };
 var cache = new Cache();
 var bandcamp = new BandcampApi();
-var updater = new CacheUpdater(cache, bandcamp, function(text) { console.log(text); });
-var recacher = new Recacher(cache, updater);
+var updater = new CacheUpdater(cache, bandcamp, logFunction);
+var recacher = new Recacher(cache, updater, logFunction);
+var seeder = new Seeder(updater, bandcamp, logFunction);
+
+var seedIfConfigured = function() {
+	if(config.startSeed != undefined) {
+		recacher.stop();
+		seeder.seed(config.startSeed, function() { recacher.start(); });	
+	}
+}
 
 require("./server")
 	.start(
@@ -16,10 +25,8 @@ require("./server")
 		cache,
 		updater,
 		recacher,
-		function() { console.log("Server listening on port " + config.port)});
+		function() {
+			seedIfConfigured();
 
-if(config.startSeed != undefined)
-{
-	var seeder = new Seeder(updater, bandcamp);
-	seeder.seed(config.startSeed);	
-}
+			console.log("Server listening on port " + config.port)
+		});

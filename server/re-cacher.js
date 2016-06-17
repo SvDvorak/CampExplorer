@@ -1,9 +1,10 @@
 
-module.exports = Recacher = function(albumCache, updater) {
+module.exports = Recacher = function(albumCache, updater, log) {
 	this.albumCache = albumCache;
 	this.updater = updater;
 	this.tagIndex = 0;
 	this.cacheDelay = 30;
+	this.log = log;
 };
 
 Recacher.prototype = {
@@ -28,6 +29,7 @@ Recacher.prototype = {
 		if(tags.length > 0 && this.updater.queue.length == 0)
 		{
 			var tagToCache = tags[this.tagIndex];
+			this.log("Recaching");
 
 			this.updater.updateTags([ tagToCache ]);
 

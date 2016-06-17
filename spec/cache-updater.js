@@ -81,4 +81,15 @@ describe("Cache updater", function() {
 
 		expect(tagsRequested).toEqual([ "tag1", "tag1" ]);
 	});
+
+	it("updates only uncached", function() {
+		cache.filterUncached = function(tags) {
+			expect(tags).toEqual(["tag1", "tag2"])
+			return ["tag2"];
+		};
+
+		sut.updateUncachedTags(["tag1", "tag2"]);
+
+		expect(tagsRequested).toEqual(["tag2"]);
+	});
 });
