@@ -10,12 +10,26 @@ module.exports = {
     server: {},
     recacher: {},
 
-    start: function (config, albumCache, updater, recacher, startedCallback) {
+    start: function (config, albumCache, updater, recacher, persister, initialDataLoader, startedCallback) {
+        var server = this;
+        this.config = config;
+        this.albumCache = albumCache;
+        this.updater = updater;
+        this.recacher = recacher;
+        this.persister = persister;
+        this.startedCallback = startedCallback;
+        this.isRunning = true;
+
+        initialDataLoader.load(function() {
+            server.setupEndpointService();
+        });
+    },
+
+    setupEndpointService: function() {
+        var server = this;
         var express = require("express");
         var bodyParser = require("body-parser");
         var app = express();
-        this.recacher = recacher;
-        this.isRunning = true;
 
         app.use(bodyParser.json());
         app.use(allowCrossDomain);
@@ -28,7 +42,7 @@ module.exports = {
                 return;
             }
 
-            var uncached = albumCache.filterUncached(request.body);
+            var uncached = server.albumCache.filterUncached(request.body);
             if(uncached.length > 0)
             {
                 res.status(202);
@@ -36,11 +50,11 @@ module.exports = {
                     error: "Tags not cached, try again later",
                     data: uncached
                 });
-                updater.updateTags(uncached);
+                server.updater.updateTags(uncached);
                 return;
             }
 
-            var albums = albumCache
+            var albums = server.albumCache
                 .getAlbumsByTags(request.body)
                 .slice(0, 50);
 
@@ -55,9 +69,10 @@ module.exports = {
             res.send(JSON.stringify(Object.keys(albumCache.albums).length));
         });
 
-        this.server = app.listen(config.port, function(){
-            recacher.start();
-            startedCallback();
+        this.server = app.listen(this.config.port, function(){
+            server.recacher.start();
+            server.persister.start(Date.now());
+            server.startedCallback();
         });
     },
 
@@ -65,5 +80,6 @@ module.exports = {
         this.isRunning = false;
         this.server.close(stoppedCallback);
         this.recacher.stop();
+        this.persister.stop();
     },
 };

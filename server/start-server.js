@@ -12,21 +12,10 @@ var updater = new CacheUpdater(cache, bandcamp, logFunction);
 var recacher = new Recacher(cache, updater, logFunction);
 var seeder = new Seeder(updater, bandcamp, logFunction);
 
-var seedIfConfigured = function() {
-	if(config.startSeed != undefined) {
-		recacher.stop();
-		seeder.seed(config.startSeed, function() { recacher.start(); });	
-	}
-}
-
 require("./server")
 	.start(
 		config,
 		cache,
 		updater,
 		recacher,
-		function() {
-			seedIfConfigured();
-
-			console.log("Server listening on port " + config.port)
-		});
+		function() { logFunction("Server listening on port " + config.port)	});

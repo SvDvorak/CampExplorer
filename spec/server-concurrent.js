@@ -2,16 +2,21 @@ var TestServer = require("./test-server");
 var Album = require("../api-types");
 var localRequest = require("./local-request");
 var requestShouldNotFail = require("./request-should-not-fail");
+var readJson = require("../server/read-json");
+var writeJson = require("../server/write-json");
+var fs = require("fs");
 
 describe("Concurrent tag caching server", function() {
     var testServer;
     var bandcamp;
+    var persister;
+    var diskPath = "./cache.json";
 
-    beforeEach(function(done) {
+    beforeEach(function() {
         testServer = new TestServer();
         bandcamp = testServer.bandcamp;
         bandcamp.delay = 1;
-        testServer.start(done);
+        persister = testServer.persister;
     });
 
     afterEach(function(done) {
@@ -21,32 +26,74 @@ describe("Concurrent tag caching server", function() {
     it("only caches tag once when new request asks for tag in progress of update", function(done) {
         bandcamp.setAlbumsForTag("tag", [ new Album("Album") ]);
 
-        localRequest(["tag"]);
-        localRequest(["tag"]);
+        testServer.start(function() {
+            localRequest(["tag"]);
+            localRequest(["tag"]);
 
-        setTimeout(function() {
-            localRequest([ "tag" ], function(albums) {
-                expect(bandcamp.tagsRequested.length).toBe(1);
-                expect(albums[0].name).toBe("Album");
-                done();
-            }, requestShouldNotFail(done));
-        }, 70);
+            setTimeout(function() {
+                localRequest([ "tag" ], function(albums) {
+                    expect(bandcamp.tagsRequested.length).toBe(1);
+                    expect(albums[0].name).toBe("Album");
+                    done();
+                }, requestShouldNotFail(done));
+            }, 70);
+        });
     });
 
     it("queues up tags to be updated and processes them in order", function(done) {
         bandcamp.setAlbumsForTag("tag1", [ new Album("Album1") ]);
         bandcamp.setAlbumsForTag("tag2", [ new Album("Album2") ]);
 
-        localRequest(["tag1", "tag2"], function() { }, function(data, responseCode) {
-            expect(data.data).toEqual([ "tag1", "tag2" ]);
-        });
+        testServer.start(function() {
+            localRequest(["tag1", "tag2"], function() { }, function(data, responseCode) {
+                expect(data.data).toEqual([ "tag1", "tag2" ]);
+            });
 
-        setTimeout(function() {
-            expect(bandcamp.tagsRequested).toEqual([ "tag1", "tag2" ]);
-	        localRequest([ "tag2" ], function(albums) {
-	            expect(albums[0].name).toBe("Album2");
-	            done();
-	        }, requestShouldNotFail(done));
-        }, 70);
+            setTimeout(function() {
+                expect(bandcamp.tagsRequested).toEqual([ "tag1", "tag2" ]);
+                localRequest([ "tag2" ], function(albums) {
+                    expect(albums[0].name).toBe("Album2");
+                    done();
+                }, requestShouldNotFail(done));
+            }, 70);
+        });
+    });
+
+    it("saves cache to disk once a day", function(done) {
+        var album = new Album("Album");
+        bandcamp.setAlbumsForTag("tag", [ album ]);
+
+        var oldPersistDateFunc = persister.getNextPersistDate;
+        persister.getNextPersistDate = function(now) { return new Date(now + 30) }
+
+        testServer.start(function() {
+            localRequest(["tag"]);
+
+            setTimeout(function() {
+                var albums = readJson.sync("./cache.json");
+                expect(albums["tag"][0].name).toEqual(album.name);
+
+                persister.getNextPersistDate = oldPersistDateFunc;
+                fs.unlinkSync(diskPath);
+                done();
+            }, 100);
+        });
+    });
+
+    it("loads albums from disk if available at start", function(done) {
+        var album = new Album("Album");
+        // Need two tags since recacher starts working on first at start
+        writeJson.sync(diskPath, { tag1: [ ], tag2: [ album ] });
+
+        testServer.start(function() {
+            setTimeout(function() {
+                localRequest(["tag2"], function(albums) {
+                    expect(albums[0].name).toBe("Album");
+
+                    fs.unlinkSync(diskPath);
+                    done();
+                })
+            }, 100);
+        });
     });
 });

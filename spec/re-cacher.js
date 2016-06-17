@@ -18,7 +18,7 @@ describe("Recacher", function() {
                 this.calledUpdates = this.calledUpdates.concat(tags);
             } };
 
-        sut = new Recacher(cache, updater);
+        sut = new Recacher(cache, updater, function() { });
         sut.cacheDelay = 0.001;
     });
 

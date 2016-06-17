@@ -8,28 +8,29 @@ module.exports = Seeder = function(updater, bandcampApi, log) {
 };
 
 Seeder.prototype = {
-	seed: function(tag, done) {
+	seed: function(tag, onResult) {
 		var seeder = this;
 		this.log("Seeding tags for all albums under " + tag);
 
-		seeder.updater.updateUncachedTags([ tag ], function(newAlbums) {
-			seeder.updateTagsForAllAlbums(newAlbums.slice(0, 50), [], done);
+		seeder.bandcampApi.getAlbumsForTag([ tag ], function(newAlbums) {
+			seeder.updateTagsForAllAlbums(newAlbums.slice(0, 50), [ tag ], onResult);
 		});
 	},
 
-	updateTagsForAllAlbums: function(albums, previousTags, done) {
+	updateTagsForAllAlbums: function(albums, previousTags, onResult) {
 		var seeder = this;
 		var count = albums.length;
+
+		if(count <= 0) {
+			onResult(previousTags);
+			return;
+		}
+
 		seeder.bandcampApi.getTagsForAlbum(albums[count - 1], function(newTags) {
 			tags = previousTags.concat(newTags);
 			count = count - 1;
 	        albums.splice(count, 1);
-    		if(count == 0) {
-				seeder.updater.updateUncachedTags(tags);
-				if(done != undefined) { done(); }
-				return;
-			}
-	        seeder.updateTagsForAllAlbums(albums, tags, done);
+	        seeder.updateTagsForAllAlbums(albums, tags, onResult);
 		});
 	}
 };

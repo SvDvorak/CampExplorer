@@ -3,9 +3,6 @@ module.exports = CacheUpdater = function(cache, albumApi, log) {
 	this.cache = cache;
 	this.albumApi = albumApi;
 	this.log = log;
-	if(log == undefined) {
-		this.log = function(text) { };
-	}
 	this.queue = [];
 	this.inProgress = undefined;
 }
