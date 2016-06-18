@@ -74,6 +74,13 @@ describe("Cache updater", function() {
 		expect(callbackCalled).toBe(true);
 	});
 
+	it("only calls event when tags are empty", function() {
+		var callbackCalled = false;
+		sut.updateTags([], function() { callbackCalled = true; });
+
+		expect(callbackCalled).toBe(true);
+	});
+
 	it("retries updating when request fails", function() {
 		sut.updateTags([ "tag1" ]);
 
@@ -91,5 +98,13 @@ describe("Cache updater", function() {
 		sut.updateUncachedTags(["tag1", "tag2"]);
 
 		expect(tagsRequested).toEqual(["tag2"]);
+	});
+
+	it("is idle when queue is empty", function() {
+		expect(sut.isIdle()).toBe(true);
+
+		sut.updateTags(["tag"]);
+
+		expect(sut.isIdle()).toBe(false);
 	});
 });

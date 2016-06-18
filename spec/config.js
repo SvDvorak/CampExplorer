@@ -1,4 +1,4 @@
-module.exports = config = {};
-
-config.port = 8000;
-config.persistPath = "./cache.json";
+module.exports = config = function() {
+	this.port = 8000;
+	this.persistPath = "./cache.json";	
+};

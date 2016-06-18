@@ -1,7 +1,9 @@
 var request = require("request");
-var config = require("./config");
+var Config = require("./config");
 
 module.exports = function(tags, onResponse, onFailure) {
+    var config = new Config();
+    
     var options =
     {
         method: "POST",

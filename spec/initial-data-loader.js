@@ -32,10 +32,13 @@ describe("initial data loader", function() {
 
 		albumsCache = { albums: { } };
 
-		updater = { updateUncachedTags: function(tags, done) {
-			updatedTags = tags;
-			done();
-		} };
+		updater = {
+			updateUncachedTags: function(tags, done) {
+				updatedTags = tags;
+				done();
+			},
+			isIdle: function() { return true; }
+		};
 
 		var seeder = { seed: function(tag, onResult) {
 			seedTag = tag;
@@ -81,9 +84,30 @@ describe("initial data loader", function() {
 	});
 
 	it("calls done when finished loading cache", function() {
-		var callbackCalled = false;
-		sut.load(function() { callbackCalled = true; })
+		var callbackCount = 0;
+		sut.load(function() { callbackCount += 1; })
 
-		expect(callbackCalled).toBe(true);
+		expect(callbackCount).toBe(1);
+	});
+
+	it("calls done once when finished seeding even though updater runs its callback multiple times", function() {
+		config.persistPath = undefined;
+
+		var updateCount = 0;
+		updater.updateUncachedTags = function(tags, done) {
+			updateCount += 1;
+			done();
+			updateCount += 1;
+			done();
+		};
+
+		updater.isIdle = function() {
+			return updateCount == 2;
+		}
+
+		var callbackCount = 0;
+		sut.load(function() { callbackCount += 1; })
+
+		expect(callbackCount).toBe(1);
 	});
 });

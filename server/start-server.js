@@ -3,9 +3,10 @@ var CacheUpdater = require("./cache-updater");
 var BandcampApi = require("../server/bandcamp");
 var Recacher = require("../server/re-cacher");
 var Seeder = require("./seeder");
-var config = require("./config");
+var Config = require("./config");
 
 var logFunction = function(text) { console.log(new Date().toISOString() + ": " + text) };
+var config = new Config();
 var cache = new Cache();
 var bandcamp = new BandcampApi();
 var updater = new CacheUpdater(cache, bandcamp, logFunction);

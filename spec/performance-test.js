@@ -21,9 +21,11 @@ describe("Server performance", function() {
     	bandcamp.setAlbumsForTag("pop", PopAlbums);
     	bandcamp.setAlbumsForTag("rock", RockAlbums);
 
-    	localRequest([ "pop", "rock" ], function(albums) {
+    	localRequest([ "pop", "rock" ]);
+
+        localRequest([ "pop", "rock" ], function(albums) {
             expect(albums.length).toBe(50);
             done();
-        }, function() { done(false); });
-    }, 100);
+        }, function() { done.fail("performance not fast enough"); });
+    }, 50);
 });

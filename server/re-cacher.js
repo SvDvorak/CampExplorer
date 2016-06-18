@@ -26,7 +26,7 @@ Recacher.prototype = {
 
 		var tags = Object.keys(this.albumCache.albums);
 
-		if(tags.length > 0 && this.updater.queue.length == 0)
+		if(tags.length > 0 && this.updater.isIdle())
 		{
 			var tagToCache = tags[this.tagIndex];
 			this.log("Recaching");

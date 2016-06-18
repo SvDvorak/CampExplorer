@@ -92,7 +92,28 @@ describe("Concurrent tag caching server", function() {
 
                     fs.unlinkSync(diskPath);
                     done();
-                })
+                });
+            }, 100);
+        });
+    });
+
+    it("uses seeder when cache is not available on disk", function(done) {
+        var album1 = new Album("Album1");
+        var album2 = new Album("Album2");
+        bandcamp.setAlbumsForTag("tag", [ album1 ]);
+        bandcamp.setAlbumsForTag("tag_sub1", [ album2 ]);
+        bandcamp.setTagsForAlbum(album1, [ "tag_sub1" ]);
+
+        testServer.config.startSeed = "tag";
+
+        testServer.start(function() {
+            setTimeout(function() {
+                localRequest(["tag_sub1"], function(albums) {
+                    expect(albums.length).toBe(1);
+                    expect(albums[0].name).toEqual(album2.name);
+
+                    done();
+                }, function() { done.fail("failed tag request"); });
             }, 100);
         });
     });

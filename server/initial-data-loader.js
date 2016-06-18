@@ -35,7 +35,11 @@ InitialDataLoader.prototype = {
 		}
 		var loader = this;
 		this.seeder.seed(this.config.startSeed, function(tags) {
-			loader.updater.updateUncachedTags(tags, done);
+			loader.updater.updateUncachedTags(tags, function() {
+				if(loader.updater.isIdle()) {
+					done();
+				}
+			});
 		});
 	}
 }
