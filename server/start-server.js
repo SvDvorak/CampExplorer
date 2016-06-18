@@ -1,9 +1,14 @@
+var BandcampApi = require("../server/bandcamp");
 var Cache = require("./album-cache");
 var CacheUpdater = require("./cache-updater");
-var BandcampApi = require("../server/bandcamp");
-var Recacher = require("../server/re-cacher");
+var Recacher = require("./re-cacher");
+var Persister = require("./seeder");
 var Seeder = require("./seeder");
+var InitialDataLoader = require("./initial-data-loader");
 var Config = require("./config");
+var readJson = require("./read-json");
+var writeJson = require("./write-json");
+var scheduleAt = require("./schedule-at");
 
 var logFunction = function(text) { console.log(new Date().toISOString() + ": " + text) };
 var config = new Config();
@@ -12,6 +17,9 @@ var bandcamp = new BandcampApi();
 var updater = new CacheUpdater(cache, bandcamp, logFunction);
 var recacher = new Recacher(cache, updater, logFunction);
 var seeder = new Seeder(updater, bandcamp, logFunction);
+var persister = new Persister(cache, writeJson, scheduleAt, config.persistPath, logFunction);
+var seeder = new Seeder(updater, bandcamp, logFunction);
+var initialDataLoader = new InitialDataLoader(config, readJson, cache, updater, seeder);
 
 require("./server")
 	.start(
@@ -19,4 +27,6 @@ require("./server")
 		cache,
 		updater,
 		recacher,
+		persister,
+		initialDataLoader,
 		function() { logFunction("Server listening on port " + config.port)	});

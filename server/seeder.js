@@ -1,4 +1,5 @@
 
+require("./extensions");
 
 module.exports = Seeder = function(updater, bandcampApi, log) {
 	this.updater = updater;
@@ -12,7 +13,7 @@ Seeder.prototype = {
 		var seeder = this;
 		this.log("Seeding tags for all albums under " + tag);
 
-		seeder.bandcampApi.getAlbumsForTag([ tag ], function(newAlbums) {
+		seeder.bandcampApi.getAlbumsForTag(tag, function(newAlbums) {
 			seeder.updateTagsForAllAlbums(newAlbums.slice(0, 50), [ tag ], onResult);
 		});
 	},
@@ -22,7 +23,7 @@ Seeder.prototype = {
 		var count = albums.length;
 
 		if(count <= 0) {
-			onResult(previousTags);
+			onResult(previousTags.getUnique().BCvalues());
 			return;
 		}
 
@@ -34,3 +35,10 @@ Seeder.prototype = {
 		});
 	}
 };
+
+Array.prototype.getUnique = function() {
+    var seen = {};
+    return this.filter(function(item) {
+        return seen.hasOwnProperty(item) ? false : (seen[item] = true);
+    });
+}

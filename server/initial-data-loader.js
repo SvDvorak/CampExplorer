@@ -35,7 +35,7 @@ InitialDataLoader.prototype = {
 		}
 		var loader = this;
 		this.seeder.seed(this.config.startSeed, function(tags) {
-			loader.updater.updateUncachedTags(tags, function() {
+			loader.updater.updateTags(tags, function() {
 				if(loader.updater.isIdle()) {
 					done();
 				}

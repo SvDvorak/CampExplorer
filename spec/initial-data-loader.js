@@ -33,7 +33,7 @@ describe("initial data loader", function() {
 		albumsCache = { albums: { } };
 
 		updater = {
-			updateUncachedTags: function(tags, done) {
+			updateTags: function(tags, done) {
 				updatedTags = tags;
 				done();
 			},
@@ -94,7 +94,7 @@ describe("initial data loader", function() {
 		config.persistPath = undefined;
 
 		var updateCount = 0;
-		updater.updateUncachedTags = function(tags, done) {
+		updater.updateTags = function(tags, done) {
 			updateCount += 1;
 			done();
 			updateCount += 1;

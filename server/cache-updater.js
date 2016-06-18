@@ -8,11 +8,6 @@ module.exports = CacheUpdater = function(cache, albumApi, log) {
 }
 
 CacheUpdater.prototype = { 
-    updateUncachedTags: function(tags, onTagAlbumsUpdated) {
-        var uncached = this.cache.filterUncached(tags);
-        this.updateTags(uncached, onTagAlbumsUpdated);
-    },
-
 	updateTags: function(tags, onTagAlbumsUpdated) {
         var updater = this;
         var cache = this.cache;
