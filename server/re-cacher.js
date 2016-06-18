@@ -24,6 +24,10 @@ Recacher.prototype = {
 			return;
 		}
 
+		var rerunRecache = function() {
+			setTimeout(function() { recacher.recache() }, recacher.cacheDelay*1000)
+		};
+
 		var tags = Object.keys(this.albumCache.albums);
 
 		if(tags.length > 0 && this.updater.isIdle())
@@ -31,14 +35,18 @@ Recacher.prototype = {
 			var tagToCache = tags[this.tagIndex];
 			this.log("Recaching");
 
-			this.updater.updateTags([ tagToCache ]);
+			this.updater.updateTags([ tagToCache ], function() {
+				rerunRecache();
+			});
 
 			this.tagIndex += 1;
 			if(this.tagIndex >= tags.length) {
 				this.tagIndex = 0;
 			}
 		}
-
-		setTimeout(function() { recacher.recache() }, this.cacheDelay*1000);
+		else
+		{
+			rerunRecache();
+		}
 	},
 };

@@ -1,7 +1,3 @@
-/*var server = require("../server/server");
-var BandcampFake = require("./bandcamp-fake");
-var Cache = require("../server/album-cache");
-var CacheUpdater = require("../server/cache-updater");*/
 var Recacher = require("../server/re-cacher");
 
 describe("Recacher", function() {
@@ -14,9 +10,13 @@ describe("Recacher", function() {
         updater = {
             calledUpdates: [],
             queue: [],
-            updateTags: function(tags) {
+            callback: function() { },
+            updateTags: function(tags, callback) {
+                this.onCallbackPassed(callback);
+                this.callback = callback;
                 this.calledUpdates = this.calledUpdates.concat(tags);
             },
+            onCallbackPassed: function(callback) { callback(); },
             isIdle: function() { return this.queue.length == 0; }
         };
 
@@ -42,20 +42,26 @@ describe("Recacher", function() {
         expect(updater.calledUpdates[0]).toEqual("tag");
     });
 
-    it("continues caching next tags after a delay", function(done) {
+    it("continues caching next tags after a delay after previous cache is done", function(done) {
+        updater.onCallbackPassed = function() { };
+
         cache.albums["tag1"] = { };
         cache.albums["tag2"] = { };
 
         sut.start();
 
-        expect(updater.calledUpdates.length).toEqual(1);
-        expect(updater.calledUpdates[0]).toEqual("tag1");
-
         setTimeout(function() {
-            expect(updater.calledUpdates.length).toEqual(2);
-            expect(updater.calledUpdates[1]).toEqual("tag2");
-            done();
-        }, 11);
+            expect(updater.calledUpdates.length).toEqual(1);
+            expect(updater.calledUpdates[0]).toEqual("tag1");
+
+            updater.callback();
+
+            setTimeout(function() {
+                expect(updater.calledUpdates.length).toEqual(2);
+                expect(updater.calledUpdates[1]).toEqual("tag2");
+                done();
+            }, 10);
+        }, 10);
     });
 
     it("loops tags when having reached end of tag collection", function(done) {
@@ -95,5 +101,16 @@ describe("Recacher", function() {
             expect(updater.calledUpdates.length).toEqual(0);
             done();
         }, 35);
+    });
+
+    it("retries recaching after a delay even if it wasn't possible this call", function(done) {
+        sut.start();
+
+        cache.albums["tag1"] = { };
+
+        setTimeout(function() {
+            expect(updater.calledUpdates.length).toBeGreaterThan(0);
+            done();
+        }, 10);
     });
 });

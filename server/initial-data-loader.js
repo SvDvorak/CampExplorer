@@ -33,6 +33,7 @@ InitialDataLoader.prototype = {
 			done();
 			return;
 		}
+		
 		var loader = this;
 		this.seeder.seed(this.config.startSeed, function(tags) {
 			loader.updater.updateTags(tags, function() {
