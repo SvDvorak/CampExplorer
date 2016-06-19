@@ -1,5 +1,5 @@
 var TestServer = require("./test-server");
-var Album = require("../api-types");
+var Album = require("../../api-types");
 var localRequest = require("./local-request");
 
 describe("Recaching server", function() {

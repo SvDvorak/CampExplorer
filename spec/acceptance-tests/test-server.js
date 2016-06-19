@@ -1,17 +1,19 @@
-var BandcampFake = require("./bandcamp-fake");
-var Cache = require("../server/album-cache");
-var CacheUpdater = require("../server/cache-updater");
-var Recacher = require("../server/re-cacher");
-var Persister = require("../server/cache-persister");
-var Seeder = require("../server/seeder");
-var InitialDataLoader = require("../server/initial-data-loader");
+var serverFolder = "../../server/";
+
+var BandcampFake = require("../bandcamp-fake");
+var Cache = require(serverFolder + "album-cache");
+var CacheUpdater = require(serverFolder + "cache-updater");
+var Recacher = require(serverFolder + "re-cacher");
+var Persister = require(serverFolder + "cache-persister");
+var Seeder = require(serverFolder + "seeder");
+var InitialDataLoader = require(serverFolder + "initial-data-loader");
 var Config = require("./config");
-var readJson = require("../server/read-json");
-var writeJson = require("../server/write-json");
-var scheduleAt = require("../server/schedule-at");
+var readJson = require(serverFolder + "read-json");
+var writeJson = require(serverFolder + "write-json");
+var scheduleAt = require(serverFolder + "schedule-at");
 
 module.exports = TestServer = function() {
-    this.server = require("../server/server");
+    this.server = require("../../server/server");
     var noLog = function(text) { };
     this.config = new Config();
     this.bandcamp = new BandcampFake();
