@@ -45,7 +45,3 @@ CachePersister.prototype = {
 		});
 	}
 };
-
-Date.prototype.addDays = function(days)
-{
-}

@@ -66,7 +66,7 @@ module.exports = {
 
         app.get("/debug/tagcount", function(request, res) {
             res.status(200);
-            res.send(JSON.stringify(Object.keys(albumCache.albums).length));
+            res.send(JSON.stringify(Object.keys(server.albumCache.albums).length));
         });
 
         this.server = app.listen(this.config.port, function(){
