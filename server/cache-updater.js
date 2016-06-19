@@ -10,38 +10,43 @@ module.exports = CacheUpdater = function(cache, albumApi, log) {
 CacheUpdater.prototype = { 
 	updateTags: function(tags, onTagAlbumsUpdated) {
         var updater = this;
-        var cache = this.cache;
-        var albumApi = this.albumApi;
 
-        updater.queue = updater.queue.concat(
-            tags.filter(function(tag) { return updater.queue.indexOf(tag) == -1; }));
-
-        if(this.queue.length == 0) {
+        if(tags.length == 0) {
             updater.callIfDefined(onTagAlbumsUpdated, []);
             return;
         }
 
-        if(this.inProgress == undefined)
-        {
+        updater.queue = updater.queue.concat(
+            tags.filter(function(tag) { return updater.queue.indexOf(tag) == -1; }));
+
+        updater.updateTagsRecursive(onTagAlbumsUpdated);
+	},
+
+    updateTagsRecursive: function(onTagAlbumsUpdated) { 
+        var updater = this;
+        var cache = this.cache;
+        var albumApi = this.albumApi;
+
+        if(this.queue.length > 0 && this.inProgress == undefined) {
             var tag = this.queue[0];
             this.inProgress = tag;
             this.log("Processing " + tag);
             albumApi.getAlbumsForTag(tag, function(newAlbums) {
                 cache.albums[tag] = newAlbums;
+                updater.removeFromQueue(tag);
                 updater.log("Finished " + tag);
 
                 updater.callIfDefined(onTagAlbumsUpdated, newAlbums);
 
                 updater.inProgress = undefined;
-                updater.removeFromQueue(tag);
-                updater.updateTags([], onTagAlbumsUpdated);
+                updater.updateTagsRecursive(onTagAlbumsUpdated);
             }, function() {
                 updater.inProgress = undefined;
 
-            	updater.updateTags([], onTagAlbumsUpdated);
+                updater.updateTagsRecursive(onTagAlbumsUpdated);
             });
         }
-	},
+    },
 
     isIdle: function() {
         return this.queue.length == 0;
