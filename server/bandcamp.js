@@ -25,9 +25,10 @@ Bandcamp.prototype = {
 		var api = this;
 
         request(albumsOptions, function(error, response, data) {
-			if(error || response.statusCode != 200) {
+			var statusCode = response != undefined ? response.statusCode : "undefined";
 
-				if(response.statusCode == 503 && albumsRequest.errorCount < 3)
+			if(error || statusCode != 200) {
+				if(statusCode == 503 && albumsRequest.errorCount < 3)
 				{
 					albumsRequest.errorCount += 1;
 					setTimeout(
@@ -37,11 +38,16 @@ Bandcamp.prototype = {
 				}
 
 				console.error("Album retrieval failed on page " + albumsRequest.page +
-					"\nStatuscode: " + response.statusCode +
+					"\nStatuscode: " + statusCode +
 					"\nError: " + error);
 
 				albumsRequest.errorCallback();
 				return;
+			}
+
+			if(data.items == undefined)
+			{
+				console.error("Items in data undefined, actual data:" + JSON.stringify(data));
 			}
 
 			albumsRequest.errorCount = 0;
@@ -70,16 +76,17 @@ Bandcamp.prototype = {
 		var api = this;
 
         request(tagsOptions, function(error, response, data) {
-			if(error || response.statusCode != 200) {
-	    		if(response != undefined && response.statusCode == 503 && retryCount < 3)
+			var statusCode = response != undefined ? response.statusCode : "undefined";
+
+			if(error || statusCode != 200) {
+	    		if(statusCode == 503 && retryCount < 3)
 	    		{
-	    			setTimeout(function() {
-	    				api.getTagsForAlbum(album, successCallback, retryCount + 1);
-	    			}, 100*retryCount);
+	    			setTimeout(
+	    				function() { api.getTagsForAlbum(album, successCallback, retryCount + 1); },
+	    				100*retryCount);
 	    			return;
 	    		}
 
-				var statusCode = response != undefined ? response.statusCode : "undefined";
 				console.error("Unable to get tags for " + album +
 					"\nStatuscode: " + statusCode +
 					"\nError: " + error);
