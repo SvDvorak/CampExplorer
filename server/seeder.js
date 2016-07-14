@@ -14,7 +14,7 @@ Seeder.prototype = {
 		this.log("Seeding tags for all albums under " + tag);
 
 		seeder.bandcampApi.getAlbumsForTag(tag, function(newAlbums) {
-			seeder.updateTagsForAllAlbums(newAlbums.slice(0, 50), [ tag ], onResult);
+			seeder.updateTagsForAllAlbums(newAlbums.slice(0, 500), [ tag ], onResult);
 		});
 	},
 

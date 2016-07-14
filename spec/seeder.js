@@ -53,10 +53,10 @@ describe("Seeder", function() {
 		expect(tags).toEqual([ "pop", "rock", "ambient", "metal" ])
 	});
 
-	it("should only retrieve tags for first 50 albums plus one for start tag", function() {
+	it("should only retrieve tags for first 500 albums plus one for start tag", function() {
 		var callbacks = 0;
 
-		var albums = generateAlbums(500);
+		var albums = generateAlbums(1000);
 
 		bandcamp.setAlbumsForTag("pop", albums);
 		albums.forEach(function(album) {
@@ -66,7 +66,7 @@ describe("Seeder", function() {
 		var tags = [];
 		seeder.seed("pop", function(newTags) { tags = newTags });
 
-		expect(tags.length).toBe(51);
+		expect(tags.length).toBe(501);
 	});
 
 	it("filters duplicate tags", function() {
