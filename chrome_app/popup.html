@@ -21,9 +21,9 @@
         <span ng-click="showVersionChangesQuestion = false" class="ignore_changes">Nope</span>
       </div>
       <div ng-show="showVersionChanges">
-        <p class="version_text">Most of the application has been rewritten to use own cache server instead of relying on direct calls to Bandcamp.
+        <p class="version_text">Most of the application has been rewritten to use separate cache server instead of relying on direct calls to Bandcamp.
         </br></br>
-        This has given some big benefits like 10x the amount of search results per tag as well as making searches incredibly fast.
+        This has given some big benefits like ten times the amount of search results per tag as well as making searches incredibly fast.
         </br></br>
         The only downside is that it relies on tags having been cached already so any tag not previously searched for will take while longer (up to a minute).
         </br></br>
@@ -32,7 +32,7 @@
       </div>
     </div>
     <div ng-show="showReviewSuggestionNow" class="review">
-      <p class="review_text">Heya, wouldn't you like to review this awesome app?<p>
+      <p class="review_text">Hey, you've been using the app for a little while now. Would you like to write a review or give any feedback on it?<p>
       <a href="https://chrome.google.com/webstore/detail/bandcamp-tag-search/fkkbhcpcpapcgcfjmllgibbnalmpbjcm" target="_blank" class="go_review" ng-click="neverShowSuggestion()">Sure</a>
       <span ng-click="showReviewSuggestionNow = false;" class="remind_me">Maybe later</span>
       <span ng-click="neverShowSuggestion()" class="never_suggest">Nope</span>
@@ -52,7 +52,7 @@
     </ul>
     <p ng-show="serverUnreachable" class="server_message">Sorry, unable to reach server at the moment
       <br>Retrying...</p>
-    <p ng-show="isCachingTags" class="server_message">Caching tags on server<br>Will retry every {{ retryTime }} seconds</p>
+    <p ng-show="isCachingTags" class="server_message">Caching missing tags on server.<br>Retrying...</p>
     <div class="spinner" ng-show="isSearching">
       <div class="throbber-loader">
         Loading…

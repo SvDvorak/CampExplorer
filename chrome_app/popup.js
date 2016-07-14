@@ -14,7 +14,7 @@ function Tag(name) {
 
 bandcampMultiTag.controller('tagsController', function ($scope) {
     $scope.adress = "163.172.155.121";
-    $scope.port = 8079;
+    $scope.port = 80;
 
     $scope.albums = [];
     $scope.isSearching = false;
@@ -106,7 +106,7 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
                 $scope.tags.forEach(x => x.isCaching = false);
                 $scope.isSearching = false;
             });
-    		});
+		});
   	};
 
   	$scope.makeRequest = function(tags, requestId, onDone) {
