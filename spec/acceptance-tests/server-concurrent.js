@@ -10,7 +10,6 @@ describe("Concurrent tag caching server", function() {
     var testServer;
     var bandcamp;
     var persister;
-    var diskPath = "./cache.json";
 
     beforeEach(function() {
         testServer = new TestServer();
@@ -64,7 +63,7 @@ describe("Concurrent tag caching server", function() {
         bandcamp.setAlbumsForTag("tag", [ album ]);
 
         var oldPersistDateFunc = persister.getNextPersistDate;
-        persister.getNextPersistDate = function(now) { return new Date(now + 30) }
+        persister.getNextPersistDate = function(now) { return new Date(now + 100) }
 
         testServer.start(function() {
             localRequest(["tag"]);
@@ -74,23 +73,21 @@ describe("Concurrent tag caching server", function() {
                 expect(albums["tag"][0].name).toEqual(album.name);
 
                 persister.getNextPersistDate = oldPersistDateFunc;
-                fs.unlinkSync(diskPath);
                 done();
-            }, 100);
+            }, 200);
         });
     });
 
     it("loads albums from disk if available at start", function(done) {
         var album = new Album("Album");
         // Need two tags since recacher starts working on first at start
-        writeJson.sync(diskPath, { tag1: [ ], tag2: [ album ] });
+        writeJson.sync(testServer.config.persistPath, { tag1: [ ], tag2: [ album ] });
 
         testServer.start(function() {
             setTimeout(function() {
                 localRequest(["tag2"], function(albums) {
                     expect(albums[0].name).toBe("Album");
 
-                    fs.unlinkSync(diskPath);
                     done();
                 });
             }, 100);

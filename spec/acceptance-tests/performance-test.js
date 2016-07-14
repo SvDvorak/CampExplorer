@@ -17,7 +17,7 @@ describe("Server performance", function() {
         testServer.stop(done);
     });
 
-    it("should be fast enough to match two popular tags within a second", function(done) {
+    it("should be fast enough to match two popular tags within a tenth of a second", function(done) {
     	bandcamp.setAlbumsForTag("pop", PopAlbums);
     	bandcamp.setAlbumsForTag("rock", RockAlbums);
 
@@ -27,5 +27,5 @@ describe("Server performance", function() {
             expect(albums.length).toBe(50);
             done();
         }, function() { done.fail("performance not fast enough"); });
-    }, 50);
+    }, 100);
 });

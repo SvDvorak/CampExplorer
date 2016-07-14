@@ -29,9 +29,10 @@ describe("Persister", function() {
 		sut = new CachePersister(cache, writeJson, scheduleAt, expectedPath, function() { });		
 	});
 
-	it("does not save at start but waits until next scheduled time", function() {
+	it("saves at start", function() {
 		sut.start(startDate);
 
+		expect(dataWritten.length).toEqual(1);
 		expect(new Date(2016, 1, 2, 0, 0, 0, 0) in scheduledCalls).toBe(true);
 	});
 
@@ -50,10 +51,10 @@ describe("Persister", function() {
 		cache.albums = { tag: [ album3 ] };
 		scheduledCalls[new Date(2016, 1, 4, 0, 0, 0, 0)]();
 
-
-		expect(dataWritten[0]["tag"]).toEqual([ album1 ]);
-		expect(dataWritten[1]["tag"]).toEqual([ album2 ]);
-		expect(dataWritten[2]["tag"]).toEqual([ album3 ]);
+		expect(dataWritten[0]).toEqual({ });
+		expect(dataWritten[1]["tag"]).toEqual([ album1 ]);
+		expect(dataWritten[2]["tag"]).toEqual([ album2 ]);
+		expect(dataWritten[3]["tag"]).toEqual([ album3 ]);
 	});
 
 	it("stops schedule when calling stop", function() {

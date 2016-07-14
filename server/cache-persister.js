@@ -18,7 +18,7 @@ module.exports = CachePersister = function(cache, writeJson, scheduleAt, path, l
 CachePersister.prototype = {
 	start: function(timeNow) {
 		this.isRunning = true;
-		this.scheduledPersist(this.getNextPersistDate(timeNow));
+		this.persistNow(timeNow);
 	},
 
 	stop: function() {
@@ -28,20 +28,24 @@ CachePersister.prototype = {
 	scheduledPersist: function(date) {
 		var persister = this;
 
-		this.scheduleAt(date, function() {
-			if(!persister.isRunning)	{
-				return;
-			}
+		this.scheduleAt(date, function() { persister.persistNow(date); });
+	},
 
-			persister.log("Persisting albums");
-			persister.writeJson.async(
-				persister.path,
-				persister.cache.albums,
-				function() {
-					var nextPersistDate = persister.getNextPersistDate(date)
-					persister.scheduledPersist(nextPersistDate);
-				},
-				function(error) { persister.log("Error writing json: " + error); });
-		});
+	persistNow: function(timeNow) {
+		var persister = this;
+
+		if(!persister.isRunning) {
+			return;
+		}
+
+		persister.log("Persisting albums");
+		persister.writeJson.async(
+			persister.path,
+			persister.cache.albums,
+			function() {
+				var nextPersistDate = persister.getNextPersistDate(timeNow)
+				persister.scheduledPersist(nextPersistDate);
+			},
+			function(error) { persister.log("Error writing json: " + error); });
 	}
 };
