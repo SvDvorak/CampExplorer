@@ -1,3 +1,3 @@
-pscp -r .\server\ root@163.172.155.121:/home/server/
-pscp .\api-types.js root@163.172.155.121:/home/api-types.js
-pscp .\package.json root@163.172.155.121:/home/package.json
+pscp -r .\server\ deploy@163.172.155.121:/home/deploy/bandcamp/server/
+pscp .\api-types.js deploy@163.172.155.121:/home/deploy/bandcamp/api-types.js
+pscp .\package.json deploy@163.172.155.121:/home/deploy/bandcamp/package.json
