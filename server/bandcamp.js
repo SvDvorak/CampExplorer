@@ -48,6 +48,7 @@ Bandcamp.prototype = {
 			if(data.items == undefined)
 			{
 				console.error("Items in data undefined, actual data:" + JSON.stringify(data));
+				return;
 			}
 
 			albumsRequest.errorCount = 0;
