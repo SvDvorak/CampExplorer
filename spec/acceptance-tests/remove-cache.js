@@ -5,6 +5,5 @@ module.exports = function(path) {
         fs.unlinkSync(path);
     }
     catch(err) {
-        console.log("No file");
     }
 }
