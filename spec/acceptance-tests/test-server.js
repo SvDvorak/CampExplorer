@@ -11,7 +11,6 @@ var Config = require("./config");
 var readJson = require(serverFolder + "read-json");
 var writeJson = require(serverFolder + "write-json");
 var scheduleAt = require(serverFolder + "schedule-at");
-var fs = require("fs");
 
 module.exports = TestServer = function() {
     this.server = require("../../server/server");
@@ -40,7 +39,6 @@ TestServer.prototype = {
 
 	stop: function(done) {
 		if(this.server.isRunning) {
-            fs.unlinkSync(this.config.persistPath);
             this.server.stop(done);
         }
         else {
