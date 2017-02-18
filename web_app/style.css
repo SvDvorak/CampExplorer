@@ -1,0 +1,221 @@
+@font-face { font-family: LiberationSans; src: url('chrome-extension://__MSG_@@extension_id__/fonts/LiberationSans-Regular.ttf'); } 
+@font-face { font-family: LiberationSans; font-weight: bold; src: url('chrome-extension://__MSG_@@extension_id__/fonts/LiberationSans-Bold.ttf');}
+
+/* Angular Bootstrap fixes */
+.nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
+
+html {
+	width: 394px;
+}
+
+body {
+	font-family: "Helvetica Neue", LiberationSans, Arial, sans-serif;
+	font-size: 100%;
+	margin: 5px;
+	margin-bottom: 0px;
+	background: #FAFAFA;
+}
+
+#status {
+	/* avoid an excessively wide status text */
+	white-space: pre;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	max-width: 400px;
+}
+
+.version_changes {
+	margin: -5px -5px 0px -5px;
+	padding: 5px 15px 13px 15px;
+	background: #E4E7EA;
+}
+
+	.version_header {
+		font-size: 16px;
+		color: #264E59;
+	}
+
+	.version_text {
+		font-size: 13px;
+		color: #264E59;
+	}
+
+	.version_changes span {
+		color: #264E59;
+		font-size: 14px;
+		margin-bottom: 15px;
+		cursor: pointer;
+	}
+
+	.version_changes span:hover {
+		text-decoration: underline;
+	}
+
+	.ignore_changes {
+		margin-left: 15px;
+	}
+
+.review {
+	margin: -5px -5px 0px -5px;
+	padding: 5px 15px;
+	background: #E4E7EA;
+}
+
+	.review_text {
+		font-size: 13px;
+		color: #264E59;
+	}
+
+	.review span {
+		color: #264E59;
+		margin-left: 15px;
+		font-size: 14px;
+		cursor: pointer;
+	}
+
+	.review span:hover {
+		text-decoration: underline;
+	}
+
+	.review a:hover {
+		text-decoration: underline;
+	}
+
+	.review a:visited {
+		color: #264E59;
+	}
+
+	.go_review {
+		color: #264E59;
+		font-size: 14px;
+		text-decoration: none;
+	}
+
+
+.input {
+	margin: 10px 10px;
+	position: relative;
+	height: 30px;
+}
+
+	.input_tag {
+		width: 80%;
+		height: 100%;
+		box-sizing: border-box;
+		padding: 5px;
+	}
+
+	.input_add {
+		width: 20%;
+		height: 100%;
+		background: #538E9F;
+		color: white;
+		border: none;
+		stroke: none;
+		text-align: center;
+		position: absolute;
+		right: 0;
+	}
+
+ul {
+	list-style-type: none;
+	padding: 0;
+}
+
+.tags {
+	margin: 10px;
+}
+
+.tag {
+	border-bottom: 1px solid #EFEFEF;
+	padding: 10px 0px;
+	font-size: 12px;
+}
+
+	.tag_name {
+		color: #408294;
+		text-decoration: none;
+	}
+
+	.tag_name:visited {
+		color: #408294;
+	}
+
+	.tag_name:hover {
+		text-decoration: underline;
+	}
+
+	.tag_caching {
+		color: #264E59;
+		display: inline;
+	}
+
+	.tag_remove {
+		float: right;
+		color: #FFA366;
+		cursor: pointer;
+	}
+
+	.tag_remove:hover {
+		color: #FF6600;
+	}
+
+.spinner {
+	padding-top: 10px;
+	text-align: center;
+	position: relative;
+}
+
+.server_message {
+	color: #264E59;
+	text-align: center;
+	margin: 0px;
+	padding: 5px 10px;
+}
+
+.albums {
+	margin-bottom: 0px;
+}
+
+.album {
+    padding: 10px;
+    display: inline-block;
+}
+
+	.album a {
+		text-decoration: none;
+		color: #408294;
+		overflow: hidden;
+	    width: 172px;
+	    display: block;
+	}
+
+	.album a:visited {
+		color: #408294;
+	}
+
+	.album a:hover {
+		text-decoration: underline;
+	}
+
+	.album p {
+		font-size: 15px;
+		margin-top: 0px;
+		margin-bottom: 5px;
+	}
+
+	.album_name {
+		font-weight: bold;
+	}
+
+	.album_name, .album_artist {
+		text-overflow: ellipsis;
+		overflow: hidden;
+		white-space: nowrap;
+	}
+
+.noResults {
+	text-align: center;
+	color: #264E59;
+	padding: 10px;
+}

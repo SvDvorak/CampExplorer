@@ -1,0 +1,67 @@
+<!doctype html>
+<html ng-app="multiTagApp">
+  <head>
+    <title>Bandcamp Tag Search</title>
+    <script src="angular.min.js"></script>
+    <script src="view-model.js"></script>
+    <link rel="stylesheet" href="spinner.css" type="text/css" />
+    <link rel="stylesheet" href="style.css" type="text/css" />
+  </head>
+  <body ng-controller="tagsController">
+    <div ng-show="showVersionChangesQuestion || showVersionChanges" class="version_changes">
+      <h2 class="version_header">Version 1.1.0</h2>
+      <div ng-show="!showVersionChanges">
+        <p class="version_text">Hey, there's been some changes since the last version, would you like to read about them?</p>
+        <span ng-click="showVersionChangesQuestion = false; showVersionChanges = true" class="expand_changes">Sure</span>
+        <span ng-click="showVersionChangesQuestion = false" class="ignore_changes">Nope</span>
+      </div>
+      <div ng-show="showVersionChanges">
+        <p class="version_text">Most of the application has been rewritten to use own cache server instead of relying on direct calls to Bandcamp.
+        </br></br>
+        This has given some big benefits like 10x the amount of search results per tag as well as making searches incredibly fast.
+        </br></br>
+        The only downside is that it relies on tags having been cached already so any tag not previously searched for will take while longer (up to a minute).
+        </br></br>
+        The interface will show which tag is being cached and you don't need to leave the app open while it caches, you can close and come back to it if you want to.</p>
+        <span ng-click="showVersionChanges = false" class="close_changes">Gotcha</span>
+      </div>
+    </div>
+    <div ng-show="showReviewSuggestionNow" class="review">
+      <p class="review_text">Hey, you've been trying out the app for a while. Would care to give a you like to review this awesome app?<p>
+      <a href="https://chrome.google.com/webstore/detail/bandcamp-tag-search/fkkbhcpcpapcgcfjmllgibbnalmpbjcm" target="_blank" class="go_review" ng-click="neverShowSuggestion()">Sure</a>
+      <span ng-click="showReviewSuggestionNow = false;" class="remind_me">Maybe later</span>
+      <span ng-click="neverShowSuggestion()" class="never_suggest">Nope</span>
+    </div>
+    <div>
+      <form class="input">
+        <input class="input_tag" type="text" ng-model="newTag" placeholder="Tag..." />
+        <input class="input_add" type="submit" ng-click="addInputTag()" value="Add" />
+      </form>
+    </div>
+    <ul class="tags">
+      <li class="tag" ng-repeat="tag in tags">
+        <a href="https://bandcamp.com/tag/{{ tag.name }}" target="_blank" class="tag_name">{{ tag.name }}</a>
+        <span class="tag_caching" ng-show="tag.isCaching">- not cached</span>
+        <span class="tag_remove" ng-click="removeTag(tag)">X</span>
+      </li>
+    </ul>
+    <p ng-show="serverUnreachable" class="server_message">Sorry, unable to reach server at the moment
+      <br>Retrying...</p>
+    <p ng-show="isCachingTags" class="server_message">Caching missing tags on server.<br>Retrying...</p>
+    <div class="spinner" ng-show="isSearching">
+      <div class="throbber-loader">
+        Loading…
+      </div>
+    </div>
+    <ul class="albums">
+      <li class="album" ng-repeat="album in albums track by $index">
+        <a href="{{ album.link }}" target="_blank" title="{{ album.name }}">
+          <img ng-src="{{ album.image }}" />
+          <p class="album_name">{{ album.name }}</p>
+          <p class="album_artist">{{ album.artist }}</p>
+        </a>
+      </li>
+    </ul>
+    <p class="noResults" ng-show="tags.length != 0 && albums.length == 0 && searchesInProgress <= 0">No albums found</p>
+  </body>
+</html>
