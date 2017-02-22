@@ -1,0 +1,11 @@
+tagsearch:
+  build: .
+  command: node_modules/.bin/nodemon start-server.js
+  environment:
+    NODE_ENV: development
+  ports:
+    - '3000:3000'
+  volumes:
+    - .:/home/app/tagsearch
+    - /var/lib/tagsearch
+    - /home/app/tagsearch/node_modules

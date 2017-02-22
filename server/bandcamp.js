@@ -1,6 +1,6 @@
 var request = require("request");
 var options = require("./bandcamp-options");
-var Album = require("../api-types");
+var Album = require("./api-types");
 
 module.exports = Bandcamp = function() {
 }
