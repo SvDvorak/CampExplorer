@@ -1,9 +1,9 @@
 var TestServer = require("./test-server");
-var Album = require("../../api-types");
+var Album = require("../../source/api-types");
 var localRequest = require("./local-request");
 var requestShouldNotFail = require("./request-should-not-fail");
-var readJson = require("../../server/read-json");
-var writeJson = require("../../server/write-json");
+var readJson = require("../../source/read-json");
+var writeJson = require("../../source/write-json");
 var fs = require("fs");
 var removeCache = require("./remove-cache");
 

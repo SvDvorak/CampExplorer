@@ -1,5 +1,5 @@
-var InitialDataLoader = require("../server/initial-data-loader");
-var Album = require("../api-types");
+var InitialDataLoader = require("../source/initial-data-loader");
+var Album = require("../source/api-types");
 
 describe("initial data loader", function() {
 	var sut;

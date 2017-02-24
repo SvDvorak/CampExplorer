@@ -1,4 +1,4 @@
-var Recacher = require("../server/re-cacher");
+var Recacher = require("../source/re-cacher");
 
 describe("Recacher", function() {
     var cache;

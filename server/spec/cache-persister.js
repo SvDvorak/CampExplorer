@@ -1,5 +1,5 @@
-var CachePersister = require("../server/cache-persister");
-var Album = require("../api-types");
+var CachePersister = require("../source/cache-persister");
+var Album = require("../source/api-types");
 
 describe("Persister", function() {
 	var sut;

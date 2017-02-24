@@ -1,9 +1,9 @@
-var Cache = require("../server/album-cache");
-var CacheUpdater = require("../server/cache-updater");
-var Seeder = require("../server/seeder");
+var Cache = require("../source/album-cache");
+var CacheUpdater = require("../source/cache-updater");
+var Seeder = require("../source/seeder");
 var BandcampFake = require("./bandcamp-fake");
 var generateAlbums = require("./generate-albums");
-require("../server/extensions");
+require("../source/extensions");
 
 describe("Seeder", function() {
 	var bandcamp;

@@ -1,5 +1,5 @@
-var Cache = require("../server/album-cache");
-var Album = require("../api-types");
+var Cache = require("../source/album-cache");
+var Album = require("../source/api-types");
 
 describe("Album cache", function() {
 	var sut;

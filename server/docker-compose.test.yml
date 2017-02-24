@@ -1,6 +1,6 @@
 tagsearch:
   build: .
-  command: node_modules/.bin/nodemon source/start-server.js
+  command: ./node_modules/.bin/jasmine
   environment:
     NODE_ENV: development
   ports:

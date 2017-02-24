@@ -1,5 +1,5 @@
 var TestServer = require("./test-server");
-var Album = require("../../api-types");
+var Album = require("../../source/api-types");
 var localRequest = require("./local-request");
 var requestShouldNotFail = require("./request-should-not-fail");
 var generateAlbums = require("../generate-albums");
