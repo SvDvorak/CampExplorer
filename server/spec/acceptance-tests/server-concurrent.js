@@ -71,7 +71,7 @@ describe("Concurrent tag caching server", function() {
             localRequest(["tag"]);
 
             setTimeout(function() {
-                var albums = readJson.sync("./cache.json");
+                var albums = readJson.sync(testServer.config.persistPath);
                 expect(albums["tag"][0].name).toEqual(album.name);
 
                 persister.getNextPersistDate = oldPersistDateFunc;
