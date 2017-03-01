@@ -1,0 +1,33 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Run Server",
+            "cwd": "${workspaceRoot}/server",
+            "runtimeExecutable": "node",
+            "runtimeArgs": [
+                "--debug=5858"
+            ],
+            "program": "${workspaceRoot}/server/source/start-server.js",
+            "restart": true,
+            "port": 5858,
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Run All Tests",
+            "cwd": "${workspaceRoot}/server",
+            "runtimeExecutable": "node",
+            //"program": "${workspaceRoot}/server/spec/re-cacher.js",
+            "runtimeArgs": [
+                "--debug=5858",
+                "${workspaceRoot}/server/node_modules/jasmine/bin/jasmine.js"
+            ],
+            "port": 5858
+        }
+    ]
+}
