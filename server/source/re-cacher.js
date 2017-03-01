@@ -7,7 +7,7 @@ module.exports = Recacher = function(albumCache, updater, log) {
 };
 
 Recacher.prototype = {
-	execute: function() {
+	execute: function(finished) {
 		var recacher = this;
 
 		var tags = Object.keys(this.albumCache.albums);
@@ -17,12 +17,16 @@ Recacher.prototype = {
 			var tagToCache = tags[this.tagIndex];
 			this.log("Recaching");
 
-			this.updater.updateTags([ tagToCache ], function() {});
-
 			this.tagIndex += 1;
 			if(this.tagIndex >= tags.length) {
 				this.tagIndex = 0;
 			}
+
+			this.updater.updateTags([ tagToCache ], finished);
+		}
+		else
+		{
+			finished();
 		}
 	},
 };

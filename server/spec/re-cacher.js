@@ -3,6 +3,8 @@ var Recacher = require("../source/re-cacher");
 describe("Recacher", function() {
     var cache;
     var updater;
+    var finishedCall;
+    var onFinished = function() { finishedCall = true; };
     var sut;
 
     beforeEach(function() {
@@ -19,13 +21,16 @@ describe("Recacher", function() {
             onCallbackPassed: function(callback) { callback(); },
             isIdle: function() { return this.queue.length == 0; }
         };
+        finishedCall = false;
 
         sut = new Recacher(cache, updater, function() { });
         sut.cacheDelay = 0.001;
     });
 
+    var execute = function() { sut.execute(onFinished); }
+
     it("does nothing if no tags exist in cache", function() {
-        sut.execute();
+        execute();
 
         expect(updater.calledUpdates.length).toEqual(0);
     });
@@ -33,18 +38,19 @@ describe("Recacher", function() {
     it("caches first tag in album cache", function() {
         cache.albums["tag"] = { };
 
-        sut.execute();
+        execute();
 
         expect(updater.calledUpdates[0]).toEqual("tag");
+        expect(finishedCall).toBe(true);
     });
 
     it("loops tags when having reached end of tag collection", function() {
         cache.albums["tag1"] = { };
         cache.albums["tag2"] = { };
 
-        sut.execute();
-        sut.execute();
-        sut.execute();
+        execute();
+        execute();
+        execute();
 
         expect(updater.calledUpdates).toEqual([ "tag1", "tag2", "tag1" ]);
     });
@@ -55,8 +61,9 @@ describe("Recacher", function() {
 
         updater.queue = [ "tag3", "tag4" ];
 
-        sut.execute();
+        execute();
 
         expect(updater.calledUpdates.length).toEqual(0);
+        expect(finishedCall).toBe(true);
     });
 });
