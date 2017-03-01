@@ -1,3 +1,5 @@
+var WorkerThread = require("./worker-thread");
+
 var allowCrossDomain = function(req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'POST');
@@ -15,7 +17,7 @@ module.exports = {
         this.config = config;
         this.albumCache = albumCache;
         this.updater = updater;
-        this.recacher = recacher;
+        this.recacher = new WorkerThread(recacher, 30*1000);
         this.persister = persister;
         this.startedCallback = startedCallback;
         this.isRunning = true;
