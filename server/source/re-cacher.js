@@ -1,3 +1,4 @@
+var Promise = require("bluebird");
 
 module.exports = Recacher = function(albumCache, updater, log) {
 	this.albumCache = albumCache;
@@ -7,7 +8,7 @@ module.exports = Recacher = function(albumCache, updater, log) {
 };
 
 Recacher.prototype = {
-	execute: function(finished) {
+	execute: function() {
 		var recacher = this;
 
 		var tags = Object.keys(this.albumCache.albums);
@@ -22,11 +23,11 @@ Recacher.prototype = {
 				this.tagIndex = 0;
 			}
 
-			this.updater.updateTags([ tagToCache ], finished);
+			return this.updater.updateTags([ tagToCache ]);
 		}
 		else
 		{
-			finished();
+			return Promise.resolve();
 		}
 	},
 };

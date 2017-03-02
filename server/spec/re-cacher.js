@@ -1,10 +1,10 @@
 var Recacher = require("../source/re-cacher");
+var Promise = require("bluebird");
 
 describe("Recacher", function() {
     var cache;
     var updater;
     var finishedCall;
-    var onFinished = function() { finishedCall = true; };
     var sut;
 
     beforeEach(function() {
@@ -12,58 +12,60 @@ describe("Recacher", function() {
         updater = {
             calledUpdates: [],
             queue: [],
-            callback: function() { },
-            updateTags: function(tags, callback) {
-                this.onCallbackPassed(callback);
-                this.callback = callback;
+            updateTags: function(tags) {
                 this.calledUpdates = this.calledUpdates.concat(tags);
+                return Promise.resolve();
             },
-            onCallbackPassed: function(callback) { callback(); },
             isIdle: function() { return this.queue.length == 0; }
         };
-        finishedCall = false;
 
         sut = new Recacher(cache, updater, function() { });
         sut.cacheDelay = 0.001;
     });
 
-    var execute = function() { sut.execute(onFinished); }
+    var execute = function() { return sut.execute(); }
 
-    it("does nothing if no tags exist in cache", function() {
-        execute();
+    var expectUpdateCallCountToBe = function(callCount) {
+        return function() { expect(updater.calledUpdates.length).toEqual(callCount); };
+    };
+    
+    var expectUpdateTagsToBe = function(tags) {
+        return function() { expect(updater.calledUpdates).toEqual(tags); }
+    };
 
-        expect(updater.calledUpdates.length).toEqual(0);
+    it("does nothing if no tags exist in cache", function(done) {
+        execute()
+            .then(expectUpdateCallCountToBe(0))
+            .finally(done);
     });
 
-    it("caches first tag in album cache", function() {
+    it("caches first tag in album cache", function(done) {
         cache.albums["tag"] = { };
 
-        execute();
-
-        expect(updater.calledUpdates[0]).toEqual("tag");
-        expect(finishedCall).toBe(true);
+        execute()
+            .then(expectUpdateTagsToBe(["tag"]))
+            .finally(done);
     });
 
-    it("loops tags when having reached end of tag collection", function() {
+    it("loops tags when having reached end of tag collection", function(done) {
         cache.albums["tag1"] = { };
         cache.albums["tag2"] = { };
 
-        execute();
-        execute();
-        execute();
-
-        expect(updater.calledUpdates).toEqual([ "tag1", "tag2", "tag1" ]);
+        execute()
+            .then(execute)
+            .then(execute)
+            .then(expectUpdateTagsToBe([ "tag1", "tag2", "tag1" ]))
+            .finally(done);
     });
 
-    it("does not cache when updater has tags in queue already", function() {
+    it("does not cache when updater has tags in queue already", function(done) {
         cache.albums["tag1"] = { };
         cache.albums["tag2"] = { };
 
         updater.queue = [ "tag3", "tag4" ];
 
-        execute();
-
-        expect(updater.calledUpdates.length).toEqual(0);
-        expect(finishedCall).toBe(true);
+        execute()
+            .then(expectUpdateCallCountToBe(0))
+            .finally(done);
     });
 });
