@@ -12,7 +12,7 @@ describe("Recaching server", function() {
         removeCache(testServer.config.persistPath);
         bandcamp = testServer.bandcamp;
         bandcamp.delay = 1;
-        testServer.recacher.cacheDelay = 0.001;
+        testServer.config.recacheIntervalInSeconds = 15.0/1000.0;
         testServer.start(done);
     });
 
