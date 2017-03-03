@@ -17,7 +17,7 @@ CacheUpdater.prototype = {
         }
 
         updater.queue = updater.queue.concat(
-            tags.filter(function(tag) { return updater.queue.indexOf(tag) == -1; }));
+            tags.filter(tag => { return updater.queue.indexOf(tag) == -1; }));
 
         updater.updateTagsRecursive(onTagAlbumsUpdated);
 	},
@@ -31,7 +31,7 @@ CacheUpdater.prototype = {
             var tag = this.queue[0];
             this.inProgress = tag;
             this.log("Processing " + tag);
-            albumApi.getAlbumsForTag(tag, function(newAlbums) {
+            albumApi.getAlbumsForTag(tag, newAlbums => {
                 cache.albums[tag] = newAlbums;
                 updater.removeFromQueue(tag);
                 updater.log("Finished " + tag);
@@ -40,7 +40,7 @@ CacheUpdater.prototype = {
 
                 updater.inProgress = undefined;
                 updater.updateTagsRecursive(onTagAlbumsUpdated);
-            }, function() {
+            }, () => {
                 updater.inProgress = undefined;
 
                 updater.updateTagsRecursive(onTagAlbumsUpdated);

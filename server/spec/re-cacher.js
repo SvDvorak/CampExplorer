@@ -26,11 +26,11 @@ describe("Recacher", function() {
     var execute = function() { return sut.execute(); }
 
     var expectUpdateCallCountToBe = function(callCount) {
-        return function() { expect(updater.calledUpdates.length).toEqual(callCount); };
+        return () => expect(updater.calledUpdates.length).toEqual(callCount);
     };
     
     var expectUpdateTagsToBe = function(tags) {
-        return function() { expect(updater.calledUpdates).toEqual(tags); }
+        return () => expect(updater.calledUpdates).toEqual(tags);
     };
 
     it("does nothing if no tags exist in cache", function(done) {

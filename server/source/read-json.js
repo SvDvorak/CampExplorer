@@ -1,19 +1,16 @@
-var fs = require("fs");
+var Promise = require("bluebird");
+var readFile = Promise.promisify(require("fs").readFile);
+var readFileSync = require("fs").readFileSync;
 
 module.exports = readJson = {
-	async: function(path, onResult, onError) {
-		fs.readFile(path, function(err, data) {
-			if (err) {
-				onError(err)
-			}
-			else {
-				onResult(JSON.parse(data));
-			}
+	async: function(path) {
+		return readFile(path).then((data) => {
+			return JSON.parse(data);
 		});
 	},
 
 	sync: function(path) {
-		var dataAsJson = fs.readFileSync(path);
+		var dataAsJson = readFileSync(path);
 		return JSON.parse(dataAsJson);
 	}
 }

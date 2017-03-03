@@ -74,7 +74,7 @@ describe("Cache updater", function() {
 		expect(callbackCalled).toBe(true);
 	});
 
-	it("only calls event when tags are empty", function() {
+	it("immediately calls event when tags are empty", function() {
 		var callbackCalled = false;
 		sut.updateTags([], function() { callbackCalled = true; });
 
