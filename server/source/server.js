@@ -1,3 +1,4 @@
+var Promise = require("bluebird");
 var WorkerThread = require("./worker-thread");
 
 var allowCrossDomain = function(req, res, next) {
@@ -22,9 +23,9 @@ module.exports = {
         this.startedCallback = startedCallback;
         this.isRunning = true;
 
-        initialDataLoader.load(function() {
-            server.setupEndpointService();
-        });
+        return initialDataLoader
+            .load()
+            .then(() => server.setupEndpointService());
     },
 
     setupEndpointService: function() {

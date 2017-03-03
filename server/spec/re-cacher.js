@@ -12,9 +12,9 @@ describe("Recacher", function() {
         updater = {
             calledUpdates: [],
             queue: [],
-            updateTags: function(tags) {
+            updateTags: function(tags, callback) {
                 this.calledUpdates = this.calledUpdates.concat(tags);
-                return Promise.resolve();
+                callback();
             },
             isIdle: function() { return this.queue.length == 0; }
         };

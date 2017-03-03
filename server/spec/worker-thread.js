@@ -1,3 +1,4 @@
+var Promise = require("bluebird");
 var WorkerThread = require("../source/worker-thread");
 
 describe("Worker Thread", function() {
@@ -6,9 +7,9 @@ describe("Worker Thread", function() {
     beforeEach(function() {
         worker = {
             calls: 0,
-            execute: function(callback) {
+            execute: function() {
                 this.calls++;
-                callback();
+                return Promise.resolve();
             }
         };
         var delayTime = 1;
@@ -20,12 +21,14 @@ describe("Worker Thread", function() {
     });
 
     it("calls function repeatedly after previous call finishes", function(done) {
-        worker.execute = function(callback) {
+        worker.execute = function() {
             var worker = this;
-            setTimeout(function() {
-                worker.calls += 1;
-                callback();
-            }, 10);
+            return new Promise((resolve, reject) => {
+                setTimeout(function() {
+                    worker.calls += 1;
+                    resolve();
+                }, 10);
+            });
         };
 
         sut.start();

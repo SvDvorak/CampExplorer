@@ -1,3 +1,4 @@
+var Promise = require("bluebird");
 
 module.exports = InitialDataLoader = function(config, readJson, albumsCache, updater, seeder) {
 	this.config = config;
@@ -8,38 +9,33 @@ module.exports = InitialDataLoader = function(config, readJson, albumsCache, upd
 }
 
 InitialDataLoader.prototype = {
-	load: function(done) {
+	load: function() {
 		var loader = this;
-		var callSeed = function() { loader.seed(done); };
+		var callSeed = function() { return loader.seed(); };
 
 		if(this.config.persistPath != undefined) {
-			var saveCache = function(data) {
-				loader.albumsCache.albums = data;
-				done();
-			};
+			var loadCache = data => { loader.albumsCache.albums = data; };
 
-			this.readJson.async(
-				this.config.persistPath,
-				saveCache,
-				callSeed);
+			return this.readJson.async(this.config.persistPath)
+				.then(loadCache)
+				.catch(callSeed);
 		}
 		else {
-			callSeed();
+			return callSeed();
 		}
 	},
 
-	seed: function(done) {
+	seed: function() {
 		if(this.config.startSeed == undefined) {
-			done();
-			return;
+			return Promise.resolve();
 		}
 
 		var loader = this;
-		this.seeder.seed(this.config.startSeed, function(tags) {
-			loader.updater.updateTags(tags, function() {
-				if(loader.updater.isIdle()) {
-					done();
-				}
+		return new Promise((resolve, reject) => {
+			this.seeder.seed(this.config.startSeed, function(tags) {
+				loader.updater.updateTags(tags, function() {
+						resolve();
+				});
 			});
 		});
 	}

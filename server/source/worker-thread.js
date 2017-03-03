@@ -1,3 +1,4 @@
+var Promise = require("bluebird");
 
 module.exports = WorkerThread = function(worker, delay) {
     this.worker = worker;
@@ -6,19 +7,25 @@ module.exports = WorkerThread = function(worker, delay) {
 
 WorkerThread.prototype = {
 	start: function() {
+        this.isRunning = true;
         this.execute();
 	},
 
     execute: function() {
         var workerThread = this;
-        workerThread.worker.execute(function() {
-            workerThread.interval = setTimeout(function() {
-                workerThread.execute();
-            }, workerThread.delay);
-        })
-    },
+        workerThread.worker
+            .execute()
+            .then(() => {
+                if(workerThread.isRunning) {
+                    workerThread.interval = setTimeout(function() {
+                        workerThread.execute();
+                    }, workerThread.delay);
+                }
+            })
+        },
 
 	stop: function() {
         clearTimeout(this.interval);
+        this.isRunning = false;
 	}
 };

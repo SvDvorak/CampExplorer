@@ -23,7 +23,9 @@ Recacher.prototype = {
 				this.tagIndex = 0;
 			}
 
-			return this.updater.updateTags([ tagToCache ]);
+			return new Promise((resolve, reject) => {
+				this.updater.updateTags([ tagToCache ], resolve);
+			});
 		}
 		else
 		{

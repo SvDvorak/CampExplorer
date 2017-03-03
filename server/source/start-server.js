@@ -29,4 +29,4 @@ require("./server")
 		recacher,
 		persister,
 		initialDataLoader,
-		function() { logFunction("Server listening on port " + config.port)	});
+		() => { logFunction("Server listening on port " + config.port); });
