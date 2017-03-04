@@ -1,31 +1,8 @@
 var Promise = require("bluebird");
 var InitialDataLoader = require("../source/initial-data-loader");
 var Album = require("../source/api-types");
-
-var emptyMatcher = {
-	toBeEmpty: function(util, customEqualityTesters) {
-		return {
-			compare: function(actual, expected) {
-				if (expected === undefined) {
-					expected = '';
-				}
-
-				var result = {};
-
-				result.pass = util.equals(Object.keys(actual).length, 0, customEqualityTesters);
-
-				if(result.pass)	{
-					result.message = "Object is empty";
-				}
-				else {
-					result.message = "Expected " + actual + " to be empty";
-				}
-
-				return result;
-			}
-		}
-	}
-}
+var EmptyMatcher = require("./empty-matcher");
+require("./test-finished");
 
 describe("initial data loader", function() {
 	var sut;
@@ -40,7 +17,7 @@ describe("initial data loader", function() {
 	var updatedTags;
 
 	beforeEach(function() {
-		jasmine.addMatchers(emptyMatcher);
+		jasmine.addMatchers(EmptyMatcher);
 		calledPath = undefined;
 
 		diskCache = undefined;
@@ -96,7 +73,7 @@ describe("initial data loader", function() {
 				expect(albumsCache.albums["tag"]).toEqual([ album ]);
 				expect(seedTag).toBe(undefined);
 			})
-			.then(done);
+			.testFinished(done);
 	});
 
 	it("runs seed with config tag if path isn't set", function(done) {
@@ -111,7 +88,7 @@ describe("initial data loader", function() {
 				expect(seedTag).toBe(config.startSeed);
 				expect(updatedTags).toEqual(seedResult);
 			})
-			.then(done);
+			.testFinished(done);
 	});
 
 	it("runs seed if cache can't be found on disk", function(done) {
@@ -119,7 +96,7 @@ describe("initial data loader", function() {
 		sut
 			.load()
 			.then(() => expect(seedTag).toBe(config.startSeed))
-			.then(done);
+			.testFinished(done);
 	});
 
 	it("does nothing if start seed is undefined", function(done) {
@@ -132,6 +109,6 @@ describe("initial data loader", function() {
 				expect(albumsCache.albums).toBeEmpty();
 				expect(seedTag).tobe
 			})
-			.then(done);
+			.testFinished(done);
 	});
 });

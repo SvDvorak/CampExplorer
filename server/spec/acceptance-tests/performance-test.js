@@ -3,6 +3,7 @@ var PopAlbums = require("./albums-pop");
 var RockAlbums = require("./albums-rock");
 var localRequest = require("./local-request");
 var removeCache = require("./remove-cache");
+require("../test-finished");
 
 describe("Server performance", function() {
     var testServer;
@@ -35,7 +36,6 @@ describe("Server performance", function() {
                 expect(albums.length).toBe(expectedResultCount)
                 expect(startTime - new Date()).toBeLessThan(maxCallTime);
             })
-            .then(done)
-            .catch(error => done.fail(error));
+            .testFinished(done);
     });
 });

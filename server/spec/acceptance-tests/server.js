@@ -1,9 +1,9 @@
 var TestServer = require("./test-server");
 var Album = require("../../source/api-types");
 var localRequest = require("./local-request");
-var requestShouldNotFail = require("./request-should-not-fail");
 var generateAlbums = require("../generate-albums");
 var removeCache = require("./remove-cache");
+require("../test-finished");
 
 describe("Server with cache", function() {
     var testServer;
@@ -43,8 +43,7 @@ describe("Server with cache", function() {
                 expect(singleAlbum.bandId).toBe("123456789");
                 expect(singleAlbum.albumId).toBe("987654321");
             })
-            .then(done)
-            .catch(error => done.fail(error));
+            .testFinished(done);
     });
 
     it("returns albums with all requested tags", function(done) {
@@ -63,8 +62,7 @@ describe("Server with cache", function() {
                 expect(albums.length).toBe(1);
                 expect(albums[0].link).toBe("AllTagsAlbum");
             })
-            .then(done)
-            .catch(error => done.fail(error));
+            .testFinished(done);
     });
 
     it("returns tags format incorrect when tags malformed", function(done) {
@@ -77,7 +75,7 @@ describe("Server with cache", function() {
                 expect(data.statusCode).toBe(400);
                 expect(JSON.parse(data.error).error).toBe("Unable to parse request data");
             })
-            .then(done);
+            .testFinished(done);
     });
 
     it("returns tag not cached when requesting uncached tag, caches and returns tag albums on subsequent request", function(done) {
@@ -92,8 +90,7 @@ describe("Server with cache", function() {
             })
             .then(() => localRequest([ "musicTag" ]))
             .then(albums => expect(albums[0].link).toBe("Album"))
-            .then(done)
-            .catch(error => done.fail(error))
+            .testFinished(done);
     });
 
     it("returns a maximum of 50 albums", function(done) {
@@ -103,8 +100,7 @@ describe("Server with cache", function() {
         localRequest([ "tag" ])
             .then(() => localRequest([ "tag" ]))
             .then(albums => expect(albums.length).toBe(50))
-            .then(done)
-            .catch(error => done.fail(error))
+            .testFinished(done);
     });
 
     var linkOnlyAlbum = function(linkText) {

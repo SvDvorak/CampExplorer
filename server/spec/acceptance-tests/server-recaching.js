@@ -2,6 +2,7 @@ var TestServer = require("./test-server");
 var Album = require("../../source/api-types");
 var localRequest = require("./local-request");
 var removeCache = require("./remove-cache");
+require("../test-finished");
 
 describe("Recaching server", function() {
     var testServer;
@@ -26,8 +27,7 @@ describe("Recaching server", function() {
         localRequest(["tag"])
             .delay(20)
             .then(() => expect(bandcamp.tagsRequested.length).toBe(2))
-            .then(done)
-            .catch(error => done.fail(error));
+            .testFinished(done);
     });
 
     it("stops recaching when stopping server", function(done) {
@@ -36,7 +36,6 @@ describe("Recaching server", function() {
             .then(() => bandcamp.setAlbumsForTag("tag", [ new Album("Album1") ]))
             .delay(70)
             .then(() => expect(bandcamp.tagsRequested.length).toBe(1))
-            .then(done)
-            .catch(error => done.fail(error))
+            .testFinished(done);
     });
 });

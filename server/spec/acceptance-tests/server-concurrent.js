@@ -1,11 +1,11 @@
 var TestServer = require("./test-server");
 var Album = require("../../source/api-types");
 var localRequest = require("./local-request");
-var requestShouldNotFail = require("./request-should-not-fail");
 var readJson = require("../../source/read-json");
 var writeJson = require("../../source/write-json");
 var fs = require("fs");
 var removeCache = require("./remove-cache");
+require("../test-finished");
 
 describe("Concurrent tag caching server", function() {
     var testServer;
@@ -37,8 +37,7 @@ describe("Concurrent tag caching server", function() {
                     expect(bandcamp.tagsRequested.length).toBe(1);
                     expect(albums[0].name).toBe("Album");
                 })
-            .then(done)
-            .catch(() => requestShouldNotFail(done));
+            .testFinished(done);
     });
 
     it("queues up tags to be updated and processes them in order", function(done) {
@@ -54,8 +53,7 @@ describe("Concurrent tag caching server", function() {
             .then(() => expect(bandcamp.tagsRequested).toEqual([ "tag1", "tag2" ]))
             .then(() => localRequest([ "tag2" ]))
             .then(albums => expect(albums[0].name).toBe("Album2"))
-            .then(done)
-            .catch(requestShouldNotFail(done));
+            .testFinished(done);
     });
 
     it("saves cache to disk once a day", function(done) {
@@ -74,8 +72,7 @@ describe("Concurrent tag caching server", function() {
 
                 persister.getNextPersistDate = oldPersistDateFunc;
             })
-            .then(done)
-            .catch(error => done.fail(error))
+            .testFinished(done);
     });
 
     it("loads albums from disk if available at start", function(done) {
@@ -87,8 +84,7 @@ describe("Concurrent tag caching server", function() {
             .delay(100)
             .then(() => localRequest(["tag2"]))
             .then(albums => expect(albums[0].name).toBe("Album"))
-            .then(done)
-            .catch(error => done.fail(error))
+            .testFinished(done);
     });
 
     it("uses seeder when cache is not available on disk", function(done) {
@@ -108,7 +104,6 @@ describe("Concurrent tag caching server", function() {
                 expect(albums.length).toBe(1);
                 expect(albums[0].name).toEqual(album2.name);
             })
-            .then(done)
-            .catch(error => done.fail(error))
+            .testFinished(done);
     });
 });

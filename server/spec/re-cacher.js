@@ -1,5 +1,6 @@
 var Recacher = require("../source/re-cacher");
 var Promise = require("bluebird");
+require("./test-finished");
 
 describe("Recacher", function() {
     var cache;
@@ -44,7 +45,7 @@ describe("Recacher", function() {
 
         execute()
             .then(expectUpdateTagsToBe(["tag"]))
-            .finally(done);
+            .testFinished(done);
     });
 
     it("loops tags when having reached end of tag collection", function(done) {
@@ -55,7 +56,7 @@ describe("Recacher", function() {
             .then(execute)
             .then(execute)
             .then(expectUpdateTagsToBe([ "tag1", "tag2", "tag1" ]))
-            .finally(done);
+            .testFinished(done);
     });
 
     it("does not cache when updater has tags in queue already", function(done) {
@@ -66,6 +67,6 @@ describe("Recacher", function() {
 
         execute()
             .then(expectUpdateCallCountToBe(0))
-            .finally(done);
+            .testFinished(done);
     });
 });
