@@ -26,23 +26,17 @@ module.exports = TestServer = function() {
 };
 
 TestServer.prototype = {
-	start: function(done) {
-        this.server.start(
+	start: function() {
+        return this.server.start(
             this.config,
             this.cache,
             this.updater,
             this.recacher,
             this.persister,
-            this.initialDataLoader,
-            done);
+            this.initialDataLoader);
 	},
 
-	stop: function(done) {
-		if(this.server.isRunning) {
-            this.server.stop(done);
-        }
-        else {
-            done();
-        }
+	stop: function() {
+        return this.server.stop();
 	}
 }

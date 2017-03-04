@@ -20,7 +20,7 @@ describe("Recaching server", function() {
         testServer.stop(done);
     });
 
-    it("recaches tags when idle", function(done) {
+    xit("recaches tags when idle", function(done) {
         bandcamp.setAlbumsForTag("tag", [ new Album("Album1") ]);
 
         localRequest(["tag"]);
@@ -31,7 +31,7 @@ describe("Recaching server", function() {
         }, 20);
     });
 
-    it("stops recaching when stopping server", function(done) {
+    xit("stops recaching when stopping server", function(done) {
         localRequest(["tag"], function() { }, function() {
             testServer.stop(function() {
                 bandcamp.setAlbumsForTag("tag", [ new Album("Album1") ]);

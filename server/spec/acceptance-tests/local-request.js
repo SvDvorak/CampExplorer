@@ -1,5 +1,6 @@
 var request = require("request");
 var Config = require("./config");
+var request = require('request-promise');
 
 module.exports = function(tags, onResponse, onFailure) {
     var config = new Config();
@@ -12,21 +13,5 @@ module.exports = function(tags, onResponse, onFailure) {
         json: tags
     };
 
-    request(options, function(error, response, data) {
-        if(response == undefined) {
-            console.log("refused connection");
-            return;
-        }
-
-        if(response.statusCode == 200) {
-            if(onResponse != undefined) {
-                onResponse(data);
-            }
-            return;
-        }
-
-        if(onFailure != undefined) {
-            onFailure(data, response.statusCode);
-        }
-    });
+    return request(options);
 }

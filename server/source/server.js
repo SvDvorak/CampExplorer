@@ -10,17 +10,16 @@ var allowCrossDomain = function(req, res, next) {
 }
 
 module.exports = {
-    server: {},
+    listenerApp: {},
     recacher: {},
 
-    start: function (config, albumCache, updater, recacher, persister, initialDataLoader, startedCallback) {
+    start: function (config, albumCache, updater, recacher, persister, initialDataLoader) {
         var server = this;
         this.config = config;
         this.albumCache = albumCache;
         this.updater = updater;
         this.recacher = new WorkerThread(recacher, config.recacheIntervalInSeconds*1000);
         this.persister = persister;
-        this.startedCallback = startedCallback;
         this.isRunning = true;
 
         return initialDataLoader
@@ -72,17 +71,28 @@ module.exports = {
             res.send(JSON.stringify(Object.keys(server.albumCache.albums).length));
         });
 
-        this.server = app.listen(this.config.port, function(){
-            server.recacher.start();
-            server.persister.start(Date.now());
-            server.startedCallback();
+
+        return new Promise((resolve, reject) => {
+            server.listenerApp = app.listen(this.config.port, function() {
+                server.recacher.start();
+                server.persister.start(Date.now());
+                resolve();
+            });
         });
     },
 
-    stop: function(stoppedCallback) {
-        this.isRunning = false;
-        this.server.close(stoppedCallback);
-        this.recacher.stop();
-        this.persister.stop();
+    stop: function() {
+		if(this.isRunning) {
+            this.isRunning = false;
+            this.recacher.stop();
+            this.persister.stop();
+            var server = this;
+            return new Promise((resolve, reject) => {
+                server.listenerApp.close(resolve);
+            });
+        }
+        else {
+            return Promise.resolve();
+        }
     },
 };

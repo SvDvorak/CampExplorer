@@ -12,22 +12,30 @@ describe("Server performance", function() {
         testServer = new TestServer();
         removeCache(testServer.config.persistPath);
         bandcamp = testServer.bandcamp;
-        testServer.start(done);
+        testServer.start().then(done);
     });
 
     afterEach(function(done) {
-        testServer.stop(done);
+        testServer.stop().then(done);
     });
 
-    it("should be fast enough to match two popular tags within a fifth of a second", function(done) {
+    it("should be fast enough to match two popular tags within a tenth of a second", function(done) {
     	bandcamp.setAlbumsForTag("pop", PopAlbums);
     	bandcamp.setAlbumsForTag("rock", RockAlbums);
 
-    	localRequest([ "pop", "rock" ]);
+        var startTime = undefined;
+        var expectedResultCount = 50;
+        var maxCallTime = 100;
 
-        localRequest([ "pop", "rock" ], function(albums) {
-            expect(albums.length).toBe(50);
-            done();
-        }, function() { done.fail("performance not fast enough"); });
-    }, 200);
+        // Cache them once first
+    	localRequest([ "pop", "rock" ])
+            .then(() => startTime = new Date())
+            .then(() => localRequest([ "pop", "rock" ]))
+            .then(albums => {
+                expect(albums.length).toBe(expectedResultCount)
+                expect(startTime - new Date()).toBeLessThan(maxCallTime);
+            })
+            .then(done)
+            .catch(error => done.fail(error));
+    });
 });

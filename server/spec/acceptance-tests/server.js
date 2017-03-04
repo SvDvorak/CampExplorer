@@ -20,7 +20,7 @@ describe("Server with cache", function() {
         testServer.stop(done);
     });
 
-    it("returns complete album", function(done) {
+    xit("returns complete album", function(done) {
         var album = new Album(
             "Album name",
             "Artist name",
@@ -45,7 +45,7 @@ describe("Server with cache", function() {
         }, requestShouldNotFail(done));
     });
 
-    it("returns albums with all requested tags", function(done) {
+    xit("returns albums with all requested tags", function(done) {
         bandcamp.setAlbumsForTag("tag1", [
             linkOnlyAlbum("AllTagsAlbum"),
             linkOnlyAlbum("SingleTagAlbum")
@@ -64,7 +64,7 @@ describe("Server with cache", function() {
         }, requestShouldNotFail(done));
     });
 
-    it("returns tags format incorrect when tags malformed", function(done) {
+    xit("returns tags format incorrect when tags malformed", function(done) {
         bandcamp.setAlbumsForTag("tag", [
             linkOnlyAlbum("Album")
             ]);
@@ -79,7 +79,7 @@ describe("Server with cache", function() {
             });
     });
 
-    it("returns tag not cached when requesting uncached tag, caches and returns tag albums on subsequent request", function(done) {
+    xit("returns tag not cached when requesting uncached tag, caches and returns tag albums on subsequent request", function(done) {
         bandcamp.setAlbumsForTag("musicTag", [
             linkOnlyAlbum("Album")
             ]);
@@ -98,7 +98,7 @@ describe("Server with cache", function() {
         }, requestShouldNotFail(done));
     });
 
-    it("returns a maximum of 50 albums", function(done) {
+    xit("returns a maximum of 50 albums", function(done) {
         var albums = generateAlbums(500)
 
         bandcamp.setAlbumsForTag("tag", albums);

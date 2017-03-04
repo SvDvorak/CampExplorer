@@ -10,16 +10,16 @@ Cache.prototype = {
         var albums = this.albums;
 
         return tags
-          .map(function(tag) { return albums[tag] || [] })
+          .map(tag => albums[tag] || [])
           .BCflatten()
           .BCgroup("link")
           .BCvalues()
-          .filter(function(x) { return x.length == tags.length; })
-          .map(function(x) { return x[0] });
+          .filter(x => x.length == tags.length)
+          .map(x => x[0]);
     },
     
     filterUncached: function(tags) {
         var albums = this.albums;
-        return tags.filter(function(tag) { return !(tag in albums); });
+        return tags.filter(tag => !(tag in albums));
     },
 };
