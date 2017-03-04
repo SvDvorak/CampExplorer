@@ -39,13 +39,13 @@ CachePersister.prototype = {
 		}
 
 		persister.log("Persisting albums");
-		persister.writeJson.async(
-			persister.path,
-			persister.cache.albums,
-			function() {
+		persister.writeJson.async(persister.path, persister.cache.albums)
+			.then(() => {
 				var nextPersistDate = persister.getNextPersistDate(timeNow)
 				persister.scheduledPersist(nextPersistDate);
-			},
-			function(error) { persister.log("Error writing json: " + error); });
+			})
+			.catch(error => {
+				persister.log("Error writing json: " + error); 
+			});
 	}
 };
