@@ -13,34 +13,30 @@ describe("Recaching server", function() {
         bandcamp = testServer.bandcamp;
         bandcamp.delay = 1;
         testServer.config.recacheIntervalInSeconds = 15.0/1000.0;
-        testServer.start(done);
+        testServer.start().then(done);
     });
 
     afterEach(function(done) {
-        testServer.stop(done);
+        testServer.stop().then(done);
     });
 
-    xit("recaches tags when idle", function(done) {
+    it("recaches tags when idle", function(done) {
         bandcamp.setAlbumsForTag("tag", [ new Album("Album1") ]);
 
-        localRequest(["tag"]);
-
-        setTimeout(function() {
-            expect(bandcamp.tagsRequested.length).toBe(2);
-            done();
-        }, 20);
+        localRequest(["tag"])
+            .delay(20)
+            .then(() => expect(bandcamp.tagsRequested.length).toBe(2))
+            .then(done)
+            .catch(error => done.fail(error));
     });
 
-    xit("stops recaching when stopping server", function(done) {
-        localRequest(["tag"], function() { }, function() {
-            testServer.stop(function() {
-                bandcamp.setAlbumsForTag("tag", [ new Album("Album1") ]);
-
-                setTimeout(function() {
-                    expect(bandcamp.tagsRequested.length).toBe(1);
-                    done();
-                }, 70);
-            });
-        });
+    it("stops recaching when stopping server", function(done) {
+        localRequest(["tag"])
+            .then(() => testServer.stop())
+            .then(() => bandcamp.setAlbumsForTag("tag", [ new Album("Album1") ]))
+            .delay(70)
+            .then(() => expect(bandcamp.tagsRequested.length).toBe(1))
+            .then(done)
+            .catch(error => done.fail(error))
     });
 });

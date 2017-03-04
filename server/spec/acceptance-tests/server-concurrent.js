@@ -21,82 +21,77 @@ describe("Concurrent tag caching server", function() {
     });
 
     afterEach(function(done) {
-        testServer.stop(done);
+        testServer.stop().then(done);
     });
 
-    xit("only caches tag once when new request asks for tag in progress of update", function(done) {
+    it("only caches tag once when new request asks for tag in progress of update", function(done) {
         bandcamp.setAlbumsForTag("tag", [ new Album("Album") ]);
 
-        testServer.start(function() {
-            localRequest(["tag"]);
-            localRequest(["tag"]);
-
-            setTimeout(function() {
-                localRequest([ "tag" ], function(albums) {
+        testServer
+            .start()
+            .then(() => localRequest(["tag"]))
+            .then(() => localRequest(["tag"]))
+            .delay(70)
+            .then(() => localRequest(["tag"]))
+            .then(albums => {
                     expect(bandcamp.tagsRequested.length).toBe(1);
                     expect(albums[0].name).toBe("Album");
-                    done();
-                }, requestShouldNotFail(done));
-            }, 70);
-        });
+                })
+            .then(done)
+            .catch(() => requestShouldNotFail(done));
     });
 
-    xit("queues up tags to be updated and processes them in order", function(done) {
+    it("queues up tags to be updated and processes them in order", function(done) {
         bandcamp.setAlbumsForTag("tag1", [ new Album("Album1") ]);
         bandcamp.setAlbumsForTag("tag2", [ new Album("Album2") ]);
 
-        testServer.start(function() {
-            localRequest(["tag1", "tag2"], function() { }, function(data, responseCode) {
-                expect(data.data).toEqual([ "tag1", "tag2" ]);
-            });
+        testServer
+            .start()
+            .then(() => localRequest(["tag1", "tag2"]))
+            .then(data => expect(data.data).toEqual([ "tag1", "tag2" ]))
 
-            setTimeout(function() {
-                expect(bandcamp.tagsRequested).toEqual([ "tag1", "tag2" ]);
-                localRequest([ "tag2" ], function(albums) {
-                    expect(albums[0].name).toBe("Album2");
-                    done();
-                }, requestShouldNotFail(done));
-            }, 70);
-        });
+            .delay(70)
+            .then(() => expect(bandcamp.tagsRequested).toEqual([ "tag1", "tag2" ]))
+            .then(() => localRequest([ "tag2" ]))
+            .then(albums => expect(albums[0].name).toBe("Album2"))
+            .then(done)
+            .catch(requestShouldNotFail(done));
     });
 
-    xit("saves cache to disk once a day", function(done) {
+    it("saves cache to disk once a day", function(done) {
         var album = new Album("Album");
         bandcamp.setAlbumsForTag("tag", [ album ]);
 
         var oldPersistDateFunc = persister.getNextPersistDate;
         persister.getNextPersistDate = function(now) { return new Date(now + 100) }
 
-        testServer.start(function() {
-            localRequest(["tag"]);
-
-            setTimeout(function() {
+        testServer.start()
+            .then(() => localRequest(["tag"]))
+            .delay(200)
+            .then(() => {
                 var albums = readJson.sync(testServer.config.persistPath);
                 expect(albums["tag"][0].name).toEqual(album.name);
 
                 persister.getNextPersistDate = oldPersistDateFunc;
-                done();
-            }, 200);
-        });
+            })
+            .then(done)
+            .catch(error => done.fail(error))
     });
 
-    xit("loads albums from disk if available at start", function(done) {
+    it("loads albums from disk if available at start", function(done) {
         var album = new Album("Album");
         // Need two tags since recacher starts working on first at start
         writeJson.sync(testServer.config.persistPath, { tag1: [ ], tag2: [ album ] });
 
-        testServer.start(function() {
-            setTimeout(function() {
-                localRequest(["tag2"], function(albums) {
-                    expect(albums[0].name).toBe("Album");
-
-                    done();
-                });
-            }, 100);
-        });
+        testServer.start()
+            .delay(100)
+            .then(() => localRequest(["tag2"]))
+            .then(albums => expect(albums[0].name).toBe("Album"))
+            .then(done)
+            .catch(error => done.fail(error))
     });
 
-    xit("uses seeder when cache is not available on disk", function(done) {
+    it("uses seeder when cache is not available on disk", function(done) {
         var album1 = new Album("Album1");
         var album2 = new Album("Album2");
         bandcamp.setAlbumsForTag("tag", [ album1 ]);
@@ -105,15 +100,15 @@ describe("Concurrent tag caching server", function() {
 
         testServer.config.startSeed = "tag";
 
-        testServer.start(function() {
-            setTimeout(function() {
-                localRequest(["tag_sub1"], function(albums) {
-                    expect(albums.length).toBe(1);
-                    expect(albums[0].name).toEqual(album2.name);
-
-                    done();
-                }, function() { done.fail("failed tag request"); });
-            }, 100);
-        });
+        testServer
+            .start()
+            .delay(100)
+            .then(() => localRequest(["tag_sub1"]))
+            .then(albums => {
+                expect(albums.length).toBe(1);
+                expect(albums[0].name).toEqual(album2.name);
+            })
+            .then(done)
+            .catch(error => done.fail(error))
     });
 });

@@ -1,8 +1,9 @@
+var Promise = require("bluebird");
 var request = require("request");
 var Config = require("./config");
 var request = require('request-promise');
 
-module.exports = function(tags, onResponse, onFailure) {
+module.exports = function(tags) {
     var config = new Config();
     
     var options =
@@ -13,5 +14,5 @@ module.exports = function(tags, onResponse, onFailure) {
         json: tags
     };
 
-    return request(options);
+    return Promise.resolve(request(options));
 }
