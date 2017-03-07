@@ -66,12 +66,13 @@ describe("Cache updater", function() {
 	});
 
 	it("calls tag albums updated event", function() {
-		var tags = [ "tag" ]
-		var callbackCalled = false;
-		sut.updateTags(tags, function(albums) { callbackCalled = true; });
-		dataReturnedCallback([ "Album" ]);
+		var tags = [ "tag1", "tag2" ]
+		var callbackCount = 0;
+		sut.updateTags(tags, albums => { callbackCount += 1; });
+		dataReturnedCallback([ "Album1" ]);
+		dataReturnedCallback([ "Album2" ]);
 
-		expect(callbackCalled).toBe(true);
+		expect(callbackCount).toBe(1);
 	});
 
 	it("immediately calls event when tags are empty", function() {
