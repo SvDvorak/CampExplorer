@@ -1,23 +1,6 @@
 var CachePersister = require("../source/cache-persister");
 var Album = require("../source/api-types");
-
-var FakePromise = function() {
-	ExceptionThrown: undefined
-}
-FakePromise.resolve = () => { return new FakePromise(); }
-
-FakePromise.prototype = {
-	then: function(func) {
-		func();
-		return this;
-	},
-	catch: function(errorFunc) {
-		if(FakePromise.ExceptionThrown != undefined) {
-			errorFunc("error");
-		}
-		return this;
-	}
-}
+var SyncPromise = require("./sync-promise");
 
 describe("Persister", function() {
 	var sut;
@@ -38,9 +21,9 @@ describe("Persister", function() {
 			calledPath = path;
 			dataWritten.push(data);
 			if(shouldThrow) {
-				FakePromise.ExceptionThrown = "error";
+				SyncPromise.ExceptionThrown = "error";
 			}
-			return FakePromise.resolve();
+			return SyncPromise.resolve();
 		} };
 
 		scheduledCalls = { };
