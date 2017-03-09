@@ -28,11 +28,9 @@ CacheUpdater.prototype = {
         else if(this.queue.length > 0 && this.inProgress == undefined) {
             var tag = this.queue[0];
             this.inProgress = tag;
-            this.log("Processing " + tag);
             albumApi.getAlbumsForTag(tag, newAlbums => {
                 cache.albums[tag] = newAlbums;
                 updater.removeFromQueue(tag);
-                updater.log("Finished " + tag);
 
                 updater.inProgress = undefined;
                 updater.updateTagsRecursive(onTagAlbumsUpdated);

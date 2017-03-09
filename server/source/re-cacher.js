@@ -16,7 +16,6 @@ Recacher.prototype = {
 		if(tags.length > 0 && this.updater.isIdle())
 		{
 			var tagToCache = tags[this.tagIndex];
-			this.log("Recaching");
 
 			this.tagIndex += 1;
 			if(this.tagIndex >= tags.length) {
