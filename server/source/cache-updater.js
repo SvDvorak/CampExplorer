@@ -43,7 +43,11 @@ CacheUpdater.prototype = {
     },
 
     isIdle: function() {
-        return this.queue.length == 0;
+        return this.queueLength() == 0;
+    },
+
+    queueLength: function() {
+        return this.queue.length;
     },
 
     removeFromQueue: function(tag) {

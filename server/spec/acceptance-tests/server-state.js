@@ -1,6 +1,6 @@
 var TestServer = require("./test-server");
 var localRequest = require("./local-request");
-var debugRequests = require("./debug-requests");
+var stateRequests = require("./server-state-requests");
 require("../test-finished");
 
 describe("Server state", function() {
@@ -21,7 +21,18 @@ describe("Server state", function() {
         var expectedTags = [ "pop", "rock", "ambient", "metal", "soundtrack" ];
 
     	cacheTags(expectedTags)
-            .then(() => debugRequests())
+            .then(() => stateRequests.getCachedTags())
+            .then(tagCount => expect(parseInt(tagCount)).toBe(expectedTags.length))
+            .testFinished(done);
+    });
+
+    it("returns all queued tags", function(done) {
+        var expectedTags = [ "pop", "rock", "ambient", "metal", "soundtrack" ];
+
+        bandcamp.delay = 9999;
+
+    	cacheTags(expectedTags)
+            .then(() => stateRequests.getQueuedTags())
             .then(tagCount => expect(parseInt(tagCount)).toBe(expectedTags.length))
             .testFinished(done);
     });

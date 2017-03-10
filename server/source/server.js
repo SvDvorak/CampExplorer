@@ -71,6 +71,10 @@ module.exports = {
             res.send(JSON.stringify(Object.keys(server.albumCache.albums).length));
         });
 
+        app.get("/admin/tagsinqueue", function(request, res) {
+            res.status(200);
+            res.send(JSON.stringify(server.updater.queueLength()));
+        });
 
         return new Promise((resolve, reject) => {
             server.listenerApp = app.listen(this.config.port, function() {
