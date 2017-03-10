@@ -1,5 +1,4 @@
 var Promise = require("bluebird");
-var request = require("request");
 var Config = require("./config");
 var request = require('request-promise');
 
@@ -14,5 +13,6 @@ module.exports = function(tags) {
         json: tags
     };
 
+    // Cant use request promise, seems to be some issue when not converting to bluebird
     return Promise.resolve(request(options));
 }
