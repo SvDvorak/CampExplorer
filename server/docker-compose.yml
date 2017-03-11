@@ -1,11 +1,17 @@
-tagsearch:
-  build: .
-  command: node_modules/.bin/nodemon source/start-server.js
-  environment:
-    NODE_ENV: development
-  ports:
-    - '3000:3000'
-  volumes:
-    - .:/home/app/tagsearch
-    - /var/lib/tagsearch
-    - /home/app/tagsearch/node_modules
+version: '2'
+services:
+  tagsearch:
+    build: .
+    command: node_modules/.bin/nodemon source/start-server.js
+    environment:
+      NODE_ENV: development
+    ports:
+      - '3000:3000'
+    volumes:
+      - .:/home/app/tagsearch
+      - /var/lib/tagsearch
+      - /home/app/tagsearch/node_modules
+  database:
+    image: docker.elastic.co/elasticsearch/elasticsearch:5.2.2
+    ports:
+      - '9200:9200'
