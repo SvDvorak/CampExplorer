@@ -50,6 +50,10 @@ CacheUpdater.prototype = {
         return this.queue.length;
     },
 
+    currentlyCachingTag: function() {
+        return this.inProgress;
+    },
+
     removeFromQueue: function(tag) {
         var i = this.queue.indexOf(tag);
         if(i != -1) {

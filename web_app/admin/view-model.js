@@ -11,36 +11,38 @@ bandcampMultiTag.controller('adminController', [ "$scope", "$http", function ($s
 
     var CreateAdminOptions = endpoint => { };
 
-    var cachedTagsFunc = function() {
-        var tile = this;
-        $http({
+    var callAdminService = function(tile, endpoint) {
+        return $http({
             method: "get",
-            url: "http://" + $scope.adress + ":" + $scope.port + "/admin/tagcount"
+            url: "http://" + $scope.adress + ":" + $scope.port + "/admin/" + endpoint
         })
         .then(response => {
-            tile.body = response.data;
-        });
+            return response.data != "" ? JSON.parse(response.data) : "";
+        })
+        .then(data => tile.body = data);
+    };
+
+    var cachedTagsFunc = function() {
+        callAdminService(this, "tagcount");
     }
 
     var tagsInQueue = function() {
-        var tile = this;
-        $http({
-            method: "get",
-            url: "http://" + $scope.adress + ":" + $scope.port + "/admin/tagsinqueue"
-        })
-        .then(response => {
-            tile.body = response.data;
-        });
+        callAdminService(this, "tagsinqueue");
+    }
+
+    var currentlyCaching = function() {
+        callAdminService(this, "currentlycachingtag");
     }
 
     $scope.tiles = [
+        { header: "Server status", body: "Online and ready =D", update: () => {} },
         { header: "Cached tags", body: 0, update: cachedTagsFunc },
-        { header: "Tags in queue", body: 1, update: tagsInQueue },
-        { header: "Currently caching", body: "ambient", update: () => {} },
+        { header: "Tags in queue", body: 0, update: tagsInQueue },
+        { header: "Currently caching", body: "", update: currentlyCaching },
         { header: "Requests per second", body: "3.14", update: () => {} }];
     
+    $scope.tiles.forEach(tile => tile.update());
     $scope.tiles.forEach(tile => setInterval(() => tile.update(), 1000));
-    //setInterval(() => $scope.tiles[0].update(), 1000);
 
   	$scope.addInputTag = function() {
   	    var newTag = $scope.newTag.replace(" ", "-");

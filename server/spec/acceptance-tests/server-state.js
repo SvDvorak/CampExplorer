@@ -27,13 +27,24 @@ describe("Server state", function() {
     });
 
     it("returns all queued tags", function(done) {
-        var expectedTags = [ "pop", "rock", "ambient", "metal", "soundtrack" ];
+        var expectedQueuedTags = [ "pop", "rock", "ambient", "metal", "soundtrack" ];
 
         bandcamp.delay = 9999;
 
-    	cacheTags(expectedTags)
+    	cacheTags(expectedQueuedTags)
             .then(() => stateRequests.getQueuedTags())
-            .then(tagCount => expect(parseInt(tagCount)).toBe(expectedTags.length))
+            .then(tagsInQueue => expect(parseInt(tagsInQueue)).toBe(expectedQueuedTags.length))
+            .testFinished(done);
+    });
+
+    it("returns currently caching tag", function(done) {
+        var expectedCachingTag = "pop";
+
+        bandcamp.delay = 9999;
+
+    	cacheTags([ expectedCachingTag ])
+            .then(() => stateRequests.getCurrentlyCachingTag())
+            .then(cachingTag => expect(cachingTag).toBe(expectedCachingTag))
             .testFinished(done);
     });
 

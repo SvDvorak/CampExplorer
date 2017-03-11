@@ -8,10 +8,10 @@ module.exports = {
         var options =
         {
             method: "GET",
-            uri: "http://localhost:" + config.port + "/admin/" + endpoint
+            uri: "http://localhost:" + config.port + "/admin/" + endpoint,
         };
 
-        return Promise.resolve(request(options));
+        return Promise.resolve(request(options)).then(data => JSON.parse(data));
     },
 
     getCachedTags: function() {
@@ -20,5 +20,9 @@ module.exports = {
 
     getQueuedTags: function() {
         return this.createRequest("tagsinqueue");
+    },
+
+    getCurrentlyCachingTag: function() {
+        return this.createRequest("currentlycachingtag");
     }
 }

@@ -62,19 +62,25 @@ module.exports = {
 
             res.setHeader("Content-Type", "application/json");
             res.setHeader("Access-Control-Allow-Origin", "*");
-            res.status(200);
-            res.send(JSON.stringify(albums));
+            sendJSONSuccess(res, albums);
         });
 
         app.get("/admin/tagcount", function(request, res) {
-            res.status(200);
-            res.send(JSON.stringify(Object.keys(server.albumCache.albums).length));
+            sendJSONSuccess(res, Object.keys(server.albumCache.albums).length);
         });
 
         app.get("/admin/tagsinqueue", function(request, res) {
-            res.status(200);
-            res.send(JSON.stringify(server.updater.queueLength()));
+            sendJSONSuccess(res, server.updater.queueLength());
         });
+
+        app.get("/admin/currentlycachingtag", function(request, res) {
+            sendJSONSuccess(res, server.updater.currentlyCachingTag());
+        });
+
+        var sendJSONSuccess = function(res, data) {
+            res.status(200);
+            res.send(JSON.stringify(data));
+        };
 
         return new Promise((resolve, reject) => {
             server.listenerApp = app.listen(this.config.port, function() {
