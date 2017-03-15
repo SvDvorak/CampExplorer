@@ -5,10 +5,11 @@ services:
     depends_on:
       - database
     build: .
-    command: node_modules/.bin/nodemon source/start-server.js
+    command: node_modules/.bin/nodemon --debug=0.0.0.0:5858 source/start-server.js
     environment:
       NODE_ENV: development
     ports:
+      - '5858:5858'
       - '3000:3000'
       - '9200'
     volumes:

@@ -3,6 +3,7 @@ var Promise = require("bluebird");
 module.exports = DatabaseFake = function() {
     this.savedTags = [];
     this.savedAlbums = [];
+    this.calledSaveAlbums = false;
 }
 
 DatabaseFake.prototype = {
@@ -20,6 +21,7 @@ DatabaseFake.prototype = {
         this.savedTags.push(tag);
     },
     saveAlbums: function(albums) {
+        this.calledSaveAlbums = true;
         this.savedAlbums = this.savedAlbums.concat(albums);
     }
 };
