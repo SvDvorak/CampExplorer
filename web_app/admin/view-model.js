@@ -42,8 +42,8 @@ bandcampMultiTag.controller('adminController', [ "$scope", "$http", function ($s
     $scope.tiles = [
         { header: "Server status", body: "Online and ready =D", update: serverStatus },
         { header: "Cached tags", body: 0, update: cachedTagsFunc },
-        { header: "Tags in queue", body: 0, update: tagsInQueue },
-        { header: "Currently caching", body: "", update: currentlyCaching },
+        //{ header: "Tags in queue", body: 0, update: tagsInQueue },
+        //{ header: "Currently caching", body: "", update: currentlyCaching },
         { header: "Requests per second", body: "3.14", update: () => {} }];
     
     $scope.tiles.forEach(tile => tile.update());

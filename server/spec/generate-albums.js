@@ -5,12 +5,13 @@ module.exports = function(count) {
 	for(i = 0; i < count; i++)
     {
         albums.push(new Album(
-        	"AlbumName" + i,
+			"AlbumId" + i,
+			"AlbumName" + i,
         	"AlbumArtist" + i,
         	"AlbumImage" + i,
         	"AlbumLink" + i,
-        	"AlbumBandId" + i,
-        	"AlbumId" + i));
+        	"AlbumBandId" + i
+        	));
     }
 
     return albums;

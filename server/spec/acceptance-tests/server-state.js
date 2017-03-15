@@ -17,7 +17,7 @@ describe("Server state", function() {
         testServer.stop().then(done);
     });
 
-    it("returns all currently cached tags", function(done) {
+    it("returns number of currently cached tags", function(done) {
         var expectedTags = [ "pop", "rock", "ambient", "metal", "soundtrack" ];
 
     	cacheTags(expectedTags)
@@ -26,7 +26,13 @@ describe("Server state", function() {
             .testFinished(done);
     });
 
-    it("returns all queued tags", function(done) {
+    it("returns zero cached tags when database has no index or type for tags", function(done) {
+        stateRequests.getCachedTags()
+            .then(tagCount => expect(parseInt(tagCount)).toBe(0))
+            .testFinished(done);
+    });
+
+    it("returns number of queued tags", function(done) {
         var expectedQueuedTags = [ "pop", "rock", "ambient", "metal", "soundtrack" ];
 
         bandcamp.delay = 9999;

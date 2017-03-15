@@ -47,9 +47,9 @@ describe("Persister", function() {
 	});
 
 	it("saves to disk at set intervals", function() {
-		var album1 = new Album("album1");
-		var album2 = new Album("album2");
-		var album3 = new Album("album3");
+		var album1 = new Album("0", "album1");
+		var album2 = new Album("1", "album2");
+		var album3 = new Album("2", "album3");
 
 		sut.start(startDate);
 

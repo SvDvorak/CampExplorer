@@ -63,7 +63,7 @@ describe("initial data loader", function() {
 	});
 
 	it("loads from disk if path is set and file found", function(done) {
-		var album = new Album("album");
+		var album = new Album("0", "album");
 		diskCache = { tag: [ album ] };
 		
 		sut
@@ -78,7 +78,7 @@ describe("initial data loader", function() {
 
 	it("runs seed with config tag if path isn't set", function(done) {
 		config.persistPath = undefined;
-		var album = new Album("album");
+		var album = new Album("0", "album");
 		diskCache = { tag: [ album ] };
 		seedResult = [ "tag" ];
 

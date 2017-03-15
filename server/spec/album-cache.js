@@ -8,7 +8,7 @@ describe("Album cache", function() {
 
     beforeEach(function() {
     	sut = new Cache();
-    	disusedAlbum = new Album("Album2", "Artist2", "Image2", "Link2");
+    	disusedAlbum = new Album("1", "Album2", "Artist2", "Image2", "Link2");
     	disusedTag = "deadtag";
     });
 
@@ -19,8 +19,8 @@ describe("Album cache", function() {
     it("returns albums matching single tag", function() {
     	var expectedAlbums =
 	    	[
-		    	new Album("Album1", "Artist1", "Image1", "Link1"),
-		    	new Album("Album2", "Artist2", "Image2", "Link2")
+		    	new Album("0", "Album1", "Artist1", "Image1", "Link1"),
+		    	new Album("1", "Album2", "Artist2", "Image2", "Link2")
 	    	];
 
     	setAlbumsForTag("tag", expectedAlbums);
@@ -31,7 +31,7 @@ describe("Album cache", function() {
     });
 
     it("returns only albums with specified tag", function() {
-    	var expectedAlbum = new Album("Album1", "Artist1", "Image1", "Link1");
+    	var expectedAlbum = new Album("0", "Album1", "Artist1", "Image1", "Link1");
 
         setAlbumsForTag("tag1", [ expectedAlbum ]);
         setAlbumsForTag(disusedTag, [ disusedAlbum ]);
@@ -48,7 +48,7 @@ describe("Album cache", function() {
     });
 
     it("returns only matching albums when using multiple tags", function() {
-    	var expectedAlbum = new Album("Album1", "Artist1", "Image1", "Link1");
+    	var expectedAlbum = new Album("0", "Album1", "Artist1", "Image1", "Link1");
 
         setAlbumsForTag("tag1", [ expectedAlbum, disusedAlbum ]);
         setAlbumsForTag("tag2", [ expectedAlbum ]);
@@ -63,7 +63,7 @@ describe("Album cache", function() {
     });
 
     it("returns empty when all tags are cached", function() {
-        setAlbumsForTag("tag", [ new Album("Album") ]);
+        setAlbumsForTag("tag", [ new Album("0", "Album") ]);
 
         expect(sut.filterUncached([ "tag" ])).toEqual([ ]);
     });

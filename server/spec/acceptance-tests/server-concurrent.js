@@ -25,7 +25,7 @@ describe("Concurrent tag caching server", function() {
     });
 
     it("only caches tag once when new request asks for tag in progress of update", function(done) {
-        bandcamp.setAlbumsForTag("tag", [ new Album("Album") ]);
+        bandcamp.setAlbumsForTag("tag", [ new Album("0", "Album") ]);
 
         testServer
             .start()
@@ -41,8 +41,8 @@ describe("Concurrent tag caching server", function() {
     });
 
     it("queues up tags to be updated and processes them in order", function(done) {
-        bandcamp.setAlbumsForTag("tag1", [ new Album("Album1") ]);
-        bandcamp.setAlbumsForTag("tag2", [ new Album("Album2") ]);
+        bandcamp.setAlbumsForTag("tag1", [ new Album("0", "Album1") ]);
+        bandcamp.setAlbumsForTag("tag2", [ new Album("1", "Album2") ]);
 
         testServer
             .start()
@@ -57,7 +57,7 @@ describe("Concurrent tag caching server", function() {
     });
 
     it("saves cache to disk once a day", function(done) {
-        var album = new Album("Album");
+        var album = new Album("0", "Album");
         bandcamp.setAlbumsForTag("tag", [ album ]);
 
         var oldPersistDateFunc = persister.getNextPersistDate;
@@ -76,7 +76,7 @@ describe("Concurrent tag caching server", function() {
     });
 
     it("loads albums from disk if available at start", function(done) {
-        var album = new Album("Album");
+        var album = new Album("0", "Album");
         // Need two tags since recacher starts working on first at start
         writeJson.sync(testServer.config.persistPath, { tag1: [ ], tag2: [ album ] });
 
@@ -88,8 +88,8 @@ describe("Concurrent tag caching server", function() {
     });
 
     it("uses seeder when cache is not available on disk", function(done) {
-        var album1 = new Album("Album1");
-        var album2 = new Album("Album2");
+        var album1 = new Album("0", "Album1");
+        var album2 = new Album("1", "Album2");
         bandcamp.setAlbumsForTag("tag", [ album1 ]);
         bandcamp.setAlbumsForTag("tag_sub1", [ album2 ]);
         bandcamp.setTagsForAlbum(album1, [ "tag_sub1" ]);

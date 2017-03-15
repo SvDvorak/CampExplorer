@@ -22,12 +22,12 @@ describe("Server with cache", function() {
 
     it("returns complete album", function(done) {
         var album = new Album(
+            "987654321",
             "Album name",
             "Artist name",
             "www.imagelink.com",
             "www.albumlink.com",
-            "123456789",
-            "987654321");
+            "123456789");
 
         bandcamp.setAlbumsForTag("tag", [ album ]);
 
@@ -36,12 +36,12 @@ describe("Server with cache", function() {
             .then(albums => {
                 expect(albums.length).toBe(1);
                 var singleAlbum = albums[0];
+                expect(singleAlbum.id).toBe("987654321");
                 expect(singleAlbum.name).toBe("Album name");
                 expect(singleAlbum.artist).toBe("Artist name");
                 expect(singleAlbum.image).toBe("www.imagelink.com");
                 expect(singleAlbum.link).toBe("www.albumlink.com");
                 expect(singleAlbum.bandId).toBe("123456789");
-                expect(singleAlbum.albumId).toBe("987654321");
             })
             .testFinished(done);
     });

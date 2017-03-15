@@ -1,7 +1,8 @@
 
-module.exports = CacheUpdater = function(cache, albumApi, log) {
+module.exports = CacheUpdater = function(cache, albumApi, database, log) {
 	this.cache = cache;
 	this.albumApi = albumApi;
+    this.database = database;
 	this.log = log;
 	this.queue = [];
 	this.inProgress = undefined;
@@ -20,16 +21,19 @@ CacheUpdater.prototype = {
     updateTagsRecursive: function(onTagAlbumsUpdated) { 
         var updater = this;
         var cache = this.cache;
+        var database = this.database;
         var albumApi = this.albumApi;
 
         if(this.queue.length == 0) {
             updater.callIfDefined(onTagAlbumsUpdated);
         }
-        else if(this.queue.length > 0 && this.inProgress == undefined) {
+        else if(this.inProgress == undefined) {
             var tag = this.queue[0];
             this.inProgress = tag;
             albumApi.getAlbumsForTag(tag, newAlbums => {
                 cache.albums[tag] = newAlbums;
+                database.saveTag(tag);
+                database.saveAlbums(newAlbums);
                 updater.removeFromQueue(tag);
 
                 updater.inProgress = undefined;

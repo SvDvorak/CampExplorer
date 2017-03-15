@@ -1,15 +1,16 @@
 var Recacher = require("../source/re-cacher");
+var DatabaseFake = require("./database-fake");
 var Promise = require("bluebird");
 require("./test-finished");
 
 describe("Recacher", function() {
-    var cache;
+    var database;
     var updater;
     var finishedCall;
     var sut;
 
     beforeEach(function() {
-        cache = { albums: { } };
+        database = new DatabaseFake();
         updater = {
             calledUpdates: [],
             queue: [],
@@ -20,7 +21,7 @@ describe("Recacher", function() {
             isIdle: function() { return this.queue.length == 0; }
         };
 
-        sut = new Recacher(cache, updater, function() { });
+        sut = new Recacher(database, updater, function() { });
         sut.cacheDelay = 0.001;
     });
 
@@ -34,14 +35,14 @@ describe("Recacher", function() {
         return () => expect(updater.calledUpdates).toEqual(tags);
     };
 
-    it("does nothing if no tags exist in cache", function(done) {
+    it("does nothing if no tags exist in database", function(done) {
         execute()
             .then(expectUpdateCallCountToBe(0))
             .finally(done);
     });
 
     it("caches first tag in album cache", function(done) {
-        cache.albums["tag"] = { };
+        database.savedTags.push("tag");
 
         execute()
             .then(expectUpdateTagsToBe(["tag"]))
@@ -49,8 +50,8 @@ describe("Recacher", function() {
     });
 
     it("loops tags when having reached end of tag collection", function(done) {
-        cache.albums["tag1"] = { };
-        cache.albums["tag2"] = { };
+        database.savedTags.push("tag1");
+        database.savedTags.push("tag2");
 
         execute()
             .then(execute)
@@ -60,8 +61,8 @@ describe("Recacher", function() {
     });
 
     it("does not cache when updater has tags in queue already", function(done) {
-        cache.albums["tag1"] = { };
-        cache.albums["tag2"] = { };
+        database.savedTags.push("tag1");
+        database.savedTags.push("tag2");
 
         updater.queue = [ "tag3", "tag4" ];
 

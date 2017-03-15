@@ -1,5 +1,6 @@
 var BandcampApi = require("./bandcamp");
 var Cache = require("./album-cache");
+var Database = require("./database");
 var CacheUpdater = require("./cache-updater");
 var Recacher = require("./re-cacher");
 var Persister = require("./cache-persister");
@@ -14,7 +15,8 @@ var logFunction = function(text) { console.log(new Date().toISOString() + ": " +
 var config = new Config();
 var cache = new Cache();
 var bandcamp = new BandcampApi();
-var updater = new CacheUpdater(cache, bandcamp, logFunction);
+var database = new Database();
+var updater = new CacheUpdater(cache, bandcamp, database, logFunction);
 var recacher = new Recacher(cache, updater, logFunction);
 var seeder = new Seeder(updater, bandcamp, logFunction);
 var persister = new Persister(cache, writeJson, scheduleAt, config.persistPath, logFunction);
@@ -25,6 +27,7 @@ require("./server")
 	.start(
 		config,
 		cache,
+		database,
 		updater,
 		recacher,
 		persister,

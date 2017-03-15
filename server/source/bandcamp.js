@@ -73,7 +73,7 @@ Bandcamp.prototype = {
     },
 
     getTagsForAlbumRecursive: function(album, successCallback, retryCount) {
-		var tagsOptions = options.createTagsOptions(album.bandId, album.albumId);
+		var tagsOptions = options.createTagsOptions(album.bandId, album.id);
 		var api = this;
 
         request(tagsOptions, function(error, response, data) {
@@ -103,12 +103,12 @@ Bandcamp.prototype = {
     convertToAlbum: function(bandcampAlbum) {
 		var albumUrl = bandcampAlbum.url_hints;
 		var album = new Album(
+			bandcampAlbum.id,
 			bandcampAlbum.primary_text,
 			bandcampAlbum.secondary_text,
 			"https://f4.bcbits.com/img/a" + bandcampAlbum.art_id + "_11.jpg",
 			"https://" + albumUrl.subdomain + ".bandcamp.com/album/" + albumUrl.slug,
-			bandcampAlbum.band_id,
-			bandcampAlbum.id);
+			bandcampAlbum.band_id);
 
 		return album;
 	}

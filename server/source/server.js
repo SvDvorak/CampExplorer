@@ -13,18 +13,20 @@ module.exports = {
     listenerApp: {},
     recacher: {},
 
-    start: function (config, albumCache, updater, recacher, persister, initialDataLoader) {
+    start: function (config, albumCache, database, updater, recacher, persister, initialDataLoader) {
         var server = this;
         this.config = config;
         this.albumCache = albumCache;
+        this.database = database;
         this.updater = updater;
         this.recacher = new WorkerThread(recacher, config.recacheIntervalInSeconds*1000);
         this.persister = persister;
         this.isRunning = true;
 
-        return initialDataLoader
-            .load()
-            .then(() => server.setupEndpointService());
+        //return initialDataLoader
+        //.load()
+        //.then(() => server.setupEndpointService());
+        server.setupEndpointService();
     },
 
     setupEndpointService: function() {
@@ -66,7 +68,10 @@ module.exports = {
         });
 
         app.get("/admin/tagcount", function(request, res) {
-            sendJSONSuccess(res, Object.keys(server.albumCache.albums).length);
+            server.database
+                .getTagCount()
+                .then(tagCount => sendJSONSuccess(res, tagCount))
+                .catch(e => sendJSONSuccess(res, 0));
         });
 
         app.get("/admin/tagsinqueue", function(request, res) {
@@ -85,7 +90,7 @@ module.exports = {
         return new Promise((resolve, reject) => {
             server.listenerApp = app.listen(this.config.port, function() {
                 server.recacher.start();
-                server.persister.start(Date.now());
+                //server.persister.start(Date.now());
                 resolve();
             });
         });
