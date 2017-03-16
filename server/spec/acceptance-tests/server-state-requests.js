@@ -24,5 +24,9 @@ module.exports = {
 
     getCurrentlyCachingTag: function() {
         return this.createRequest("currentlycachingtag");
+    },
+
+    getAlbumCount: function() {
+        return this.createRequest("albumcount");
     }
 }

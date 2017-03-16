@@ -77,5 +77,13 @@ Database.prototype = {
                 type: "tags"
             })
             .then(data => data.count);
+    },
+    getAlbumCount: function() {
+        return createClient()
+            .count({
+                index: "tagsearch",
+                type: "albums"
+            })
+            .then(data => data.count);
     }
 }

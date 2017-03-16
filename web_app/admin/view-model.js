@@ -37,6 +37,10 @@ bandcampMultiTag.controller('adminController', [ "$scope", "$http", function ($s
         callAdminService(this, "currentlycachingtag");
     }
 
+    var numberOfAlbums = function() {
+        callAdminService(this, "albumcount");
+    }
+
     var serverStatus = function() { this.body = $scope.serverIsUp ? "Online and ready =D" : "Server is down =(" };
 
     $scope.tiles = [
@@ -44,6 +48,7 @@ bandcampMultiTag.controller('adminController', [ "$scope", "$http", function ($s
         { header: "Cached tags", body: 0, update: cachedTagsFunc },
         { header: "Tags in queue", body: 0, update: tagsInQueue },
         { header: "Currently caching", body: "", update: currentlyCaching },
+        { header: "Number of albums", body: "", update: numberOfAlbums },
         { header: "Requests per second", body: "3.14", update: () => {} }];
     
     $scope.tiles.forEach(tile => tile.update());

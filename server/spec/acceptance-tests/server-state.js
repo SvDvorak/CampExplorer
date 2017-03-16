@@ -54,6 +54,24 @@ describe("Server state", function() {
             .testFinished(done);
     });
 
+    it("returns number of albums cached", function(done) {
+        var tag = "pop";
+
+        var expectedAlbums = [ { name: "Album1" }, { name: "Album2" }, { name: "Album3" }];
+        bandcamp.setAlbumsForTag(tag, expectedAlbums);
+
+        cacheTags([ tag ])
+            .then(() => stateRequests.getAlbumCount())
+            .then(albumCount => expect(albumCount).toBe(expectedAlbums.length))
+            .testFinished(done);
+    });
+
+    it("returns zero as album count when database has no index or type for tags", function(done) {
+            stateRequests.getAlbumCount()
+                .then(albumCount => expect(albumCount).toBe(0))
+                .testFinished(done);
+    });
+
     var cacheTags = function(tags) {
     	return localRequest(tags);
     }

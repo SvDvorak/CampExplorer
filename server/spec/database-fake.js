@@ -17,6 +17,13 @@ DatabaseFake.prototype = {
         }
         return Promise.resolve(this.savedTags.length);
     },
+    getAlbumCount: function() {
+        if(this.savedTags.length == 0)
+        {
+            return Promise.reject("No tags exception");
+        }
+        return Promise.resolve(this.savedAlbums.length);
+    },
     saveTag: function(tag) {
         this.savedTags.push(tag);
     },

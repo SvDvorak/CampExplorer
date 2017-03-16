@@ -82,6 +82,13 @@ module.exports = {
             sendJSONSuccess(res, server.updater.currentlyCachingTag());
         });
 
+        app.get("/admin/albumcount", function(request, res) {
+            server.database
+                .getAlbumCount()
+                .then(albumCount => sendJSONSuccess(res, albumCount))
+                .catch(e => sendJSONSuccess(res, 0));
+        });
+
         var sendJSONSuccess = function(res, data) {
             res.status(200);
             res.send(JSON.stringify(data));
