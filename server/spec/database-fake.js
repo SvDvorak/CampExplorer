@@ -1,9 +1,9 @@
 var Promise = require("bluebird");
+require("../source/extensions");
 
 module.exports = DatabaseFake = function() {
     this.savedTags = [];
-    this.savedAlbums = [];
-    this.calledSaveAlbums = false;
+    this.saveAlbumsCalls = [];
 }
 
 DatabaseFake.prototype = {
@@ -22,13 +22,12 @@ DatabaseFake.prototype = {
         {
             return Promise.reject("No tags exception");
         }
-        return Promise.resolve(this.savedAlbums.length);
+        return Promise.resolve(this.saveAlbumsCalls.map(calls => calls.albums).flatten().length);
     },
     saveTag: function(tag) {
         this.savedTags.push(tag);
     },
-    saveAlbums: function(albums) {
-        this.calledSaveAlbums = true;
-        this.savedAlbums = this.savedAlbums.concat(albums);
+    saveAlbums: function(tag, albums) {
+        this.saveAlbumsCalls.push({ tag: tag, albums: albums });
     }
 };

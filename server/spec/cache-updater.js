@@ -42,11 +42,14 @@ describe("Cache updater", function() {
 
 		var expectedAlbums = [ { id: "123" }, { id: "345" } ];
 
-		dataReturnedCallback(expectedAlbums[0]);
-		dataReturnedCallback(expectedAlbums[1]);
+		dataReturnedCallback([ expectedAlbums[0] ]);
+		dataReturnedCallback([ expectedAlbums[1] ]);
 
 		expect(database.savedTags).toEqual(expectedTags);
-		expect(database.savedAlbums).toEqual(expectedAlbums);
+		expect(database.saveAlbumsCalls).toEqual([
+			{ tag: "tag1", albums: [ { id: "123" } ] },
+			{ tag: "tag2", albums: [ { id: "345" } ] }
+		]);
 	});
 
 	it("ignores tags that are already queued", function() {
@@ -60,7 +63,7 @@ describe("Cache updater", function() {
 	it("removes tag from queue when finished updating", function() {
 		sut.updateTags(["tag"]);
 
-		dataReturnedCallback();
+		dataReturnedCallback([]);
 
 		expect(sut.queueLength()).toBe(0);
 	});
@@ -73,13 +76,13 @@ describe("Cache updater", function() {
 		sut.updateTags(tags1);
 		sut.updateTags(tags2);
 
-		dataReturnedCallback();
+		dataReturnedCallback([]);
 		expect(database.savedTags).toEqual(expectedTags.slice(0, 1));
-		dataReturnedCallback();
+		dataReturnedCallback([]);
 		expect(database.savedTags).toEqual(expectedTags.slice(0, 2));
-		dataReturnedCallback();
+		dataReturnedCallback([]);
 		expect(database.savedTags).toEqual(expectedTags.slice(0, 3));
-		dataReturnedCallback();
+		dataReturnedCallback([]);
 		expect(database.savedTags).toEqual(expectedTags.slice(0, 4));
 	});
 

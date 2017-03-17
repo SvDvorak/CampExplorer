@@ -11,7 +11,7 @@ Cache.prototype = {
 
         return tags
           .map(tag => albums[tag] || [])
-          .BCflatten()
+          .flatten()
           .BCgroup("link")
           .BCvalues()
           .filter(x => x.length == tags.length)

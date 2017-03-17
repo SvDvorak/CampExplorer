@@ -3,6 +3,7 @@ var Config = require("./config");
 var request = require("request-promise");
 var elasticsearch = require('elasticsearch');
 var Promise = require('bluebird');
+require("./extensions");
 
 var hostAddress = "tagsearch_database:9200";
 var host = "http://tagsearch_database:9200/";
@@ -35,10 +36,6 @@ var getOptions = function(address, data) {
     };
 }
 
-var indexOperation = function(id) { 
-    return { index : { _index: "tagsearch", _type: "albums", _id : id } };
-}
-
 module.exports = Database = function() {
 }
 
@@ -48,9 +45,21 @@ var createClient = function() {
     })
 };
 
-var flatten = function(arrayOfArrays) {
-    return [].concat.apply([], arrayOfArrays);
-}
+var createUpsertOperation = function(album) {
+    return [
+        { update : { _id : album.id } },
+        { 
+            script: {
+                lang: "groovy",
+                file: "update_tags",
+                params: {
+                    new_tag: album.tags[0]
+                }
+            },
+            upsert: album
+        }
+    ]
+};
 
 Database.prototype = {
     saveTag: function(tag) {
@@ -62,13 +71,20 @@ Database.prototype = {
                 body: { }
             });
     },
-    saveAlbums: function(albums) {
+    saveAlbums: function(tag, albums) {
         if(albums.length == 0) {
             return Promise.resolve();
         }
 
+        albums.forEach(album => { album.tags = [ tag ]});
+
         return createClient()
-            .bulk({ body: flatten(albums.map(album => [ indexOperation(album.id), album ])) });
+            .bulk({
+                index: "tagsearch",
+                type: "albums",
+                body: albums.map(album => createUpsertOperation(album)).flatten()
+            })
+            .catch(error => { console.log("Save albums errors: "); console.log(error); });
     },
     getTagCount: function() {
         return createClient()

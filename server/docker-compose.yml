@@ -22,4 +22,5 @@ services:
     ports:
       - '9200:9200'
     volumes:
+      - ./elasticsearch/scripts/update_tags.groovy:/usr/share/elasticsearch/config/scripts/update_tags.groovy
       - ./elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml

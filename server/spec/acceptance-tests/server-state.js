@@ -18,7 +18,7 @@ describe("Server state", function() {
     });
 
     it("returns number of currently cached tags", function(done) {
-        var expectedTags = [ "pop", "rock", "ambient", "metal", "soundtrack" ];
+        var expectedTags = [ "funk", "rock", "ambient", "metal", "soundtrack" ];
 
     	cacheTags(expectedTags)
             .then(() => stateRequests.getCachedTags())
@@ -67,9 +67,9 @@ describe("Server state", function() {
     });
 
     it("returns zero as album count when database has no index or type for tags", function(done) {
-            stateRequests.getAlbumCount()
-                .then(albumCount => expect(albumCount).toBe(0))
-                .testFinished(done);
+        stateRequests.getAlbumCount()
+            .then(albumCount => expect(albumCount).toBe(0))
+            .testFinished(done);
     });
 
     var cacheTags = function(tags) {

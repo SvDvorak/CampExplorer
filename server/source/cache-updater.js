@@ -33,7 +33,7 @@ CacheUpdater.prototype = {
             albumApi.getAlbumsForTag(tag, newAlbums => {
                 cache.albums[tag] = newAlbums;
                 database.saveTag(tag);
-                database.saveAlbums(newAlbums);
+                database.saveAlbums(tag, newAlbums);
                 updater.removeFromQueue(tag);
 
                 updater.inProgress = undefined;
