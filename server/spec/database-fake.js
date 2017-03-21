@@ -3,10 +3,36 @@ require("../source/extensions");
 
 module.exports = DatabaseFake = function() {
     this.savedTags = [];
+    this.getAlbumsCalls = [];
     this.saveAlbumsCalls = [];
 }
 
 DatabaseFake.prototype = {
+    saveTag: function(tag) {
+        this.savedTags.push(tag);
+    },
+    saveAlbums: function(tag, albums) {
+        this.saveAlbumsCalls.push({ tag: tag, albums: albums });
+    },
+    getUnsavedTags: function(tags) {
+        savedTags = this.savedTags;
+        return Promise.resolve(tags.filter(tag => savedTags.indexOf(tag) == -1));
+    },
+    getAlbumsByTags: function(tags) {
+        this.getAlbumsCalls.push({ tags: tags });
+        databaseFake = this;
+        return Promise.resolve(tags
+          .map(tag => databaseFake.getAlbumsByTag(tag) || [])
+          .flatten()
+          .BCgroup("link")
+          .BCvalues()
+          .filter(x => x.length == tags.length)
+          .map(x => x[0]));
+    },
+    getAlbumsByTag: function(tag) {
+        var filtered = this.saveAlbumsCalls.filter(call => call.tag == tag)[0].albums;
+        return filtered;
+    },
     getTags: function() {
         return this.savedTags;
     },
@@ -24,10 +50,4 @@ DatabaseFake.prototype = {
         }
         return Promise.resolve(this.saveAlbumsCalls.map(calls => calls.albums).flatten().length);
     },
-    saveTag: function(tag) {
-        this.savedTags.push(tag);
-    },
-    saveAlbums: function(tag, albums) {
-        this.saveAlbumsCalls.push({ tag: tag, albums: albums });
-    }
 };

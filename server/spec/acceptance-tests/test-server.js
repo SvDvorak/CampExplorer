@@ -20,7 +20,7 @@ module.exports = TestServer = function() {
     this.bandcamp = new BandcampFake();
     this.cache = new Cache();
     this.database = new DatabaseFake();
-    this.updater = new CacheUpdater(this.cache, this.bandcamp, this.database, noLog);
+    this.updater = new CacheUpdater(this.bandcamp, this.database, noLog);
     this.recacher = new Recacher(this.database, this.updater, noLog);
     this.persister = new Persister(this.cache, writeJson, scheduleAt, this.config.persistPath, noLog);
     this.seeder = new Seeder(this.updater, this.bandcamp, noLog);
@@ -31,7 +31,6 @@ TestServer.prototype = {
 	start: function() {
         return this.server.start(
             this.config,
-            this.cache,
             this.database,
             this.updater,
             this.recacher,

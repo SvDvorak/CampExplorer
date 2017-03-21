@@ -16,7 +16,7 @@ var config = new Config();
 var cache = new Cache();
 var bandcamp = new BandcampApi();
 var database = new Database();
-var updater = new CacheUpdater(cache, bandcamp, database, logFunction);
+var updater = new CacheUpdater(bandcamp, database, logFunction);
 var recacher = new Recacher(cache, updater, logFunction);
 var seeder = new Seeder(updater, bandcamp, logFunction);
 var persister = new Persister(cache, writeJson, scheduleAt, config.persistPath, logFunction);
@@ -26,7 +26,6 @@ var initialDataLoader = new InitialDataLoader(config, readJson, cache, updater, 
 require("./server")
 	.start(
 		config,
-		cache,
 		database,
 		updater,
 		recacher,

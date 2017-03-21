@@ -5,7 +5,6 @@ var CacheUpdater = require("../source/cache-updater");
 describe("Cache updater", function() {
 	var bandcamp;
 	var database;
-	var cache;
 	var sut;
 	var dataReturnedCallback;
 	var errorCallback;
@@ -20,8 +19,7 @@ describe("Cache updater", function() {
 				errorCallback = error;
 		}};
 		database = new DatabaseFake();
-		cache = { albums: {} };
-		sut = new CacheUpdater(cache, bandcamp, database, function(text) { });
+		sut = new CacheUpdater(bandcamp, database, function(text) { });
     });
 
 	var createSaveData = function(saveAddress, saveData) {

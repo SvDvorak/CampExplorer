@@ -86,6 +86,46 @@ Database.prototype = {
             })
             .catch(error => { console.log("Save albums errors: "); console.log(error); });
     },
+    getUnsavedTags: function(tags) {
+        return createClient()
+            .search({
+                index: "tagsearch",
+                type: "tags",
+                body: {
+                    query: {
+                        terms: {
+                            _id: tags
+                        }
+                    }
+                }
+            })
+            .then(results => {
+                var savedTags = results.hits.hits.map(x => x._id);
+                return tags.filter(tag => savedTags.indexOf(tag) == -1)
+            });
+    },
+    getAlbumsByTags: function(tags) {
+        var terms = tags.map(tag => {
+            return { term: { tags: tag } }
+        });
+        return createClient()
+            .search({
+                index: "tagsearch",
+                type: "albums",
+                body: {
+                    query: {
+                        constant_score: {
+                            filter: {
+                                bool: {
+                                    must: terms
+                                }
+                            }
+                        }
+                    }
+                }
+            })
+            .then(results => results.hits.hits.map(x => x._source));
+    },
     getTagCount: function() {
         return createClient()
             .count({

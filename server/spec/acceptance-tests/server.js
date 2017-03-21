@@ -8,11 +8,13 @@ require("../test-finished");
 describe("Server with cache", function() {
     var testServer;
     var bandcamp;
+    var database;
 
     beforeEach(function(done) {
         testServer = new TestServer();
         removeCache(testServer.config.persistPath);
         bandcamp = testServer.bandcamp;
+        database = testServer.database;
         testServer.start().then(done);
     });
 
@@ -85,7 +87,7 @@ describe("Server with cache", function() {
 
         localRequest([ "musicTag" ])
             .then(response => {
-                expect(response.error).toBe("Tags not cached, try again later");
+                expect(response.error).toBe("Tags not loaded, try again later");
                 expect(response.data).toEqual([ "musicTag" ]);
             })
             .then(() => localRequest([ "musicTag" ]))
@@ -100,6 +102,15 @@ describe("Server with cache", function() {
         localRequest([ "tag" ])
             .then(() => localRequest([ "tag" ]))
             .then(albums => expect(albums.length).toBe(50))
+            .testFinished(done);
+    });
+
+    it("returns empty result without using database when calling without tags", function(done) {
+        localRequest([ ])
+            .then(albums => {
+                expect(albums.length).toBe(0);
+                expect(database.getAlbumsCalls.length).toBe(0);
+            })
             .testFinished(done);
     });
 
