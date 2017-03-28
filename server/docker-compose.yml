@@ -19,8 +19,11 @@ services:
   database:
     container_name: tagsearch_database
     image: docker.elastic.co/elasticsearch/elasticsearch:5.2.2
+    command: /bin/bash /usr/share/elasticsearch/start.sh
     ports:
       - '9200:9200'
     volumes:
-      - ./elasticsearch/scripts/update_tags.groovy:/usr/share/elasticsearch/config/scripts/update_tags.groovy
       - ./elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ./elasticsearch/wait-for-it.sh:/usr/share/elasticsearch/wait-for-it.sh
+      - ./elasticsearch/start.sh:/usr/share/elasticsearch/start.sh
+      - ./elasticsearch/initial-index.sh:/usr/share/elasticsearch/initial-index.sh
