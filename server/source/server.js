@@ -13,20 +13,20 @@ module.exports = {
     listenerApp: {},
     recacher: {},
 
-    start: function (config, albumCache, database, updater, recacher, persister, initialDataLoader) {
+    start: function (config, database, updater, recacher, persister, initialDataLoader) {
         var server = this;
         this.config = config;
-        this.albumCache = albumCache;
         this.database = database;
         this.updater = updater;
         this.recacher = new WorkerThread(recacher, config.recacheIntervalInSeconds*1000);
         this.persister = persister;
         this.isRunning = true;
 
+        // TODO: REIMPLEMENT
         //return initialDataLoader
         //.load()
         //.then(() => server.setupEndpointService());
-        server.setupEndpointService();
+        return Promise.resolve(server.setupEndpointService());
     },
 
     setupEndpointService: function() {
@@ -46,31 +46,44 @@ module.exports = {
                 return;
             }
 
-            var uncached = server.albumCache.filterUncached(request.body);
-            if(uncached.length > 0)
-            {
-                res.status(202);
-                res.send({
-                    error: "Tags not cached, try again later",
-                    data: uncached
-                });
-                server.updater.updateTags(uncached);
+            var requestedTags = request.body;
+
+            if(requestedTags.length == 0) {
+                sendJSONSuccess(res, [ ]);
                 return;
             }
 
-            var albums = server.albumCache
-                .getAlbumsByTags(request.body)
-                .slice(0, 50);
-
-            res.setHeader("Content-Type", "application/json");
-            res.setHeader("Access-Control-Allow-Origin", "*");
-            sendJSONSuccess(res, albums);
+            server.database
+                .getUnsavedTags(requestedTags)
+                .then(unsavedTags => {
+                    if(unsavedTags.length > 0)
+                    {
+                        res.status(202);
+                        res.send({
+                            error: "Tags not loaded, try again later",
+                            data: unsavedTags
+                        });
+                        server.updater.updateTags(unsavedTags);
+                    }
+                    else
+                    {
+                        server.database
+                            .getAlbumsByTags(requestedTags)
+                            .then(matchingAlbums => {
+                                var pagedAlbums = matchingAlbums.slice(0, 50);
+                                sendJSONSuccess(res, pagedAlbums);
+                            })
+                            .catch(error => console.log(error));
+                    }
+                })
+                .catch(error => console.log(error));
         });
 
         app.get("/admin/tagcount", function(request, res) {
             server.database
                 .getTagCount()
-                .then(tagCount => sendJSONSuccess(res, tagCount))
+                .then(tagCount => 
+                    sendJSONSuccess(res, tagCount))
                 .catch(e => sendJSONSuccess(res, 0));
         });
 
@@ -97,6 +110,7 @@ module.exports = {
         return new Promise((resolve, reject) => {
             server.listenerApp = app.listen(this.config.port, function() {
                 server.recacher.start();
+                // TODO: REIMPLEMENT
                 //server.persister.start(Date.now());
                 resolve();
             });
