@@ -1,6 +1,4 @@
-var Promise = require("bluebird");
 var Config = require("./config");
-var request = require("request-promise");
 var elasticsearch = require('elasticsearch');
 var Promise = require('bluebird');
 require("./extensions");
@@ -50,8 +48,8 @@ var createUpsertOperation = function(album) {
         { update : { _id : album.id } },
         { 
             script: {
-                lang: "groovy",
-                file: "update_tags",
+                lang: "painless",
+                inline: "if(!ctx._source.tags.contains(params.new_tag)) { ctx._source.tags.add(params.new_tag); }",
                 params: {
                     new_tag: album.tags[0]
                 }
@@ -114,12 +112,8 @@ Database.prototype = {
                 type: "albums",
                 body: {
                     query: {
-                        constant_score: {
-                            filter: {
-                                bool: {
-                                    must: terms
-                                }
-                            }
+                        bool: {
+                            must: terms
                         }
                     }
                 }
