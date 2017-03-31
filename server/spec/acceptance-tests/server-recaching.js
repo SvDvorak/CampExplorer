@@ -33,7 +33,6 @@ describe("Recaching server", function() {
     it("stops recaching when stopping server", function(done) {
         localRequest(["tag"])
             .then(() => testServer.stop())
-            .then(() => bandcamp.setAlbumsForTag("tag", [ new Album("0", "Album1") ]))
             .delay(70)
             .then(() => expect(bandcamp.tagsRequested.length).toBe(1))
             .testFinished(done);

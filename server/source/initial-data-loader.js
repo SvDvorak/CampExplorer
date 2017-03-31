@@ -33,9 +33,9 @@ InitialDataLoader.prototype = {
 		var loader = this;
 		return new Promise((resolve, reject) => {
 			this.seeder.seed(this.config.startSeed, function(tags) {
-				loader.updater.updateTags(tags, function() {
-						resolve();
-				});
+				loader.updater
+					.updateTags(tags)
+					.then(resolve);
 			});
 		});
 	}

@@ -39,9 +39,9 @@ describe("initial data loader", function() {
 		albumsCache = { albums: { } };
 
 		updater = {
-			updateTags: function(tags, done) {
+			updateTags: function(tags) {
 				updatedTags = tags;
-				done();
+				return Promise.resolve();
 			},
 			isIdle: function() { return true; }
 		};

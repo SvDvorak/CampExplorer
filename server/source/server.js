@@ -13,20 +13,19 @@ module.exports = {
     listenerApp: {},
     recacher: {},
 
-    start: function (config, database, updater, recacher, persister, initialDataLoader) {
+    start: function (config, database, updater, recacher, seeder) {
         var server = this;
         this.config = config;
         this.database = database;
         this.updater = updater;
         this.recacher = new WorkerThread(recacher, config.recacheIntervalInSeconds*1000);
-        this.persister = persister;
         this.isRunning = true;
 
-        // TODO: REIMPLEMENT
-        //return initialDataLoader
-        //.load()
-        //.then(() => server.setupEndpointService());
-        return Promise.resolve(server.setupEndpointService());
+        var startPromise = Promise.resolve();
+        if(config.startSeed) {
+            startPromise.then(new Promise((resolve, reject) => seeder.seed(config.startSeed, resolve)));
+        }
+        return startPromise.then(() => server.setupEndpointService());
     },
 
     setupEndpointService: function() {
@@ -110,8 +109,6 @@ module.exports = {
         return new Promise((resolve, reject) => {
             server.listenerApp = app.listen(this.config.port, function() {
                 server.recacher.start();
-                // TODO: REIMPLEMENT
-                //server.persister.start(Date.now());
                 resolve();
             });
         });
@@ -121,7 +118,6 @@ module.exports = {
 		if(this.isRunning) {
             this.isRunning = false;
             this.recacher.stop();
-            this.persister.stop();
             var server = this;
             return new Promise((resolve, reject) => {
                 server.listenerApp.close(resolve);

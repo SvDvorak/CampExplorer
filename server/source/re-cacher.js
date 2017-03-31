@@ -11,24 +11,28 @@ Recacher.prototype = {
 	execute: function() {
 		var recacher = this;
 
-		var tags = [];//this.database.getTags();
+		this.log("in recacher execute");
+		return this.database.getSavedTags()
+			.then(tags => {
+				recacher.log("recacher got tags, is idle? " + recacher.updater.isIdle());
+				recacher.log("recacher got tags: " + JSON.stringify(tags));
+				if(tags.length > 0 && recacher.updater.isIdle())
+				{
+					var tagToCache = tags[recacher.tagIndex];
+					recacher.log("Recaching " + tagToCache);
 
-		if(tags.length > 0 && this.updater.isIdle())
-		{
-			var tagToCache = tags[this.tagIndex];
+					recacher.tagIndex += 1;
+					if(recacher.tagIndex >= tags.length) {
+						recacher.tagIndex = 0;
+					}
 
-			this.tagIndex += 1;
-			if(this.tagIndex >= tags.length) {
-				this.tagIndex = 0;
-			}
-
-			return new Promise((resolve, reject) => {
-				this.updater.updateTags([ tagToCache ], resolve);
-			});
-		}
-		else
-		{
-			return Promise.resolve();
-		}
+					return recacher.updater.updateTags([ tagToCache ]);
+				}
+				else
+				{
+					return Promise.resolve();
+				}
+			})
+			.catch(() => recacher.log("Failed recaching"));
 	},
 };

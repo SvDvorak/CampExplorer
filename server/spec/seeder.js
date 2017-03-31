@@ -1,45 +1,27 @@
-var Cache = require("../source/album-cache");
-var CacheUpdater = require("../source/cache-updater");
 var Seeder = require("../source/seeder");
 var BandcampFake = require("./bandcamp-fake");
 var generateAlbums = require("./generate-albums");
 require("../source/extensions");
+require("./test-finished");
 
 describe("Seeder", function() {
 	var bandcamp;
-	var cache;
 	var seeder;
-	var updatedTags;
-	var albumsCallback;
-	var tagsCallback;
 
 	beforeEach(function() {
-		updatedTags = [];
-		albumsCallback = function() { };
-		tagsCallback = function() { };
-
 		bandcamp = new BandcampFake();
-		updater = { updateUncachedTags: function(tags, callback) {
-			updatedTags = updatedTags.concat(tags);
-			albumsCallback = callback;
-		}};
-		seeder = new Seeder(updater, bandcamp, function() { });
+		seeder = new Seeder(bandcamp, function() { });
 	});
 
-	var getAlbumNamesFor = function(tag) {
-		return cache.albums[tag].map(function(album) { return album.name; });
-	}
-
-	it("should retrieve initial tag", function() {
+	it("should retrieve initial tag", function(done) {
 		bandcamp.setAlbumsForTag("pop", []);
 
-		var tags = [];
-		seeder.seed("pop", function(newTags) { tags = newTags });
-
-		expect(tags).toEqual([ "pop" ]);
+		seeder.seed("pop")
+			.then(tags => expect(tags).toEqual([ "pop" ]))
+			.testFinished(done);
 	});
 
-	it("should for each initial tag album result retrieve their tags consecutively too", function() {
+	it("should for each initial tag album result retrieve their tags consecutively too", function(done) {
 		var album1 = { name: "PopAlbum1" };
 		var album2 = { name: "PopAlbum2" };
 
@@ -47,37 +29,34 @@ describe("Seeder", function() {
 		bandcamp.setTagsForAlbum(album1, [ "rock", "ambient" ])
 		bandcamp.setTagsForAlbum(album2, [ "metal" ])
 
-		var tags = [];
-		seeder.seed("pop", function(newTags) { tags = newTags });
-
-		expect(tags).toEqual([ "pop", "rock", "ambient", "metal" ])
+		seeder.seed("pop")
+			.then(tags => expect(tags).toEqual([ "pop", "rock", "ambient", "metal" ]))
+			.testFinished(done);
 	});
 
-	it("should only retrieve tags for first 500 albums plus one for start tag", function() {
+	it("should only retrieve tags for first 500 albums plus one for start tag", function(done) {
 		var callbacks = 0;
 
 		var albums = generateAlbums(1000);
 
 		bandcamp.setAlbumsForTag("pop", albums);
-		albums.forEach(function(album) {
-			bandcamp.setTagsForAlbum(album, album.name);
-		});
+		albums.forEach(album => bandcamp.setTagsForAlbum(album, album.name));
 
 		var tags = [];
-		seeder.seed("pop", function(newTags) { tags = newTags });
-
-		expect(tags.length).toBe(501);
+		seeder.seed("pop")
+			.then(tags => expect(tags.length).toBe(501))
+			.testFinished(done);
 	});
 
-	it("filters duplicate tags", function() {
+	it("filters duplicate tags", function(done) {
 		var album = { name: "Album" };
 
 		bandcamp.setAlbumsForTag("pop", [ album ]);
 		bandcamp.setTagsForAlbum(album, [ "pop", "rock" ])
 
 		var tags = [];
-		seeder.seed("pop", function(newTags) { tags = newTags });
-
-		expect(tags).toEqual([ "pop", "rock" ])
+		seeder.seed("pop")
+			.then(tags => expect(tags).toEqual([ "pop", "rock" ]))
+			.testFinished(done);
 	});
 });

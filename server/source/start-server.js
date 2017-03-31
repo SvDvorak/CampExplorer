@@ -13,15 +13,11 @@ var scheduleAt = require("./schedule-at");
 
 var logFunction = function(text) { console.log(new Date().toISOString() + ": " + text) };
 var config = new Config();
-var cache = new Cache();
 var bandcamp = new BandcampApi();
 var database = new Database();
 var updater = new CacheUpdater(bandcamp, database, logFunction);
-var recacher = new Recacher(cache, updater, logFunction);
-var seeder = new Seeder(updater, bandcamp, logFunction);
-var persister = new Persister(cache, writeJson, scheduleAt, config.persistPath, logFunction);
-var seeder = new Seeder(updater, bandcamp, logFunction);
-var initialDataLoader = new InitialDataLoader(config, readJson, cache, updater, seeder);
+var recacher = new Recacher(database, updater, logFunction);
+var seeder = new Seeder(bandcamp, logFunction);
 
 require("./server")
 	.start(
@@ -29,6 +25,5 @@ require("./server")
 		database,
 		updater,
 		recacher,
-		persister,
-		initialDataLoader,
-		() => { logFunction("Server listening on port " + config.port); });
+		seeder)
+    .then(() => { logFunction("Server listening on port " + config.port); });

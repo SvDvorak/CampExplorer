@@ -16,8 +16,8 @@ var AlbumsRequest = function(tag, successCallback, errorCallback) {
 }
 
 Bandcamp.prototype = {
-    getAlbumsForTag: function (tag, successCallback, errorCallback) {
-    	this.getAlbumsForTagRecursive(new AlbumsRequest(tag, successCallback, errorCallback));
+    getAlbumsForTag: function (tag) {
+    	return new Promise((resolve, reject) => this.getAlbumsForTagRecursive(new AlbumsRequest(tag, resolve, reject)));
     },
 
     getAlbumsForTagRecursive: function (albumsRequest) {
@@ -68,8 +68,8 @@ Bandcamp.prototype = {
 		});
     },
 
-    getTagsForAlbum: function(album, successCallback) {
-    	this.getTagsForAlbumRecursive(album, successCallback, 0);
+    getTagsForAlbum: function(album) {
+    	return new Promise((resolve, reject) => this.getTagsForAlbumRecursive(album, resolve, 0));
     },
 
     getTagsForAlbumRecursive: function(album, successCallback, retryCount) {

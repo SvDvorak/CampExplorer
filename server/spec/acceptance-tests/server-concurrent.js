@@ -56,49 +56,18 @@ describe("Concurrent tag caching server", function() {
             .testFinished(done);
     });
 
-    it("saves cache to disk once a day", function(done) {
-        var album = new Album("0", "Album");
-        bandcamp.setAlbumsForTag("tag", [ album ]);
+    it("uses seeder when config has seed set", function(done) {
+        testServer.config.startSeed = "tag";
 
-        var oldPersistDateFunc = persister.getNextPersistDate;
-        persister.getNextPersistDate = function(now) { return new Date(now + 100) }
-
-        testServer.start()
-            .then(() => localRequest(["tag"]))
-            .delay(200)
-            .then(() => {
-                var albums = readJson.sync(testServer.config.persistPath);
-                expect(albums["tag"][0].name).toEqual(album.name);
-
-                persister.getNextPersistDate = oldPersistDateFunc;
-            })
-            .testFinished(done);
-    });
-
-    it("loads albums from disk if available at start", function(done) {
-        var album = new Album("0", "Album");
-        // Need two tags since recacher starts working on first at start
-        writeJson.sync(testServer.config.persistPath, { tag1: [ ], tag2: [ album ] });
-
-        testServer.start()
-            .delay(100)
-            .then(() => localRequest(["tag2"]))
-            .then(albums => expect(albums[0].name).toBe("Album"))
-            .testFinished(done);
-    });
-
-    it("uses seeder when cache is not available on disk", function(done) {
         var album1 = new Album("0", "Album1");
         var album2 = new Album("1", "Album2");
         bandcamp.setAlbumsForTag("tag", [ album1 ]);
         bandcamp.setAlbumsForTag("tag_sub1", [ album2 ]);
         bandcamp.setTagsForAlbum(album1, [ "tag_sub1" ]);
 
-        testServer.config.startSeed = "tag";
-
         testServer
             .start()
-            .delay(100)
+            .then(() => localRequest(["tag_sub1"])) // Cache once first
             .then(() => localRequest(["tag_sub1"]))
             .then(albums => {
                 expect(albums.length).toBe(1);

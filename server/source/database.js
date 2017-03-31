@@ -102,6 +102,16 @@ Database.prototype = {
                 return tags.filter(tag => savedTags.indexOf(tag) == -1)
             });
     },
+    getSavedTags: function() {
+        return createClient()
+            .search({
+                index: "tagsearch",
+                type: "tags",
+                body: { query: { match_all: { } }
+            }
+        })
+        .then(results => results.hits.hits.map(x => x._id));
+    },
     getAlbumsByTags: function(tags) {
         var terms = tags.map(tag => {
             return { term: { tags: tag } }

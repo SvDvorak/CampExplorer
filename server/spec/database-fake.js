@@ -10,13 +10,19 @@ module.exports = DatabaseFake = function() {
 DatabaseFake.prototype = {
     saveTag: function(tag) {
         this.savedTags.push(tag);
+        return Promise.resolve();
     },
     saveAlbums: function(tag, albums) {
         this.saveAlbumsCalls.push({ tag: tag, albums: albums });
+        return Promise.resolve();
     },
     getUnsavedTags: function(tags) {
         savedTags = this.savedTags;
         return Promise.resolve(tags.filter(tag => savedTags.indexOf(tag) == -1));
+    },
+    getSavedTags: function() {
+        savedTags = this.savedTags;
+        return Promise.resolve(savedTags);
     },
     getAlbumsByTags: function(tags) {
         this.getAlbumsCalls.push({ tags: tags });

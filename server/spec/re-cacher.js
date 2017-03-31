@@ -70,4 +70,19 @@ describe("Recacher", function() {
             .then(expectUpdateCallCountToBe(0))
             .testFinished(done);
     });
+
+    it("logs and returns normally when recaching fails", function(done) {
+        database.savedTags.push("tag1");
+
+        updater.updateTags = () => {
+            throw new Error("error");
+        };
+
+        execute()
+            .then(() => done())
+            .catch(() => {
+                fail("didn't handle errors from dependencies");
+                done();
+            });
+    });
 });

@@ -18,13 +18,10 @@ module.exports = TestServer = function() {
     var noLog = function(text) { };
     this.config = new Config();
     this.bandcamp = new BandcampFake();
-    this.cache = new Cache();
     this.database = new DatabaseFake();
     this.updater = new CacheUpdater(this.bandcamp, this.database, noLog);
     this.recacher = new Recacher(this.database, this.updater, noLog);
-    this.persister = new Persister(this.cache, writeJson, scheduleAt, this.config.persistPath, noLog);
-    this.seeder = new Seeder(this.updater, this.bandcamp, noLog);
-    this.initialDataLoader = new InitialDataLoader(this.config, readJson, this.cache, this.updater, this.seeder);
+    this.seeder = new Seeder(this.bandcamp, noLog);
 };
 
 TestServer.prototype = {
@@ -34,8 +31,7 @@ TestServer.prototype = {
             this.database,
             this.updater,
             this.recacher,
-            this.persister,
-            this.initialDataLoader);
+            this.seeder);
 	},
 
 	stop: function() {

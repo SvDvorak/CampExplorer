@@ -21,10 +21,10 @@ describe("Worker Thread", function() {
     });
 
     it("calls function repeatedly after previous call finishes", function(done) {
-        worker.execute = function() {
+        worker.execute = () => {
             var worker = this;
             return new Promise((resolve, reject) => {
-                setTimeout(function() {
+                setTimeout(() => {
                     worker.calls += 1;
                     resolve();
                 }, 10);
@@ -33,7 +33,7 @@ describe("Worker Thread", function() {
 
         sut.start();
 
-        setTimeout(function() {
+        setTimeout(() => {
             expect(worker.calls).toBeLessThan(10);
             done();
         }, 100);
@@ -44,8 +44,8 @@ describe("Worker Thread", function() {
 
         sut.start();
 
-        setTimeout(function() {
-            expect(worker.calls).toEqual(2);
+        setTimeout(() => {
+            expect(worker.calls).toEqual(1);
             done();
         }, 60);
     });
@@ -54,9 +54,9 @@ describe("Worker Thread", function() {
         sut.start();
         sut.stop();
 
-        setTimeout(function() {
-            expect(worker.calls).toEqual(1);
+        setTimeout(() => {
+            expect(worker.calls).toEqual(0);
             done();
-        }, 60);
+        }, 20);
     });
 });

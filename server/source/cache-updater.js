@@ -1,3 +1,4 @@
+var Promise = require("bluebird");
 
 module.exports = CacheUpdater = function(albumApi, database, log) {
 	this.albumApi = albumApi;
@@ -5,46 +6,50 @@ module.exports = CacheUpdater = function(albumApi, database, log) {
 	this.log = log;
 	this.queue = [];
 	this.inProgress = undefined;
+    this.updatingPromise = Promise.resolve();
 }
 
 CacheUpdater.prototype = { 
-	updateTags: function(tags, onTagAlbumsUpdated) {
+	updateTags: function(tags) {
         var updater = this;
 
         updater.queue = updater.queue.concat(
             tags.filter(tag => { return updater.queue.indexOf(tag) == -1; }));
 
-        updater.updateTagsRecursive(onTagAlbumsUpdated);
+        if(this.inProgress == undefined) {
+            this.updatingPromise = new Promise((resolve, reject) => updater.updateTagsRecursive(resolve));
+        }
+
+        return Promise.resolve(this.updatingPromise);
 	},
 
-    updateTagsRecursive: function(onTagAlbumsUpdated) { 
+    updateTagsRecursive: function(resolve) { 
         var updater = this;
         var database = this.database;
         var albumApi = this.albumApi;
 
         if(this.queue.length == 0) {
-            updater.callIfDefined(onTagAlbumsUpdated);
+            resolve();
+            return;
         }
-        else if(this.inProgress == undefined) {
-            var tag = this.queue[0];
-            this.inProgress = tag;
-            albumApi.getAlbumsForTag(tag, newAlbums => {
-                database.saveTag(tag);
-                database.saveAlbums(tag, newAlbums);
-                updater.removeFromQueue(tag);
 
-                updater.inProgress = undefined;
-                updater.updateTagsRecursive(onTagAlbumsUpdated);
-            }, () => {
-                updater.inProgress = undefined;
-
-                updater.updateTagsRecursive(onTagAlbumsUpdated);
+        var tag = this.queue[0];
+        this.inProgress = tag;
+        albumApi.getAlbumsForTag(tag)
+            .then(albums => database.saveAlbums(tag, albums))
+            .then(() => database.saveTag(tag))
+            .then(() => updater.removeFromQueue(tag))
+            .catch(ex => {
+                updater.log("Unable to update " + tag + " because " + ex)
+            })
+            .finally(() => {
+                updater.inProgress = undefined
+                updater.updateTagsRecursive(resolve);
             });
-        }
     },
 
     isIdle: function() {
-        return this.queueLength() == 0;
+        return !this.updatingPromise.isPending();
     },
 
     queueLength: function() {
@@ -61,11 +66,4 @@ CacheUpdater.prototype = {
             this.queue.splice(i, 1);
         }
     },
-
-    callIfDefined: function(callback) {
-        if(callback != undefined)
-        {
-            callback();
-        }
-    }
 };
