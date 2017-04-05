@@ -78,12 +78,12 @@ describe("Cache updater", function() {
 			.testFinished(done);
 	});
 
-	it("logs and retries updating when update fails", function(done) {
+	it("logs and skips tag when update fails", function(done) {
 		bandcamp.getAlbumsForTag = createGetMethodThatFailsFor(bandcamp.getAlbumsForTag, 1)
 
 		sut.updateTags([ "tag1" ])
 			.then(() => {
-				expect(tagsRequested).toEqual([ "tag1", "tag1" ]);
+				expect(tagsRequested).toEqual([ "tag1" ]);
 				expect(logCalls.length).toBe(1);
 			})
 			.testFinished(done);

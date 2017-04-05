@@ -3,7 +3,8 @@ var options = require("./bandcamp-options");
 var Promise = require("bluebird");
 var Album = require("./api-types");
 
-module.exports = Bandcamp = function() {
+module.exports = Bandcamp = function(log) {
+	this.log = log;
 }
 
 var AlbumsRequest = function(tag, successCallback, errorCallback) {
@@ -18,7 +19,8 @@ var AlbumsRequest = function(tag, successCallback, errorCallback) {
 
 Bandcamp.prototype = {
     getAlbumsForTag: function (tag) {
-    	return new Promise((resolve, reject) => this.getAlbumsForTagRecursive(new AlbumsRequest(tag, resolve, reject)));
+		var api = this;
+    	return new Promise((resolve, reject) => api.getAlbumsForTagRecursive(new AlbumsRequest(tag, resolve, reject)));
     },
 
     getAlbumsForTagRecursive: function (albumsRequest) {
@@ -38,7 +40,7 @@ Bandcamp.prototype = {
 					return;
 				}
 
-				console.error("Album retrieval failed on page " + albumsRequest.page +
+				api.log("Album retrieval failed on page " + albumsRequest.page +
 					"\nStatuscode: " + statusCode +
 					"\nError: " + error);
 
@@ -48,7 +50,8 @@ Bandcamp.prototype = {
 
 			if(data.items == undefined)
 			{
-				console.error("Items in data undefined, actual data:" + JSON.stringify(data));
+				api.log("Items in data undefined, actual data:" + JSON.stringify(data));
+				albumsRequest.errorCallback();
 				return;
 			}
 
@@ -89,7 +92,7 @@ Bandcamp.prototype = {
 	    			return;
 	    		}
 
-				console.error("Unable to get tags for " + album +
+				api.log("Unable to get tags for " + album +
 					"\nStatuscode: " + statusCode +
 					"\nError: " + error);
 

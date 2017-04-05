@@ -38,10 +38,10 @@ CacheUpdater.prototype = {
         albumApi.getAlbumsForTag(tag)
             .then(albums => database.saveAlbums(tag, albums))
             .then(() => database.saveTag(tag))
-            .then(() => updater.removeFromQueue(tag))
-            .catch(ex => updater.log("Unable to update " + tag + " because " + ex))
+            .catch(ex => updater.log("Unable to update " + tag + " because " + JSON.stringify(ex)))
             .finally(() => {
                 updater.inProgress = undefined
+                updater.removeFromQueue(tag);
                 updater.updateTagsRecursive(resolve);
             });
     },

@@ -17,7 +17,7 @@ module.exports = TestServer = function() {
     this.server = require(sourceFolder + "server");
     var noLog = function(text) { };
     this.config = new Config();
-    this.bandcamp = new BandcampFake();
+    this.bandcamp = new BandcampFake(noLog);
     this.database = new DatabaseFake();
     this.updater = new CacheUpdater(this.bandcamp, this.database, noLog);
     this.recacher = new Recacher(this.database, this.updater, noLog);

@@ -1,6 +1,6 @@
 var Promise = require("bluebird");
 
-module.exports = BandcampFake = function() {
+module.exports = BandcampFake = function(log) {
     this.albums = [];
     this.tags = [];
     this.tagsRequested = [];

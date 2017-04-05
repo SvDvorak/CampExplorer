@@ -15,17 +15,13 @@ WorkerThread.prototype = {
         var workerThread = this;
         workerThread.worker
             .execute()
-            .then(() => console.log("Please queue man"))
-            .then(() => workerThread.queueExecute())
-            .catch(() => console.log("Seriously..."));
+            .then(() => workerThread.queueExecute());
     },
 
     queueExecute: function() {
         var workerThread = this;
-        console.log("queue execute! " + this.isRunning);
         if(workerThread.isRunning) {
             workerThread.interval = setTimeout(() => {
-                console.log("execute!");
                 workerThread.execute();
             }, workerThread.delay);
         }

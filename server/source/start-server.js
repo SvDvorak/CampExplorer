@@ -13,7 +13,7 @@ var scheduleAt = require("./schedule-at");
 
 var logFunction = function(text) { console.log(new Date().toISOString() + ": " + text) };
 var config = new Config();
-var bandcamp = new BandcampApi();
+var bandcamp = new BandcampApi(logFunction);
 var database = new Database();
 var updater = new CacheUpdater(bandcamp, database, logFunction);
 var recacher = new Recacher(database, updater, logFunction);

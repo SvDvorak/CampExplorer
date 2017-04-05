@@ -3,7 +3,7 @@ indexStatus=$(curl -s -o /dev/null -w "%{http_code}" localhost:9200/tagsearch)
 if [ "$indexStatus" != "200" ]; then
     
     printf "Creating initial index\n"
-    curl -XPUT localhost:9200/tagsearch/ -s -o /dev/null -d '{
+    curl -XPUT localhost:9200/tagsearch/ -s -d '{
         "mappings" : {
             "albums" : {
                 "properties" : {

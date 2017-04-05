@@ -84,8 +84,7 @@ Database.prototype = {
                 index: "tagsearch",
                 type: "albums",
                 body: albums.map(album => createUpsertOperation(album)).flatten()
-            })
-            .catch(error => { console.log("Save albums errors: "); console.log(error); });
+            });
     },
     getUnsavedTags: function(tags) {
         return createClient()
@@ -121,7 +120,7 @@ Database.prototype = {
                     ]
                 }
             })
-        .then(results => results.hits.hits.map(x => x._id));
+        .then(results => results.hits.hits.map(x => x._id)[0]);
     },
     getAlbumsByTags: function(count, tags) {
         var terms = tags.map(tag => {

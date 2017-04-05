@@ -14,14 +14,8 @@ Recacher.prototype = {
 		}
 
 		var recacher = this;
-		this.log("in recacher execute");
 		return this.database.getTagWithOldestUpdate()
-			.then(tag => {
-				recacher.log("recacher got tag, is idle? " + recacher.updater.isIdle());
-				recacher.log("recacher got tag: " + tag);
-
-				return recacher.updater.updateTags([ tag ]);
-			})
+			.then(tag => recacher.updater.updateTags([ tag ]))
 			.catch(e => recacher.log("Failed recaching because " + e));
 	},
 };
