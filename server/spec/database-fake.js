@@ -26,7 +26,7 @@ DatabaseFake.prototype = {
         }
         return Promise.resolve(this.savedTags[0]);
     },
-    getAlbumsByTags: function(tags) {
+    getAlbumsByTags: function(count, tags) {
         this.getAlbumsCalls.push({ tags: tags });
         databaseFake = this;
         return Promise.resolve(tags
@@ -35,7 +35,8 @@ DatabaseFake.prototype = {
           .BCgroup("link")
           .BCvalues()
           .filter(x => x.length == tags.length)
-          .map(x => x[0]));
+          .map(x => x[0])
+          .slice(0, count));
     },
     getAlbumsByTag: function(tag) {
         var filtered = this.saveAlbumsCalls.filter(call => call.tag == tag)[0].albums;

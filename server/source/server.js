@@ -67,11 +67,8 @@ module.exports = {
                     else
                     {
                         server.database
-                            .getAlbumsByTags(requestedTags)
-                            .then(matchingAlbums => {
-                                var pagedAlbums = matchingAlbums.slice(0, 50);
-                                sendJSONSuccess(res, pagedAlbums);
-                            })
+                            .getAlbumsByTags(50, requestedTags)
+                            .then(albums => sendJSONSuccess(res, albums))
                             .catch(error => console.log(error));
                     }
                 })

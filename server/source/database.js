@@ -123,7 +123,7 @@ Database.prototype = {
             })
         .then(results => results.hits.hits.map(x => x._id));
     },
-    getAlbumsByTags: function(tags) {
+    getAlbumsByTags: function(count, tags) {
         var terms = tags.map(tag => {
             return { term: { tags: tag } }
         });
@@ -136,7 +136,8 @@ Database.prototype = {
                         bool: {
                             must: terms
                         }
-                    }
+                    },
+                    size: count
                 }
             })
             .then(results => results.hits.hits.map(x => x._source));
