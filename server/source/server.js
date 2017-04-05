@@ -23,7 +23,7 @@ module.exports = {
 
         var startPromise = Promise.resolve();
         if(config.startSeed) {
-            startPromise.then(new Promise((resolve, reject) => seeder.seed(config.startSeed, resolve)));
+            startPromise.then(() => new Promise((resolve, reject) => seeder.seed(config.startSeed, resolve)));
         }
         return startPromise.then(() => server.setupEndpointService());
     },
@@ -108,7 +108,7 @@ module.exports = {
 
         return new Promise((resolve, reject) => {
             server.listenerApp = app.listen(this.config.port, function() {
-                server.recacher.start();
+                //server.recacher.start();
                 resolve();
             });
         });

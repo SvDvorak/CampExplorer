@@ -39,9 +39,7 @@ CacheUpdater.prototype = {
             .then(albums => database.saveAlbums(tag, albums))
             .then(() => database.saveTag(tag))
             .then(() => updater.removeFromQueue(tag))
-            .catch(ex => {
-                updater.log("Unable to update " + tag + " because " + ex)
-            })
+            .catch(ex => updater.log("Unable to update " + tag + " because " + ex))
             .finally(() => {
                 updater.inProgress = undefined
                 updater.updateTagsRecursive(resolve);

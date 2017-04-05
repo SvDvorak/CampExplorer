@@ -1,6 +1,7 @@
 var Config = require("./config");
 var elasticsearch = require('elasticsearch');
 var Promise = require('bluebird');
+var moment = require('moment');
 require("./extensions");
 
 var hostAddress = "tagsearch_database:9200";
@@ -66,7 +67,9 @@ Database.prototype = {
                 index: "tagsearch",
                 type: "tags",
                 id: tag,
-                body: { }
+                body: {
+                    lastUpdated: moment().format("YYYYMMDDTHHmmssZ")
+                }
             });
     },
     saveAlbums: function(tag, albums) {
@@ -102,14 +105,22 @@ Database.prototype = {
                 return tags.filter(tag => savedTags.indexOf(tag) == -1)
             });
     },
-    getSavedTags: function() {
+    getTagWithOldestUpdate: function() {
         return createClient()
             .search({
                 index: "tagsearch",
                 type: "tags",
-                body: { query: { match_all: { } }
-            }
-        })
+                body: {
+                    query: { match_all: { } },
+                    size: 1,
+                    sort: [ {
+                            lastUpdated: {
+                                order: "asc"
+                            }
+                        }
+                    ]
+                }
+            })
         .then(results => results.hits.hits.map(x => x._id));
     },
     getAlbumsByTags: function(tags) {

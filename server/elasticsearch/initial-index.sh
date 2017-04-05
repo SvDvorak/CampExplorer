@@ -7,13 +7,17 @@ if [ "$indexStatus" != "200" ]; then
         "mappings" : {
             "albums" : {
                 "properties" : {
-                    "tags" : { "type": "string", "index" : "not_analyzed" }
+                    "tags" : { "type": "keyword", "index" : "not_analyzed" }
+                }
+            },
+            "tags" : {
+                "properties" : {
+                    "lastUpdated" : { "type":"date", "format": "basic_date_time_no_millis" }
                 }
             }
         }
     }
     '
-
 fi
 
 printf "Ran index setup\n"

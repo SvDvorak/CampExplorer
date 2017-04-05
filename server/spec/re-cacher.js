@@ -41,22 +41,11 @@ describe("Recacher", function() {
             .finally(done);
     });
 
-    it("caches first tag in album cache", function(done) {
+    it("caches tag with oldest last update in database", function(done) {
         database.savedTags.push("tag");
 
         execute()
             .then(expectUpdateTagsToBe(["tag"]))
-            .testFinished(done);
-    });
-
-    it("loops tags when having reached end of tag collection", function(done) {
-        database.savedTags.push("tag1");
-        database.savedTags.push("tag2");
-
-        execute()
-            .then(execute)
-            .then(execute)
-            .then(expectUpdateTagsToBe([ "tag1", "tag2", "tag1" ]))
             .testFinished(done);
     });
 

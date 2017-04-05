@@ -1,5 +1,6 @@
 var request = require("request");
 var options = require("./bandcamp-options");
+var Promise = require("bluebird");
 var Album = require("./api-types");
 
 module.exports = Bandcamp = function() {
