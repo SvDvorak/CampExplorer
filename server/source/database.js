@@ -60,7 +60,32 @@ var createUpsertOperation = function(album) {
     ]
 };
 
+var maxConnectionAttemptTime = 60*1000;
+
+var tryConnection = function(resolve, reject, time) {
+    var client = new elasticsearch.Client({
+        host: hostAddress,
+        log: []
+    });
+
+    if(time > maxConnectionAttemptTime) {
+        reject(new Error("Unable to connect to database"));
+    }
+
+    client.ping()
+        .then(() => resolve())
+        .catch(() => {
+            Promise
+                .delay(1000)
+                .then(() => tryConnection(resolve, reject, time + 1000));
+        });
+};
+
 Database.prototype = {
+    waitForConnection: function() {
+        var database = this;
+        return new Promise((resolve, reject) => tryConnection(resolve, reject, 0));
+    },
     saveTag: function(tag) {
         return createClient()
             .index({

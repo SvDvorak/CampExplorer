@@ -5,9 +5,13 @@ module.exports = DatabaseFake = function() {
     this.savedTags = [];
     this.getAlbumsCalls = [];
     this.saveAlbumsCalls = [];
+    this.connectionPromise = Promise.resolve();
 }
 
 DatabaseFake.prototype = {
+    waitForConnection: function() {
+        return this.connectionPromise;
+    },
     saveTag: function(tag) {
         this.savedTags.push(tag);
         return Promise.resolve();

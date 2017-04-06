@@ -25,5 +25,7 @@ require("./server")
 		database,
 		updater,
 		recacher,
-		seeder)
-    .then(() => { logFunction("Server listening on port " + config.port); });
+		seeder,
+		logFunction)
+    .then(() => logFunction("Server listening on port " + config.port))
+	.catch(error => logFunction("Unable to start server because " + error));

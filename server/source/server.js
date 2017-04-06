@@ -13,20 +13,26 @@ module.exports = {
     listenerApp: {},
     recacher: {},
 
-    start: function (config, database, updater, recacher, seeder) {
+    start: function (config, database, updater, recacher, seeder, log) {
         var server = this;
         this.config = config;
         this.database = database;
         this.updater = updater;
         this.recacher = new WorkerThread(recacher, config.recacheIntervalInSeconds*1000);
+        this.log = log;
         this.isRunning = true;
 
-        var startPromise = Promise.resolve();
+        log("Waiting for database connection")
+        var startPromise = database
+            .waitForConnection()
+            .then(() => log("Database connection established"));
+
         if(config.startSeed) {
             startPromise
-                .then(() => new Promise((resolve, reject) => seeder.seed(config.startSeed, resolve)))
-                .then(tags => console.log(tags));
+                .then(() => seeder.seed(config.startSeed))
+                .then(tags => server.updater.updateTags(tags));
         }
+
         return startPromise.then(() => server.setupEndpointService());
     },
 
@@ -64,17 +70,16 @@ module.exports = {
                             error: "Tags not loaded, try again later",
                             data: unsavedTags
                         });
-                        server.updater.updateTags(unsavedTags);
+                        return server.updater.updateTags(unsavedTags);
                     }
                     else
                     {
-                        server.database
+                        return server.database
                             .getAlbumsByTags(50, requestedTags)
-                            .then(albums => sendJSONSuccess(res, albums))
-                            .catch(error => console.log(error));
+                            .then(albums => sendJSONSuccess(res, albums));
                     }
                 })
-                .catch(error => console.log(error));
+                .catch(error => server.log(error));
         });
 
         app.get("/admin/tagcount", function(request, res) {

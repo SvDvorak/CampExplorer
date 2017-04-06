@@ -15,13 +15,13 @@ var scheduleAt = require(sourceFolder + "schedule-at");
 
 module.exports = TestServer = function() {
     this.server = require(sourceFolder + "server");
-    var noLog = function(text) { };
+    this.noLog = function(text) { };
     this.config = new Config();
-    this.bandcamp = new BandcampFake(noLog);
+    this.bandcamp = new BandcampFake(this.noLog);
     this.database = new DatabaseFake();
-    this.updater = new CacheUpdater(this.bandcamp, this.database, noLog);
-    this.recacher = new Recacher(this.database, this.updater, noLog);
-    this.seeder = new Seeder(this.bandcamp, noLog);
+    this.updater = new CacheUpdater(this.bandcamp, this.database, this.noLog);
+    this.recacher = new Recacher(this.database, this.updater, this.noLog);
+    this.seeder = new Seeder(this.bandcamp, this.noLog);
 };
 
 TestServer.prototype = {
@@ -31,7 +31,8 @@ TestServer.prototype = {
             this.database,
             this.updater,
             this.recacher,
-            this.seeder);
+            this.seeder,
+            this.noLog);
 	},
 
 	stop: function() {

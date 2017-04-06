@@ -8,7 +8,7 @@ module.exports = Seeder = function(bandcampApi, log) {
 };
 
 Seeder.prototype = {
-	seed: function(tag, onResult) {
+	seed: function(tag) {
 		var seeder = this;
 		seeder.log("Seeding tags for all albums under " + tag);
 
