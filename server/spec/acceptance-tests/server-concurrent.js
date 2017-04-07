@@ -1,10 +1,6 @@
 var TestServer = require("./test-server");
 var Album = require("../../source/api-types");
 var localRequest = require("./local-request");
-var readJson = require("../../source/read-json");
-var writeJson = require("../../source/write-json");
-var fs = require("fs");
-var removeCache = require("./remove-cache");
 require("../test-finished");
 
 describe("Concurrent tag caching server", function() {
@@ -14,7 +10,6 @@ describe("Concurrent tag caching server", function() {
 
     beforeEach(function() {
         testServer = new TestServer();
-        removeCache(testServer.config.persistPath);
         bandcamp = testServer.bandcamp;
         bandcamp.delay = 1;
         persister = testServer.persister;

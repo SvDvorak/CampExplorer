@@ -2,7 +2,6 @@ var TestServer = require("./test-server");
 var Album = require("../../source/api-types");
 var localRequest = require("./local-request");
 var generateAlbums = require("../generate-albums");
-var removeCache = require("./remove-cache");
 require("../test-finished");
 
 describe("Server with cache", function() {
@@ -12,7 +11,6 @@ describe("Server with cache", function() {
 
     beforeEach(function(done) {
         testServer = new TestServer();
-        removeCache(testServer.config.persistPath);
         bandcamp = testServer.bandcamp;
         database = testServer.database;
         testServer.start().then(done);

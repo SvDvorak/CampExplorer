@@ -1,7 +1,6 @@
 var TestServer = require("./test-server");
 var Album = require("../../source/api-types");
 var localRequest = require("./local-request");
-var removeCache = require("./remove-cache");
 require("../test-finished");
 
 describe("Recaching server", function() {
@@ -10,7 +9,6 @@ describe("Recaching server", function() {
 
     beforeEach(function(done) {
         testServer = new TestServer();
-        removeCache(testServer.config.persistPath);
         bandcamp = testServer.bandcamp;
         bandcamp.delay = 1;
         testServer.config.recacheIntervalInSeconds = 15.0/1000.0;

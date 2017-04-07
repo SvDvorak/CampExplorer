@@ -2,7 +2,6 @@ var TestServer = require("./test-server");
 var PopAlbums = require("./albums-pop");
 var RockAlbums = require("./albums-rock");
 var localRequest = require("./local-request");
-var removeCache = require("./remove-cache");
 require("../test-finished");
 
 describe("Server performance", function() {
@@ -11,7 +10,6 @@ describe("Server performance", function() {
 
     beforeEach(function(done) {
         testServer = new TestServer();
-        removeCache(testServer.config.persistPath);
         bandcamp = testServer.bandcamp;
         testServer.start().then(done);
     });

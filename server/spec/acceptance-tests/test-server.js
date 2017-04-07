@@ -2,16 +2,10 @@ var sourceFolder = "../../source/";
 
 var BandcampFake = require("../bandcamp-fake");
 var DatabaseFake = require("../database-fake");
-var Cache = require(sourceFolder + "album-cache");
 var CacheUpdater = require(sourceFolder + "cache-updater");
 var Recacher = require(sourceFolder + "re-cacher");
-var Persister = require(sourceFolder + "cache-persister");
 var Seeder = require(sourceFolder + "seeder");
-var InitialDataLoader = require(sourceFolder + "initial-data-loader");
 var Config = require("./config");
-var readJson = require(sourceFolder + "read-json");
-var writeJson = require(sourceFolder + "write-json");
-var scheduleAt = require(sourceFolder + "schedule-at");
 
 module.exports = TestServer = function() {
     this.server = require(sourceFolder + "server");

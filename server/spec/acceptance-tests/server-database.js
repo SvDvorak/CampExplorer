@@ -29,13 +29,14 @@ describe("Server using database", function() {
     it("aborts server start if connection to database cannot be established", function(done) {
         var failedConnection = null;
         database.connectionPromise = new Promise((resolve, reject) => { failedConnection = reject; })
-        var serverStart = testServer.start();
+        var threwError = false;
+        var serverStart = testServer.start().catch(() => threwError = true);
 
         Promise
             .delay(20)
             .then(() => failedConnection())
             .delay(20)
-            .then(() => expect(serverStart.isRejected()).toBe(true))
+            .then(() => expect(threwError).toBe(true))
             .testFinished(done);
     });
 
