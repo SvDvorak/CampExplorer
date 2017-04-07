@@ -1,9 +1,21 @@
 version: '2'
+services:
   tagsearch:
+    container_name: tagsearch_app
+    depends_on:
+      - database
     build: .
     environment:
       NODE_ENV: production
     ports:
       - '3000:3000'
+      - '9200'
     volumes:
       - /var/lib/tagsearch
+  database:
+    container_name: tagsearch_database
+    image: docker.elastic.co/elasticsearch/elasticsearch:5.2.2
+    ports:
+      - '9200:9200'
+    volumes:
+      - ./elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
