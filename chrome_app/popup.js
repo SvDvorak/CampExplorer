@@ -45,6 +45,10 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
     showVersionChangeIfUpgraded();
 
   	$scope.addInputTag = function() {
+        if($scope.tags.length >= 10) {
+            return;
+        }
+
   	    var newTag = $scope.newTag.replace(" ", "-");
   	    $scope.addTag(newTag);
   	    $scope.newTag = null;

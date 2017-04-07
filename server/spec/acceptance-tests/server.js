@@ -103,6 +103,14 @@ describe("Server with cache", function() {
             .testFinished(done);
     });
 
+    it("limits request to 10 tags", function(done) {
+        var tags = [...Array(11).keys()].map(x => "tag" + x);
+
+        localRequest(tags)
+            .then(() => expect(bandcamp.tagsRequested).toEqual(tags.slice(0, 10)))
+            .testFinished(done);
+    });
+
     it("returns empty result without using database when calling without tags", function(done) {
         localRequest([ ])
             .then(albums => {
