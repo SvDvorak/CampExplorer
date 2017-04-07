@@ -5,7 +5,7 @@ var moment = require('moment');
 require("./extensions");
 
 module.exports = Database = function() {
-    this.nostAddress = "tagsearch_database:9200";
+    this.hostAddress = "tagsearch_database:9200";
 }
 
 var createUpsertOperation = function(album) {
@@ -26,12 +26,7 @@ var createUpsertOperation = function(album) {
 
 var maxConnectionAttemptTime = 60*1000;
 
-var tryConnection = function(resolve, reject, time) {
-    var client = new elasticsearch.Client({
-        host: this.hostAddress,
-        log: []
-    });
-
+var tryConnection = function(client, resolve, reject, time) {
     if(time > maxConnectionAttemptTime) {
         reject(new Error("Unable to connect to database"));
     }
@@ -41,7 +36,7 @@ var tryConnection = function(resolve, reject, time) {
         .catch(() => {
             Promise
                 .delay(1000)
-                .then(() => tryConnection(resolve, reject, time + 1000));
+                .then(() => tryConnection(client, resolve, reject, time + 1000));
         });
 };
 
@@ -70,8 +65,11 @@ Database.prototype = {
         })
     },
     waitForConnection: function() {
-        var database = this;
-        return new Promise((resolve, reject) => tryConnection(resolve, reject, 0));
+        var client = new elasticsearch.Client({
+            host: this.hostAddress,
+            log: []
+        });
+        return new Promise((resolve, reject) => tryConnection(client, resolve, reject, 0));
     },
     createIfNeeded: function() {
         var client = this.createClient();
