@@ -1,5 +1,4 @@
 var BandcampApi = require("./bandcamp");
-var Cache = require("./album-cache");
 var Database = require("./database");
 var CacheUpdater = require("./cache-updater");
 var Recacher = require("./re-cacher");
