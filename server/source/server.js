@@ -1,10 +1,10 @@
 var Promise = require("bluebird");
 var WorkerThread = require("./worker-thread");
 
-var allowCrossDomain = function(req, res, next) {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'POST');
-    res.header('Access-Control-Allow-Headers', 'Content-Type');
+var allowCrossDomain = function(req, response, next) {
+    response.header('Access-Control-Allow-Origin', '*');
+    response.header('Access-Control-Allow-Methods', 'POST');
+    response.header('Access-Control-Allow-Headers', 'Content-Type');
 
     next();
 }
@@ -47,70 +47,47 @@ module.exports = {
         app.use(bodyParser.json());
         app.use(allowCrossDomain);
 
-        app.post("/v1/albums", function(request, res) {
+        app.post("/v1/albums", function(request, response) {
             if(request.body.constructor !== Array)
             {
-                res.status(400);
-                res.send({ error: "Unable to parse request data" });
+                response.status(400);
+                response.send({ error: "Unable to parse request data" });
                 return;
             }
 
             var requestedTags = request.body;
 
             if(requestedTags.length == 0) {
-                sendJSONSuccess(res, [ ]);
+                server.sendJSONSuccess(response, [ ]);
                 return;
             }
 
-            server.database
-                .getUnsavedTags(requestedTags)
-                .then(unsavedTags => {
-                    if(unsavedTags.length > 0)
-                    {
-                        res.status(202);
-                        res.send({
-                            error: "Tags not loaded, try again later",
-                            data: unsavedTags
-                        });
-                        return server.updater.updateTags(unsavedTags);
-                    }
-                    else
-                    {
-                        return server.database
-                            .getAlbumsByTags(50, requestedTags)
-                            .then(albums => sendJSONSuccess(res, albums));
-                    }
-                })
+            server.sendAlbumsForLoadedTags(response, requestedTags)
                 .catch(error => server.log(error));
         });
 
-        app.get("/admin/tagcount", function(request, res) {
+        app.get("/admin/tagcount", function(request, response) {
             server.database
                 .getTagCount()
-                .then(tagCount => 
-                    sendJSONSuccess(res, tagCount))
-                .catch(e => sendJSONSuccess(res, 0));
+                .then(tagCount => server.sendJSONSuccess(response, tagCount))
+                .catch(e => server.sendJSONSuccess(response, 0));
         });
 
-        app.get("/admin/tagsinqueue", function(request, res) {
-            sendJSONSuccess(res, server.updater.queueLength());
+        app.get("/admin/tagsinqueue", function(request, response) {
+            server.sendJSONSuccess(response, server.updater.queueLength());
         });
 
-        app.get("/admin/currentlycachingtag", function(request, res) {
-            sendJSONSuccess(res, server.updater.currentlyCachingTag());
+        app.get("/admin/currentlycachingtag", function(request, response) {
+            server.sendJSONSuccess(response, server.updater.currentlyCachingTag());
         });
 
-        app.get("/admin/albumcount", function(request, res) {
+        app.get("/admin/albumcount", function(request, response) {
             server.database
                 .getAlbumCount()
-                .then(albumCount => sendJSONSuccess(res, albumCount))
-                .catch(e => sendJSONSuccess(res, 0));
+                .then(albumCount => server.sendJSONSuccess(response, albumCount))
+                .catch(e => server.sendJSONSuccess(response, 0));
         });
 
-        var sendJSONSuccess = function(res, data) {
-            res.status(200);
-            res.send(JSON.stringify(data));
-        };
 
         return new Promise((resolve, reject) => {
             server.listenerApp = app.listen(this.config.port, function() {
@@ -118,6 +95,38 @@ module.exports = {
                 resolve();
             });
         });
+    },
+
+    sendAlbumsForLoadedTags: function(response, requestedTags) {
+        var server = this;
+        return this.database
+            .getUnsavedTags(requestedTags)
+            .then(unsavedTags => {
+                if(unsavedTags.length > 0)
+                {
+                    return server.sendTagsNotLoaded(response, unsavedTags);
+                }
+                else
+                {
+                    return server.database
+                        .getAlbumsByTags(50, requestedTags)
+                        .then(albums => server.sendJSONSuccess(response, albums));
+                }
+            })
+    },
+
+    sendTagsNotLoaded: function(response, unsavedTags) {
+        response.status(202);
+        response.send({
+            error: "Tags not loaded, try again later",
+            data: unsavedTags
+        });
+        return this.updater.updateTags(unsavedTags);
+    },
+
+    sendJSONSuccess: function(response, data) {
+        response.status(200);
+        response.send(JSON.stringify(data));
     },
 
     stop: function() {
