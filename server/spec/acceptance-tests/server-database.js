@@ -16,7 +16,7 @@ describe("Server using database", function() {
         database.connectionPromise = new Promise((resolve, reject) => { establishConnection = resolve; })
         var serverStart = testServer.start();
 
-        Promise.resolve()
+        Promise
             .delay(20)
             .then(() => expect(serverStart.isPending()).toBe(true))
             .then(() => establishConnection())
@@ -31,11 +31,18 @@ describe("Server using database", function() {
         database.connectionPromise = new Promise((resolve, reject) => { failedConnection = reject; })
         var serverStart = testServer.start();
 
-        Promise.resolve()
+        Promise
             .delay(20)
             .then(() => failedConnection())
             .delay(20)
             .then(() => expect(serverStart.isRejected()).toBe(true))
+            .testFinished(done);
+    });
+
+    it("upgrades database at start", function(done) {
+        testServer.start()
+            .then(() => expect(database.created).toBe(true))
+            .then(() => testServer.stop())
             .testFinished(done);
     });
 });

@@ -12,6 +12,9 @@ DatabaseFake.prototype = {
     waitForConnection: function() {
         return this.connectionPromise;
     },
+    createIfNeeded: function() {
+        this.created = true;
+    },
     saveTag: function(tag) {
         this.savedTags.push(tag);
         return Promise.resolve();

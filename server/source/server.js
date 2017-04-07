@@ -25,7 +25,9 @@ module.exports = {
         log("Waiting for database connection")
         var startPromise = database
             .waitForConnection()
-            .then(() => log("Database connection established"));
+            .then(() => log("Database connection established"))
+            .then(() => database.createIfNeeded())
+            .then(result => log(result));
 
         if(config.startSeed) {
             startPromise

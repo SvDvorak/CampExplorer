@@ -4,45 +4,9 @@ var Promise = require('bluebird');
 var moment = require('moment');
 require("./extensions");
 
-var hostAddress = "tagsearch_database:9200";
-var host = "http://tagsearch_database:9200/";
-
-var putOptions = function(address, data) {
-    return options =
-    {
-        method: "PUT",
-        uri: host + address,
-        headers: { "Content-Type": "application/json;charset=UTF-8" },
-        json: data
-    };
-}
-
-var postOptions = function(data) {
-    return options =
-    {
-        method: "POST",
-        uri: host + "tagsearch/albums/_bulk",
-        headers: { "Content-Type": "application/json;charset=UTF-8" },
-        json: data
-    };
-}
-
-var getOptions = function(address, data) {
-    return options =
-    {
-        method: "GET",
-        uri: host + address,
-    };
-}
-
 module.exports = Database = function() {
+    this.nostAddress = "tagsearch_database:9200";
 }
-
-var createClient = function() {
-    return new elasticsearch.Client({
-        host: hostAddress
-    })
-};
 
 var createUpsertOperation = function(album) {
     return [
@@ -64,7 +28,7 @@ var maxConnectionAttemptTime = 60*1000;
 
 var tryConnection = function(resolve, reject, time) {
     var client = new elasticsearch.Client({
-        host: hostAddress,
+        host: this.hostAddress,
         log: []
     });
 
@@ -81,13 +45,50 @@ var tryConnection = function(resolve, reject, time) {
         });
 };
 
+var tagsearchMappings = {
+    index: "tagsearch",
+    body: {
+        mappings : {
+            albums : {
+                properties : {
+                    tags : { type: "keyword", index: "not_analyzed" }
+                }
+            },
+            tags : {
+                properties : {
+                    lastUpdated : { type:"date", format: "basic_date_time_no_millis" }
+                }
+            }
+        }
+    }
+}
+
 Database.prototype = {
+    createClient: function() {
+        return new elasticsearch.Client({
+            host: this.hostAddress
+        })
+    },
     waitForConnection: function() {
         var database = this;
         return new Promise((resolve, reject) => tryConnection(resolve, reject, 0));
     },
+    createIfNeeded: function() {
+        var client = this.createClient();
+        return client.indices.exists({
+            index: "tagsearch"
+        })
+        .then(indexExists => { 
+            if(!indexExists){
+                return client.indices.create(tagsearchMappings)
+                    .then(() => "Index does not exist, created index mapppings");
+            }
+            
+            return Promise.resolve("Index already exists, no need to create");
+        });
+    },
     saveTag: function(tag) {
-        return createClient()
+        return this.createClient()
             .index({
                 index: "tagsearch",
                 type: "tags",
@@ -104,7 +105,7 @@ Database.prototype = {
 
         albums.forEach(album => { album.tags = [ tag ]});
 
-        return createClient()
+        return this.createClient()
             .bulk({
                 index: "tagsearch",
                 type: "albums",
@@ -112,7 +113,7 @@ Database.prototype = {
             });
     },
     getUnsavedTags: function(tags) {
-        return createClient()
+        return this.createClient()
             .search({
                 index: "tagsearch",
                 type: "tags",
@@ -130,7 +131,7 @@ Database.prototype = {
             });
     },
     getTagWithOldestUpdate: function() {
-        return createClient()
+        return this.createClient()
             .search({
                 index: "tagsearch",
                 type: "tags",
@@ -151,7 +152,7 @@ Database.prototype = {
         var terms = tags.map(tag => {
             return { term: { tags: tag } }
         });
-        return createClient()
+        return this.createClient()
             .search({
                 index: "tagsearch",
                 type: "albums",
@@ -167,7 +168,7 @@ Database.prototype = {
             .then(results => results.hits.hits.map(x => x._source));
     },
     getTagCount: function() {
-        return createClient()
+        return this.createClient()
             .count({
                 index: "tagsearch",
                 type: "tags"
@@ -175,7 +176,7 @@ Database.prototype = {
             .then(data => data.count);
     },
     getAlbumCount: function() {
-        return createClient()
+        return this.createClient()
             .count({
                 index: "tagsearch",
                 type: "albums"
