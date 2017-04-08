@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/SvDvorak/BandcampMultitagSearch",
   "dependencies": {
-    "bluebird": "https://registry.npmjs.org/bluebird/-/bluebird-3.4.7.tgz",
+    "bluebird": "^3.4.7",
     "body-parser": "^1.15.1",
     "elasticsearch": "^12.1.3",
     "express": "^4.13.4",
