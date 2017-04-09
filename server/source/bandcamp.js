@@ -40,18 +40,16 @@ Bandcamp.prototype = {
 					return;
 				}
 
-				api.log("Album retrieval failed on page " + albumsRequest.page +
+				albumsRequest.errorCallback(new Error(
+					"Album retrieval failed on page " + albumsRequest.page +
 					"\nStatuscode: " + statusCode +
-					"\nError: " + error);
-
-				albumsRequest.errorCallback();
+					"\nError: " + error));
 				return;
 			}
 
 			if(data.items == undefined)
 			{
-				api.log("Items in data undefined, actual data:" + JSON.stringify(data));
-				albumsRequest.errorCallback();
+				albumsRequest.errorCallback(new Error("Items in data undefined, actual data:" + JSON.stringify(data)));
 				return;
 			}
 
@@ -73,10 +71,11 @@ Bandcamp.prototype = {
     },
 
     getTagsForAlbum: function(album) {
-    	return new Promise((resolve, reject) => this.getTagsForAlbumRecursive(album, resolve, 0));
+		var api = this;
+    	return new Promise((resolve, reject) => api.getTagsForAlbumRecursive(album, resolve, reject, 0));
     },
 
-    getTagsForAlbumRecursive: function(album, successCallback, retryCount) {
+    getTagsForAlbumRecursive: function(album, successCallback, errorCallback, retryCount) {
 		var tagsOptions = options.createTagsOptions(album.bandId, album.id);
 		var api = this;
 
@@ -88,15 +87,14 @@ Bandcamp.prototype = {
 	    		{
 					var nextRetryCount = retryCount + 1;
 	    			setTimeout(
-	    				function() { api.getTagsForAlbumRecursive(album, successCallback, nextRetryCount); },
+	    				function() { api.getTagsForAlbumRecursive(album, successCallback, errorCallback, nextRetryCount); },
 	    				1000*nextRetryCount);
 	    			return;
 	    		}
 
-				api.log("Unable to get tags for " + album +
+				errorCallback("Unable to get tags for " + album +
 					"\nStatuscode: " + statusCode +
 					"\nError: " + error);
-
 				return;
 			}
 

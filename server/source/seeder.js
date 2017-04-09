@@ -18,20 +18,30 @@ Seeder.prototype = {
 
 	updateTagsForAllAlbums: function(albums, previousTags) {
 		var seeder = this;
-		var count = albums.length;
 
-		if(count <= 0) {
+		if(albums.length <= 0) {
 			return Promise.resolve(previousTags.getUnique().BCvalues());
 		}
 
+		var albumWithTags = albums[albums.length - 1];
+
 		return seeder.bandcampApi
-			.getTagsForAlbum(albums[count - 1])
+			.getTagsForAlbum(albumWithTags)
 			.then(newTags => {
 				tags = previousTags.concat(newTags);
-				count = count - 1;
-				albums.splice(count, 1);
-				return seeder.updateTagsForAllAlbums(albums, tags);
+				return seeder.updateNextAlbum(albums, tags);
+			})
+			.catch(e => {
+				seeder.log("Unable to get tags for " + albumWithTags.name + " with id " + albumWithTags.id + " because " + e);
+				seeder.log("Continuing with next tag");
+				return seeder.updateNextAlbum(albums, tags);
 			});
+	},
+
+	updateNextAlbum: function(albums, tags) {
+		var newCount = albums.length - 1;
+		albums.splice(newCount, 1);
+		return seeder.updateTagsForAllAlbums(albums, tags);
 	}
 };
 
