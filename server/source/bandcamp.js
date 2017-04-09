@@ -86,9 +86,10 @@ Bandcamp.prototype = {
 			if(error || statusCode != 200) {
 	    		if(statusCode == 503 && retryCount < 3)
 	    		{
+					var nextRetryCount = retryCount + 1;
 	    			setTimeout(
-	    				function() { api.getTagsForAlbum(album, successCallback, retryCount + 1); },
-	    				100*retryCount);
+	    				function() { api.getTagsForAlbumRecursive(album, successCallback, nextRetryCount); },
+	    				1000*nextRetryCount);
 	    			return;
 	    		}
 
