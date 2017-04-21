@@ -24,7 +24,7 @@
   "dependencies": {
     "bluebird": "^3.4.7",
     "body-parser": "^1.15.1",
-    "elasticsearch": "^12.1.3",
+    "elasticsearch": "^13.0.0-beta2",
     "express": "^4.13.4",
     "moment": "^2.18.1",
     "request": "^2.72.0",
