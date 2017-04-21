@@ -34,14 +34,14 @@ Seeder.prototype = {
 			.catch(e => {
 				seeder.log("Unable to get tags for " + albumWithTags.name + " with id " + albumWithTags.id + " because " + e);
 				seeder.log("Continuing with next tag");
-				return seeder.updateNextAlbum(albums, tags);
+				return seeder.updateNextAlbum(albums, previousTags);
 			});
 	},
 
 	updateNextAlbum: function(albums, tags) {
 		var newCount = albums.length - 1;
 		albums.splice(newCount, 1);
-		return seeder.updateTagsForAllAlbums(albums, tags);
+		return this.updateTagsForAllAlbums(albums, tags);
 	}
 };
 

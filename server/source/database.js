@@ -79,7 +79,7 @@ Database.prototype = {
         .then(indexExists => { 
             if(!indexExists){
                 return client.indices.create(tagsearchMappings)
-                    .then(() => "Index does not exist, created index mapppings");
+                    .then(() => "Index does not exist, created index mappings");
             }
             
             return Promise.resolve("Index already exists, no need to create");
