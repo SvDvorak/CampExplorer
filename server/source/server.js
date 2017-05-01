@@ -13,13 +13,16 @@ module.exports = {
     listenerApp: {},
     recacher: {},
 
-    start: function (config, database, updater, recacher, seeder, log) {
+    start: function (config, database, updater, recacher, seeder, timeProvider, log) {
         var server = this;
         this.config = config;
         this.database = database;
         this.updater = updater;
         this.recacher = new WorkerThread(recacher, config.recacheIntervalInSeconds*1000);
+        this.timeProvider = timeProvider;
         this.log = log;
+        this.requests = [];
+        this.requestRate = 5;
         this.isRunning = true;
 
         log("Waiting for database connection")
@@ -64,6 +67,8 @@ module.exports = {
 
             server.sendAlbumsForLoadedTags(response, requestedTags)
                 .catch(error => server.log(error));
+            
+            server.requests.push(server.timeProvider.now());
         });
 
         app.get("/admin/tagcount", function(request, response) {
@@ -86,6 +91,11 @@ module.exports = {
                 .getAlbumCount()
                 .then(albumCount => server.sendJSONSuccess(response, albumCount))
                 .catch(e => server.sendJSONSuccess(response, 0));
+        });
+
+        app.get("/admin/requestrate", function(request, response) {
+            server.requests = server.requests.filter(x => server.timeProvider.minutesSince(x) < server.requestRate);
+            server.sendJSONSuccess(response, server.requests.length);
         });
 
 

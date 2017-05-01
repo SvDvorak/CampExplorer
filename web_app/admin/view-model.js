@@ -6,7 +6,7 @@ function Tag(name) {
 }
 
 bandcampMultiTag.controller('adminController', [ "$scope", "$http", function ($scope, $http) {
-    $scope.adress = "localhost";
+    $scope.adress = "bandcamptagsearch.tech";
     $scope.port = 3000;
     $scope.serverIsUp = false;
 
@@ -41,6 +41,10 @@ bandcampMultiTag.controller('adminController', [ "$scope", "$http", function ($s
         callAdminService(this, "albumcount");
     }
 
+    var requestRate = function() {
+        callAdminService(this, "requestrate");
+    }
+
     var serverStatus = function() { this.body = $scope.serverIsUp ? "Online and ready =D" : "Server is down =(" };
 
     $scope.tiles = [
@@ -49,7 +53,7 @@ bandcampMultiTag.controller('adminController', [ "$scope", "$http", function ($s
         { header: "Tags in queue", body: 0, update: tagsInQueue },
         { header: "Currently caching", body: "", update: currentlyCaching },
         { header: "Number of albums", body: "", update: numberOfAlbums },
-        { header: "Requests per second", body: "3.14", update: () => {} }];
+        { header: "Requests last 5 min", body: "", update: requestRate }];
     
     $scope.tiles.forEach(tile => tile.update());
     $scope.tiles.forEach(tile => setInterval(() => tile.update(), 1000));

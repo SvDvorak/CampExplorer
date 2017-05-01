@@ -5,6 +5,7 @@ var DatabaseFake = require("../database-fake");
 var CacheUpdater = require(sourceFolder + "cache-updater");
 var Recacher = require(sourceFolder + "re-cacher");
 var Seeder = require(sourceFolder + "seeder");
+var TimeProvider = require(sourceFolder + "time-provider");
 var Config = require("./config");
 
 module.exports = TestServer = function() {
@@ -16,6 +17,7 @@ module.exports = TestServer = function() {
     this.updater = new CacheUpdater(this.bandcamp, this.database, this.noLog);
     this.recacher = new Recacher(this.database, this.updater, this.noLog);
     this.seeder = new Seeder(this.bandcamp, this.noLog);
+    this.timeProvider = new TimeProvider();
 };
 
 TestServer.prototype = {
@@ -26,6 +28,7 @@ TestServer.prototype = {
             this.updater,
             this.recacher,
             this.seeder,
+            this.timeProvider,
             this.noLog);
 	},
 

@@ -28,5 +28,9 @@ module.exports = {
 
     getAlbumCount: function() {
         return this.createRequest("albumcount");
+    },
+
+    getRequestRate: function() {
+        return this.createRequest("requestrate");
     }
 }

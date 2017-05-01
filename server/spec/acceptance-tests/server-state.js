@@ -1,15 +1,18 @@
 var TestServer = require("./test-server");
 var localRequest = require("./local-request");
 var stateRequests = require("./server-state-requests");
+var moment = require("moment");
 require("../test-finished");
 
 describe("Server state", function() {
     var testServer;
     var bandcamp;
+    var timeProvider;
 
     beforeEach(function(done) {
         testServer = new TestServer();
         bandcamp = testServer.bandcamp;
+        timeProvider = testServer.timeProvider;
         testServer.start().then(done);
     });
 
@@ -72,7 +75,22 @@ describe("Server state", function() {
             .testFinished(done);
     });
 
+    it("returns number of requests performed in last 5 minutes", function(done) {
+        cacheAtTimeInMinutes(10)
+            .then(() => cacheAtTimeInMinutes(7))
+            .then(() => cacheAtTimeInMinutes(4))
+            .then(() => cacheAtTimeInMinutes(4))
+            .then(() => stateRequests.getRequestRate())
+            .then(requests => expect(requests).toBe(2))
+            .testFinished(done);
+    });
+
+    var cacheAtTimeInMinutes = function(minutes) {
+        timeProvider.setTime(moment().subtract(minutes, "minutes"));
+        return localRequest([ "tag" ])
+    };
+
     var cacheTags = function(tags) {
     	return localRequest(tags);
-    }
+    };
 });
