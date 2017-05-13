@@ -16,5 +16,3 @@ USER root
 COPY . $HOME/tagsearch
 RUN chown -R app:app $HOME/*
 USER app
-
-CMD ["node", "source/start-server.js"]

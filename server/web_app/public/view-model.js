@@ -13,7 +13,7 @@ function Tag(name) {
 }
 
 bandcampMultiTag.controller('tagsController', function ($scope) {
-    $scope.adress = "bandcamptagsearch.tech";
+    $scope.adress = "localhost";
     $scope.port = 3000;
 
     $scope.albums = [];
@@ -29,20 +29,6 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
     $scope.canShowReviewSuggestion = true;
     $scope.showReviewSuggestionNow = false;
     $scope.reviewSuggestionSearchCount = 50;
-
-    chrome.storage.local.get({
-          "lastUsedTags" : [],
-          "userSearchCount" : 0,
-          "canShowReviewSuggestion" : true
-        }, result => {
-            $scope.userSearchCount = result.userSearchCount;
-            $scope.canShowReviewSuggestion = result.canShowReviewSuggestion;
-            $scope.$apply(() => {
-                result.lastUsedTags.forEach(x => { $scope.addTag(x); });
-        });
-    });
-
-    showVersionChangeIfUpgraded();
 
   	$scope.addInputTag = function() {
         if($scope.tags.length >= 10) {
@@ -64,7 +50,6 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
 
     $scope.updateUserSearchCount = function() {
         $scope.userSearchCount += 1;
-        chrome.storage.local.set({ userSearchCount: $scope.userSearchCount });
 
         if($scope.canShowReviewSuggestion &&
           $scope.userSearchCount % $scope.reviewSuggestionSearchCount == 0)
@@ -81,29 +66,12 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
         $scope.searchTags();
   	};
 
-    function showVersionChangeIfUpgraded() {
-        var currentVersion = chrome.app.getDetails().version;
-        var previousVersion = localStorage['version']
-        if (currentVersion != previousVersion) {
-            if (typeof previousVersion != 'undefined') {
-                $scope.showVersionChangesQuestion = true;
-            }
-            localStorage['version'] = currentVersion;
-        }
-    }
-
-    $scope.neverShowSuggestion = function() {
-        $scope.canShowReviewSuggestion = false;
-        chrome.storage.local.set({ canShowReviewSuggestion: false });
-    };
-
   	$scope.searchTags = function() {
         $scope.latestRequestId += 1;
         var requestId = $scope.latestRequestId;
 
         $scope.isSearching = true;
-        chrome.storage.local.set({ lastUsedTags: $scope.tags.map(x => x.name) });
-    		$scope.makeRequest($scope.tags.map(x => x.name), requestId, function(albums) {
+		$scope.makeRequest($scope.tags.map(x => x.name), requestId, function(albums) {
             $scope.$apply(() => {
                 $scope.albums = albums;
                 $scope.isCachingTags = false;

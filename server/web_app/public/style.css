@@ -1,0 +1,165 @@
+@font-face { font-family: LiberationSans; src: url('chrome-extension://__MSG_@@extension_id__/fonts/LiberationSans-Regular.ttf'); } 
+@font-face { font-family: LiberationSans; font-weight: bold; src: url('chrome-extension://__MSG_@@extension_id__/fonts/LiberationSans-Bold.ttf');}
+
+/* Angular Bootstrap fixes */
+.nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
+
+body {
+	font-family: "Helvetica Neue", LiberationSans, Arial, sans-serif;
+	font-size: 100%;
+	margin: 5px;
+	margin-bottom: 0px;
+	background: #FAFAFA;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.search {
+	display: flex;
+	flex-direction: column;
+	margin: 0.3em;
+	max-width: 90vw;
+}
+
+.title {
+	font-size: 3.5em;
+	font-weight: normal;
+	color: #408194;
+	margin: 1em 0 5px 0;
+}
+
+.subtitle {
+	font-size: 1.3em;
+	font-weight: normal;
+	/*color: #76adbd;*/
+	color: #91c2d0;
+	margin: 2px 0 10px 5px;
+}
+
+.input {
+	height: 2em;
+	margin: 15px 0 0 0;
+	display: flex;
+	flex-direction: row;
+}
+
+	.input_tag {
+		width: 80%;
+		box-sizing: border-box;
+		padding: 0.5em;
+	}
+
+	.input_add {
+		width: 20%;
+		height: 100%;
+		background: #538E9F;
+		color: white;
+		border: none;
+		stroke: none;
+		text-align: center;
+	}
+
+ul {
+	list-style-type: none;
+	padding: 0;
+}
+
+.tags {
+	margin: 10px;
+}
+
+.tag {
+	border-bottom: 1px solid #EFEFEF;
+	padding: 10px 0px;
+	font-size: 12px;
+}
+
+	.tag_name {
+		color: #408294;
+		text-decoration: none;
+	}
+
+	.tag_name:visited {
+		color: #408294;
+	}
+
+	.tag_name:hover {
+		text-decoration: underline;
+	}
+
+	.tag_caching {
+		color: #264E59;
+		display: inline;
+	}
+
+	.tag_remove {
+		float: right;
+		color: #FFA366;
+		cursor: pointer;
+	}
+
+	.tag_remove:hover {
+		color: #FF6600;
+	}
+
+.spinner {
+	padding-top: 10px;
+	text-align: center;
+	position: relative;
+}
+
+.server_message {
+	color: #264E59;
+	text-align: center;
+	margin: 0px;
+	padding: 5px 10px;
+}
+
+.albums {
+	margin-bottom: 0px;
+	display: flex;
+	flex-flow: row wrap; 
+	max-width: 36em;
+}
+
+.album {
+    padding: 10px;
+}
+	.album a {
+		text-decoration: none;
+		color: #408294;
+		overflow: hidden;
+	    width: 172px;
+	    display: block;
+	}
+
+	.album a:visited {
+		color: #408294;
+	}
+
+	.album a:hover {
+		text-decoration: underline;
+	}
+
+	.album p {
+		font-size: 15px;
+		margin-top: 0px;
+		margin-bottom: 5px;
+	}
+
+	.album_name {
+		font-weight: bold;
+	}
+
+	.album_name, .album_artist {
+		text-overflow: ellipsis;
+		overflow: hidden;
+		white-space: nowrap;
+	}
+
+.noResults {
+	text-align: center;
+	color: #264E59;
+	padding: 10px;
+}

@@ -67,6 +67,6 @@
         </a>
       </li>
     </ul>
-    <p class="noResults" ng-show="tags.length != 0 && albums.length == 0 && searchesInProgress <= 0">No albums found</p>
+    <p class="noResults" ng-show="tags.length != 0 && albums.length == 0 && !isSearching">No albums found</p>
   </body>
 </html>

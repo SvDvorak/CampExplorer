@@ -1,10 +1,24 @@
 version: '2'
 services:
+  node-server:
+    container_name: node_template
+    build: .
+    image: node_server
+  web:
+    container_name: tagsearch_web
+    image: node_server
+    depends_on:
+      - node-server
+      - tagsearch
+    command: node_modules/.bin/nodemon web_app/server.js
+    ports:
+      - '80'
   tagsearch:
     container_name: tagsearch_app
+    image: node_server
     depends_on:
+      - node-server
       - database
-    build: .
     command: node_modules/.bin/nodemon --debug=0.0.0.0:5858 source/start-server.js
     environment:
       NODE_ENV: development

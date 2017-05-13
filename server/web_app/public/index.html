@@ -1,0 +1,48 @@
+<!doctype html>
+<html ng-app="multiTagApp">
+  <head>
+    <title>Bandcamp Tag Search</title>
+    <script src="angular.min.js"></script>
+    <script src="view-model.js"></script>
+    <link rel="stylesheet" href="spinner.css" type="text/css" />
+    <link rel="stylesheet" href="style.css" type="text/css" />
+  </head>
+  <body ng-controller="tagsController">
+    <div class="search">
+      <h1 class="title">Camp Explorer</h1>
+      <h2 class="subtitle">a bandcamp search tool</h2>
+      <div>
+        <form class="input">
+          <input class="input_tag" type="text" ng-model="newTag" placeholder="Tag..." />
+          <input class="input_add" type="submit" ng-click="addInputTag()" value="Add" />
+        </form>
+      </div>
+      <ul class="tags">
+        <li class="tag" ng-repeat="tag in tags">
+          <a href="https://bandcamp.com/tag/{{ tag.name }}" target="_blank" class="tag_name">{{ tag.name }}</a>
+          <span class="tag_caching" ng-show="tag.isCaching">- not cached</span>
+          <span class="tag_remove" ng-click="removeTag(tag)">X</span>
+        </li>
+      </ul>
+    </div>
+
+    <p ng-show="serverUnreachable" class="server_message">Sorry, unable to reach server at the moment
+      <br>Retrying...</p>
+    <p ng-show="isCachingTags" class="server_message">Caching missing tags on server.<br>Retrying...</p>
+    <div class="spinner" ng-show="isSearching">
+      <div class="throbber-loader">
+        Loading…
+      </div>
+    </div>
+    <ul class="albums">
+      <li class="album" ng-repeat="album in albums track by $index">
+        <a href="{{ album.link }}" target="_blank" title="{{ album.name }}">
+          <img ng-src="{{ album.image }}" />
+          <p class="album_name">{{ album.name }}</p>
+          <p class="album_artist">{{ album.artist }}</p>
+        </a>
+      </li>
+    </ul>
+    <p class="noResults" ng-show="tags.length != 0 && albums.length == 0 && !isSearching">No albums found</p>
+  </body>
+</html>
