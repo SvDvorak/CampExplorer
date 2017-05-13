@@ -1,4 +1,4 @@
-var sourceFolder = "../../source/";
+var sourceFolder = "../../";
 
 var BandcampFake = require("../bandcamp-fake");
 var DatabaseFake = require("../database-fake");

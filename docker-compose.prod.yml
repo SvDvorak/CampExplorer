@@ -1,0 +1,39 @@
+version: '2'
+services:
+  node-server:
+    container_name: node_template
+    build: .
+    image: node_server
+  web:
+    container_name: tagsearch_web
+    image: node_server
+    depends_on:
+      - node-server
+      - tagsearch
+    command: node web_app/start-server.js
+    environment:
+      NODE_ENV: production
+    ports:
+      - '80:3001'
+  tagsearch:
+    container_name: tagsearch_backend
+    depends_on:
+      - database
+    build: .
+    command: node backend/start-server.js
+    environment:
+      NODE_ENV: production
+    ports:
+      - '3000:3000'
+      - '9200'
+  database:
+    container_name: tagsearch_database
+    image: docker.elastic.co/elasticsearch/elasticsearch:5.2.2
+    ports:
+      - '9200:9200'
+    volumes:
+      - ./database/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - database:/usr/share/elasticsearch/data
+
+volumes:
+  database: { }

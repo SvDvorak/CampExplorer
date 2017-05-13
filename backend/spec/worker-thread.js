@@ -1,5 +1,5 @@
 var Promise = require("bluebird");
-var WorkerThread = require("../source/worker-thread");
+var WorkerThread = require("../worker-thread");
 
 describe("Worker Thread", function() {
     var worker;

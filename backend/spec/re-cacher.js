@@ -1,4 +1,4 @@
-var Recacher = require("../source/re-cacher");
+var Recacher = require("../re-cacher");
 var DatabaseFake = require("./database-fake");
 var Promise = require("bluebird");
 require("./test-finished");

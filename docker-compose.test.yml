@@ -1,7 +1,7 @@
 version: '2'
 services:
   tagsearch:
-    container_name: tagsearch_app
+    container_name: tagsearch_backend
     build: .
     command: ./node_modules/.bin/jasmine
     environment:

@@ -10,18 +10,20 @@ services:
     depends_on:
       - node-server
       - tagsearch
-    command: node_modules/.bin/nodemon web_app/server.js
+    command: node_modules/.bin/nodemon web_app/start-server.js
+    environment:
+      NODE_ENV: development
     ports:
       - '80:3001'
     volumes:
       - .:/home/app/tagsearch
   tagsearch:
-    container_name: tagsearch_app
+    container_name: tagsearch_backend
     image: node_server
     depends_on:
       - node-server
       - database
-    command: node_modules/.bin/nodemon --debug=0.0.0.0:5858 source/start-server.js
+    command: node_modules/.bin/nodemon --debug=0.0.0.0:5858 backend/start-server.js
     environment:
       NODE_ENV: development
     ports:
@@ -30,7 +32,6 @@ services:
       - '9200'
     volumes:
       - .:/home/app/tagsearch
-      - /var/lib/tagsearch
       - /home/app/tagsearch/node_modules
   database:
     container_name: tagsearch_database
@@ -38,4 +39,4 @@ services:
     ports:
       - '9200:9200'
     volumes:
-      - ./elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ./database/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml

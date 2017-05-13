@@ -1,4 +1,4 @@
-var Album = require("../source/api-types");
+var Album = require("../api-types");
 
 module.exports = function(count) {
 	var albums = [];

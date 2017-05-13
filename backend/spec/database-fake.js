@@ -1,5 +1,5 @@
 var Promise = require("bluebird");
-require("../source/extensions");
+require("../extensions");
 
 module.exports = DatabaseFake = function() {
     this.savedTags = [];
