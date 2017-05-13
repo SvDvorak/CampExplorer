@@ -12,7 +12,9 @@ services:
       - tagsearch
     command: node_modules/.bin/nodemon web_app/server.js
     ports:
-      - '80'
+      - '80:3001'
+    volumes:
+      - .:/home/app/tagsearch
   tagsearch:
     container_name: tagsearch_app
     image: node_server

@@ -1,12 +1,12 @@
-var express = require("express");
-var path = require("path");
+var express = require('express');
+var path = require('path');
 var app = express();
 
-var port = 3030;
+var port = 3001;
 
-//app.use('/static', express.static(path.join(__dirname, 'public')));
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'web_app')));
+app.use('/statistics', express.static(path.join(__dirname, 'web_statistics')));
 
 app.listen(port, function() {
-    console.log("Example app listening on port " + port);
+    console.log("Listening for HTTP requests on port " + port + ". Check Docker Compose if mapped to different port.");
 });
