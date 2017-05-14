@@ -4,29 +4,51 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "Testing",
+            "program": "${workspaceRoot}/backend/start-server.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
             "name": "Run Server",
-            "cwd": "${workspaceRoot}/server",
-            "runtimeExecutable": "node",
+            "cwd": "${workspaceRoot}",
             "runtimeArgs": [
                 "--debug=5858"
             ],
-            "program": "${workspaceRoot}/server/source/start-server.js",
-            "restart": true,
+            "program": "${workspaceRoot}/backend/start-server.js",
             "port": 5858,
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen"
         },
         {
+            "name": "Attach",
+            "type": "node",
+            "request": "attach",
+            "port": 5858,
+            "address": "localhost",
+            "localRoot": "${workspaceRoot}/backend",
+            "remoteRoot": "/home/app/tagsearch"
+        },
+        {
             "type": "node",
             "request": "launch",
             "name": "Run All Tests",
-            "cwd": "${workspaceRoot}/server",
-            "runtimeExecutable": "node",
-            //"program": "${workspaceRoot}/server/spec/re-cacher.js",
+            "cwd": "${workspaceRoot}",
+
+            // Run all tests in config
+            "program": "",
             "runtimeArgs": [
                 "--debug=5858",
-                "${workspaceRoot}/server/node_modules/jasmine/bin/jasmine.js"
-            ],
+                "${workspaceRoot}/node_modules/jasmine/bin/jasmine.js",
+                "JASMINE_CONFIG_PATH=backend/spec/jasmine.json"
+           ],
+
+            // Run specific test-file
+            /*"program": "${workspaceRoot}/backend/spec/acceptance-tests/server-state.js",
+            "runtimeArgs": [
+                "--debug=5858",
+                "${workspaceRoot}/node_modules/jasmine/bin/jasmine.js"
+            ],*/
             "port": 5858
         }
     ]
