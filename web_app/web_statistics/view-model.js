@@ -6,7 +6,7 @@ function Tag(name) {
 }
 
 bandcampMultiTag.controller('adminController', [ "$scope", "$http", function ($scope, $http) {
-    $scope.adress = "localhost";
+    $scope.adress = "bandcamptagsearch.tech";
     $scope.port = 3000;
     $scope.serverIsUp = false;
 

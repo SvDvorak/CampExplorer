@@ -13,7 +13,7 @@ function Tag(name) {
 }
 
 bandcampMultiTag.controller('tagsController', function ($scope) {
-    $scope.adress = "localhost";
+    $scope.adress = "bandcamptagsearch.tech";
     $scope.port = 3000;
 
     $scope.albums = [];
