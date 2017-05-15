@@ -17,9 +17,10 @@ services:
       - '80:3001'
   tagsearch:
     container_name: tagsearch_backend
+    image: node_server
     depends_on:
+      - node-server
       - database
-    build: .
     command: node backend/start-server.js
     environment:
       NODE_ENV: production
