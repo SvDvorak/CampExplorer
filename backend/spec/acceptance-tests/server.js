@@ -79,14 +79,14 @@ describe("Server with cache", function() {
     });
 
     it("returns tag not cached when requesting uncached tag, caches and returns tag albums on subsequent request", function(done) {
-        bandcamp.setAlbumsForTag("musicTag", [
+        bandcamp.setAlbumsForTag("musictag", [
             linkOnlyAlbum("Album")
             ]);
 
         localRequest([ "musicTag" ])
             .then(response => {
                 expect(response.error).toBe("Tags not loaded, try again later");
-                expect(response.data).toEqual([ "musicTag" ]);
+                expect(response.data).toEqual([ "musictag" ]);
             })
             .then(() => localRequest([ "musicTag" ]))
             .then(albums => expect(albums[0].link).toBe("Album"))
@@ -108,6 +108,15 @@ describe("Server with cache", function() {
 
         localRequest(tags)
             .then(() => expect(bandcamp.tagsRequested).toEqual(tags.slice(0, 10)))
+            .testFinished(done);
+    });
+
+    it("lower cases all tag parameters before use", function(done) {
+        bandcamp.setAlbumsForTag("tag", [ linkOnlyAlbum("Album") ]);
+
+        localRequest(["TAG"])
+            .then(() => localRequest([ "TAG" ]))
+            .then(albums => expect(albums.length).toBe(1))
             .testFinished(done);
     });
 

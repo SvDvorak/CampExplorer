@@ -58,7 +58,7 @@ module.exports = {
                 return;
             }
 
-            var requestedTags = request.body.slice(0, 10);
+            var requestedTags = request.body.slice(0, 10).map(x => x.toLowerCase());
 
             if(requestedTags.length == 0) {
                 server.sendJSONSuccess(response, [ ]);
