@@ -1,4 +1,4 @@
-var bandcampMultiTag = angular.module('multiTagApp', [])
+var bandcampMultiTag = angular.module('multiTagApp', ['tw.directives.clickOutside'])
     .config([
       '$compileProvider',
       function ($compileProvider) {

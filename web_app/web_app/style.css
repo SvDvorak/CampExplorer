@@ -7,7 +7,7 @@
 body {
 	font-family: "Helvetica Neue", LiberationSans, Arial, sans-serif;
 	font-size: 100%;
-	margin: 5px;
+	margin: 0px;
 	margin-bottom: 0px;
 	background: #FAFAFA;
 	display: flex;
@@ -22,11 +22,17 @@ body {
 	max-width: 90vw;
 }
 
+.logo {
+	height: 10em;
+	color: #408194;
+	fill: currentColor;
+}
+
 .title {
 	font-size: 3.5em;
 	font-weight: normal;
 	color: #408194;
-	margin: 1em 0 5px 0;
+	margin: 0 0 5px 0;
 }
 
 .subtitle {
@@ -163,3 +169,46 @@ ul {
 	color: #264E59;
 	padding: 10px;
 }
+
+.sidebar {
+	display: flex;
+	flex-direction: row;
+	position: fixed;
+	align-self: flex-end;
+	margin-top: 3.5em;
+	padding: 0.3em;
+	padding-right: 0;
+	max-width: 90vw;
+}
+
+	.sidebar div {
+		background: rgba(240, 240, 240, 0.9);
+	}
+
+	.shortcuts {
+		display: flex;
+		flex-direction: column;
+		border: 0.1em solid #ccc;
+		border-right-width: 0;
+		border-radius: 1em 0 0 1em;
+	}
+
+	.shortcuts img {
+		width: 2.5em;
+		margin: 0.2em;
+	}
+
+	.info {
+		border: 0.1em solid #ccc;
+		border-left: 0px;
+		border-left: 0px;
+		padding: 0.7em;
+		width: 24em;
+		max-height: 80vh;
+		overflow-y: scroll;
+	}
+
+	.info p {
+		white-space: pre-wrap;
+		margin: 0px;
+	}

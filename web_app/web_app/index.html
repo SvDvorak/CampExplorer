@@ -4,11 +4,13 @@
     <title>Bandcamp Tag Search</title>
     <script src="angular.min.js"></script>
     <script src="view-model.js"></script>
+    <script src="angular-click-outside.js"></script>
     <link rel="stylesheet" href="spinner.css" type="text/css" />
     <link rel="stylesheet" href="style.css" type="text/css" />
   </head>
   <body ng-controller="tagsController">
     <div class="search">
+      <img class="logo" src="campexplorer.svg" />
       <h1 class="title">Camp Explorer</h1>
       <h2 class="subtitle">a bandcamp search tool</h2>
       <div>
@@ -44,5 +46,15 @@
       </li>
     </ul>
     <p class="noResults" ng-show="tags.length != 0 && albums.length == 0 && !isSearching">No albums found</p>
+    <div class="sidebar" tw-click-outside="showInfo = false">
+      <div class="shortcuts">
+        <a ng-click="showInfo = !showInfo"><img src="info.svg" /></a>
+        <a href="mailto:bandcamptagsearch@gmail.com"><img src="mail.svg" /></a>
+        <a href="https://github.com/SvDvorak/BandcampMultitagSearch"><img src="mark-github.svg" /></a>
+      </div>
+      <div class="info" ng-hide="!showInfo">
+        <p><ng-include src="'info.txt'" /></p>
+      </div>
+    </div>
   </body>
 </html>
