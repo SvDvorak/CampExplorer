@@ -93,13 +93,13 @@ describe("Server with cache", function() {
             .testFinished(done);
     });
 
-    it("returns a maximum of 50 albums", function(done) {
+    it("returns a maximum of 90 albums", function(done) {
         var albums = generateAlbums(500)
 
         bandcamp.setAlbumsForTag("tag", albums);
         localRequest([ "tag" ])
             .then(() => localRequest([ "tag" ]))
-            .then(albums => expect(albums.length).toBe(50))
+            .then(albums => expect(albums.length).toBe(90))
             .testFinished(done);
     });
 

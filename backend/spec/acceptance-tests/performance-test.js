@@ -23,7 +23,7 @@ describe("Server performance", function() {
     	bandcamp.setAlbumsForTag("rock", RockAlbums);
 
         var startTime = undefined;
-        var expectedResultCount = 50;
+        var expectedResultCount = 90;
         var maxCallTime = 100;
 
         // Cache them once first

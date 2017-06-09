@@ -119,7 +119,7 @@ module.exports = {
                 else
                 {
                     return server.database
-                        .getAlbumsByTags(50, requestedTags)
+                        .getAlbumsByTags(90, requestedTags)
                         .then(albums => server.sendJSONSuccess(response, albums));
                 }
             })
