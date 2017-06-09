@@ -210,3 +210,7 @@ ul {
 		white-space: pre-wrap;
 		margin: 0px;
 	}
+
+	.info h3 {
+		margin-bottom: 0px;
+	}

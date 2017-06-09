@@ -1,35 +1,19 @@
+<h3>Camp Explorer</h3>
 Bandcamp is a great place to find new and fascinating music.
 
 But you probably have an idea of your type of music so actually finding new things matching that taste is a bit tough.
 
 This tool helps you out by letting you search for different tags/genres/locations and finds albums that match all those criterias.
 
-
-So just start adding criterias in the text box and when you find an album you find interesting, click on the album to jump to its page.
+<h3>Usage</h3>
+Just start adding criterias in the text box and when you find an album you find interesting, click on the album to jump to its page.
 
 Note that tags that have not been cached previously might take a while for the server to cache up.
 
-
-Known Issues:
+<h3>Known Issues</h3>
 - It isn't possible to get all albums at Bandcamp so some albums might be missing.
 
-
-Release Notes:
+<h3>Release Notes</h3>
 2.0.0
 - New web-client
-- Major changes to how searching works, should give a 10x increase in results and return them much faster if they've already been cached.
-
-1.0.4
-- Minor fix in preparation for larger update
-
-1.0.3
-- Fixed rare error when having multiple tags
-
-1.0.2
-- Changed Bandcamp throttling message.
-
-1.0.1
-- Fixed app not handling 503 (Service unavailable) errors which occurs when searching Bandcamp too often. App now retries multiple times with a longer timeout for each try. A graphical icon next to the search spinner indicates when this is happening.
-
-1.0.0
-- Initial release
+- Major changes to how searching works compared to older version of Chrome app, should give a 10x increase in results and return them much faster if they've already been cached.
