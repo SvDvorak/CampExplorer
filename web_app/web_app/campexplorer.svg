@@ -1,23 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Generator: Adobe Illustrator 21.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+<svg fill="#a2c3cd" stroke="#a2c3cd" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 163.3 163.3" style="enable-background:new 0 0 163.3 163.3;" xml:space="preserve">
 <style type="text/css">
-	.st0{fill:none;stroke:#000000;stroke-width:5;stroke-linecap:round;stroke-miterlimit:10;}
+	.st0{fill:none;stroke:inherit;stroke-width:5;stroke-linecap:round;stroke-miterlimit:10;}
 	.st1{fill:#FFFFFF;stroke:#000000;stroke-width:3;stroke-miterlimit:10;}
-	.st2{stroke:#000000;stroke-width:3;stroke-miterlimit:10;}
-	.st3{stroke:#000000;stroke-miterlimit:10;}
+	.st2{fill:inherit;stroke:inherit;stroke-width:3;stroke-miterlimit:10;}
+	.st3{fill:inherit;stroke:inherit;stroke-miterlimit:10;}
 	.st4{fill:#FFFFFF;}
 	.st5{fill:none;stroke:#FFFFFF;stroke-miterlimit:10;}
+	.edges{fill:inherit;}
 </style>
 <path class="st0" d="M13.4,118.6c0,0,17.8-8.6,71.9-8.6s64.5,8.6,64.5,8.6"/>
-<path d="M15.3,87.1v3.7l0.2,23c0,1.3,1.1,2.3,2.3,2.3l0,0c1.3,0,2.3-1,2.3-2.3l0.2-23v-3.7v-1.8v-0.9v-0.8c0.1-2,0.8-3.9,1.9-5.6
+<path class="edges" d="M15.3,87.1v3.7l0.2,23c0,1.3,1.1,2.3,2.3,2.3l0,0c1.3,0,2.3-1,2.3-2.3l0.2-23v-3.7v-1.8v-0.9v-0.8c0.1-2,0.8-3.9,1.9-5.6
 	s2.6-3,4.3-4c1.8-0.9,3.7-1.4,5.7-1.4l58.5,0.7l29.3,0.2h3.7h1.8h0.9h0.7c1.8,0.1,3.6,0.7,5.2,1.6s2.9,2.4,3.8,3.9
 	c0.9,1.6,1.4,3.4,1.4,5.3l0.2,14.6l0.4,14.6l0,0c0,1.4,1.2,2.5,2.6,2.5h0.7c1.4,0,2.5-1.1,2.6-2.5l0,0l0.4-14.6l0.2-14.6
 	c0-3-0.7-6.1-2.2-8.7s-3.6-5-6.2-6.6c-2.6-1.7-5.6-2.6-8.6-2.8l-1.1-0.1h-0.9h-1.8h-3.7l-29.3,0.2L32.3,67c-2.9,0-5.8,0.8-8.3,2.2
 	c-2.5,1.5-4.7,3.5-6.2,5.9s-2.4,5.3-2.6,8.2v1.1v0.9L15.3,87.1z"/>
 <g>
-	<path d="M50.9,43.4c-1.3,0.1-2.6,0.2-4,0.3c-1.4,0.1-2.8,0.2-4.2,0.3h-0.6v-0.7L42,40.7l-0.1-1.3c0-0.1,0-0.2,0-0.4
+	<path class="edges" d="M50.9,43.4c-1.3,0.1-2.6,0.2-4,0.3c-1.4,0.1-2.8,0.2-4.2,0.3h-0.6v-0.7L42,40.7l-0.1-1.3c0-0.1,0-0.2,0-0.4
 		c0-0.1,0-0.3,0-0.4s0-0.3,0.1-0.4l0.1-0.4c0.3-1,0.9-2,1.7-2.7c0.8-0.7,1.9-1.2,3.1-1.2c0.6,0,1.1,0.1,1.7,0.2
 		c0.5,0.2,1.1,0.5,1.5,0.8c0.4,0.4,0.8,0.8,1.1,1.3c0.3,0.5,0.5,1,0.6,1.6c0.1,0.5,0.1,1.1,0,1.6s-0.1,1-0.2,1.5
 		C51.4,41.8,51.1,42.7,50.9,43.4z M50.8,43.2c-0.2-1-0.4-1.9-0.6-2.7c-0.1-0.4-0.2-0.8-0.2-1.1c0-0.2-0.1-0.3-0.1-0.5
@@ -56,7 +57,7 @@
 	</g>
 </g>
 <g>
-	<path d="M56.3,53.8L56.3,53.8c15.7-2.1,31.7-2.1,47.4,0l0,0c6,0,10.9,4.9,10.9,10.9v0.4c1.3,9.8,1.3,19.8,0,29.6l0,0
+	<path class="edges" d="M56.3,53.8L56.3,53.8c15.7-2.1,31.7-2.1,47.4,0l0,0c6,0,10.9,4.9,10.9,10.9v0.4c1.3,9.8,1.3,19.8,0,29.6l0,0
 		c0,6-5.3,10.3-10.9,10.9l0,0c-15.7,2.5-31.7,2.5-47.4,0l0,0c-5.9-0.9-10.9-4.9-10.9-10.9l-0.3-2.5c-0.9-8.2-0.9-16.4,0-24.6
 		l0.3-2.9C45.4,58.7,50.3,53.8,56.3,53.8z"/>
 </g>
@@ -66,22 +67,22 @@
 		c-0.1,1.7-0.2,3.4-0.4,5.2C80,53.1,80,53.1,79.9,53C79.9,53.1,79.9,53.1,79.9,53z"/>
 </g>
 <g>
-	<circle cx="82.9" cy="48.9" r="0.7"/>
+	<circle class="edges" cx="82.9" cy="48.9" r="0.7"/>
 </g>
 <g>
-	<circle cx="82.9" cy="42.7" r="0.7"/>
+	<circle class="edges" cx="82.9" cy="42.7" r="0.7"/>
 </g>
 <g>
-	<circle cx="82.9" cy="36.5" r="0.7"/>
+	<circle class="edges" cx="82.9" cy="36.5" r="0.7"/>
 </g>
 <g>
-	<circle cx="76.6" cy="36.5" r="0.7"/>
+	<circle class="edges" cx="76.6" cy="36.5" r="0.7"/>
 </g>
 <g>
-	<circle cx="76.6" cy="42.7" r="0.7"/>
+	<circle class="edges" cx="76.6" cy="42.7" r="0.7"/>
 </g>
 <g>
-	<circle cx="76.6" cy="48.9" r="0.7"/>
+	<circle class="edges" cx="76.6" cy="48.9" r="0.7"/>
 </g>
 <g>
 	<path class="st3" d="M42.8,93c0.1,1.7,0.2,3.3,0.6,4.9s1,3.2,1.8,4.6c0.9,1.4,2,2.6,3.3,3.5s2.8,1.6,4.4,2.1s3.2,0.8,4.8,1
