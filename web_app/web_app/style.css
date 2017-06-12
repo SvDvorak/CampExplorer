@@ -18,12 +18,13 @@ body {
 .search {
 	display: flex;
 	flex-direction: column;
-	margin: 0.3em;
+	margin-top: 2em;
 	max-width: 90vw;
 }
 
 .logo {
 	height: 10em;
+	margin: -0.7em;
 }
 
 .title {
@@ -36,7 +37,6 @@ body {
 .subtitle {
 	font-size: 1.3em;
 	font-weight: normal;
-	/*color: #76adbd;*/
 	color: #91c2d0;
 	margin: 2px 0 10px 5px;
 }
