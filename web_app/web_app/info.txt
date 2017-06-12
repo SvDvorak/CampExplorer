@@ -6,7 +6,7 @@ But you probably have an idea of your type of music so actually finding new thin
 This tool helps you out by letting you search for different tags/genres/locations and finds albums that match all those criterias.
 
 <h3>Usage</h3>
-Type in a search criteria and press add. Repeat for all tags you want to find albums for. When you find an interesting one, click on the album to jump to its page.
+Type in a search criteria and press add. Repeat for all tags you want to find albums for. When you find an interesting album, click on it to jump to its page.
 
 Note that tags that have not been cached previously might take a while for the server to cache up.
 
