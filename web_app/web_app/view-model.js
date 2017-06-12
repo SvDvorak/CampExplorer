@@ -35,7 +35,7 @@ bandcampMultiTag.controller('tagsController', function ($scope) {
             return;
         }
 
-  	    var newTag = $scope.newTag.replace(" ", "-");
+  	    var newTag = $scope.newTag.replace(/[, ]/g, "-");
   	    $scope.addTag(newTag);
   	    $scope.newTag = null;
         $scope.updateUserSearchCount();
