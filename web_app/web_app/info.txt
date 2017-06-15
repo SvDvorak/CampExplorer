@@ -6,12 +6,14 @@ But you probably have an idea of your type of music so actually finding new thin
 This tool helps you out by letting you search for different tags/genres/locations and finds albums that match all those criterias.
 
 <h3>Usage</h3>
-Type in a search criteria and press add. Repeat for all tags you want to find albums for. When you find an interesting album, click on it to jump to its page.
+Type in a search criteria and press add. Repeat for all criterias you want to find albums for. Click the x to the right of the added search criteria to remove it.
 
-Note that tags that have not been cached previously might take a while for the server to cache up.
+When you find an interesting album, click on it to jump to its page.
+
+Note that search criterias that have not been cached previously might take a while for the server to cache up.
 
 <h3>Known Issues</h3>
-- It isn't possible to get all albums at Bandcamp so some albums might be missing.
+- It isn't possible to get all albums from Bandcamp so some albums might be missing.
 
 <h3>Release Notes</h3>
 2.0.0
