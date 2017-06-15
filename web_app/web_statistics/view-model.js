@@ -1,12 +1,12 @@
-var bandcampMultiTag = angular.module('adminApp', []);
+var statistics = angular.module('statistics', []);
 
 function Tag(name) {
     this.name = name;
     this.isCaching = false;
 }
 
-bandcampMultiTag.controller('adminController', [ "$scope", "$http", function ($scope, $http) {
-    $scope.adress = "bandcamptagsearch.tech";
+statistics.controller('statisticsController', [ "$scope", "$http", function ($scope, $http) {
+    $scope.adress = "campexplorer.io";
     $scope.port = 3000;
     $scope.serverIsUp = false;
 

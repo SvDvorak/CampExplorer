@@ -1,4 +1,4 @@
-var bandcampMultiTag = angular.module('multiTagApp', ['tw.directives.clickOutside'])
+var tagsearch = angular.module('tagsearch', ['tw.directives.clickOutside'])
     .config([
       '$compileProvider',
       function ($compileProvider) {
@@ -12,8 +12,8 @@ function Tag(name) {
     this.isCaching = false;
 }
 
-bandcampMultiTag.controller('tagsController', function ($scope) {
-    $scope.adress = "bandcamptagsearch.tech";
+tagsearch.controller('searchController', function ($scope) {
+    $scope.adress = "campexplorer.io";
     $scope.port = 3000;
 
     $scope.albums = [];

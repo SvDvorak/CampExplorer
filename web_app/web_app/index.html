@@ -1,5 +1,5 @@
 <!doctype html>
-<html ng-app="multiTagApp">
+<html ng-app="tagsearch">
   <head>
     <title>Camp Explorer</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="spinner.css" type="text/css" />
     <link rel="stylesheet" href="style.css" type="text/css" />
   </head>
-  <body ng-controller="tagsController">
+  <body ng-controller="searchController">
     <div class="search">
       <img class="logo" src="campexplorer.svg" />
       <h1 class="title">Camp Explorer</h1>
@@ -56,7 +56,7 @@
           document.write("<a href='" + "mail" + "to:" + username + "@" + hostname + "'><img src='mail.svg' /></a>");
         </script>
         <a href="https://twitter.com/svdvorak"><img src="twitter.svg" /></a>
-        <a href="https://github.com/SvDvorak/BandcampMultitagSearch"><img src="mark-github.svg" /></a>
+        <a href="https://github.com/SvDvorak/CampExplorer"><img src="mark-github.svg" /></a>
       </div>
       <div class="info" ng-hide="!showInfo">
         <p><ng-include src="'info.txt'" /></p>

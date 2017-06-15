@@ -1,5 +1,5 @@
 {
-  "name": "BandcampMultitagPlugin",
+  "name": "CampExplorer",
   "version": "1.1.0",
   "description": "Service to search Bandcamp using multiple tags",
   "main": "angular.min.js",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/SvDvorak/BandcampMultitagSearch.git"
+    "url": "git://github.com/SvDvorak/CampExplorer.git"
   },
   "keywords": [
     "Bandcamp",
@@ -18,9 +18,9 @@
   "author": "Andreas Wilcox",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/SvDvorak/BandcampMultitagSearch/issues"
+    "url": "https://github.com/SvDvorak/CampExplorer/issues"
   },
-  "homepage": "https://github.com/SvDvorak/BandcampMultitagSearch",
+  "homepage": "www.campexplorer.io",
   "dependencies": {
     "bluebird": "^3.4.7",
     "body-parser": "^1.15.1",
