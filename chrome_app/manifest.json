@@ -1,10 +1,10 @@
 {
 	"manifest_version": 2,
 
-	"name": "Bandcamp Tag Search",
-	"short_name": "TagSearch",
-	"description": "Allows you to search Bandcamp for albums with multiple tags",
-	"version": "1.0.3",
+	"name": "Camp Explorer",
+	"short_name": "CampExplorer",
+	"description": "A Bandcamp search tool",
+	"version": "2.0.0",
 	"author": "Andreas Wilcox",
 
 	"web_accessible_resources": [
@@ -14,7 +14,7 @@
 	"browser_action": {
 		"default_icon": "icon19.png",
 		"default_popup": "popup.html",
-		"default_title": "Bandcamp tag search"
+		"default_title": "Camp Explorer"
 	},
 	"icons": {
 		"19": "icon19.png",
@@ -22,7 +22,7 @@
   	},
 	"permissions": [
 		"storage",
-		"http://bandcamptagsearch.tech",
+		"http://campexplorer.io",
 		"http://bandcamp.com/",
 		"https://bandcamp.com/",
 		"https://*.bcbits.com/"

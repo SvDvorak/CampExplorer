@@ -4,15 +4,15 @@
  "browser_action" field in manifest.json contains the "default_popup" key with
  value "popup.html".
  -->
-<html ng-app="multiTagApp">
+<html ng-app="tagsearch">
   <head>
-    <title>Bandcamp Tag Search</title>
+    <title>Camp Explorer</title>
     <script src="angular.min.js"></script>
     <script src="popup.js"></script>
     <link rel="stylesheet" href="spinner.css" type="text/css" />
     <link rel="stylesheet" href="style.css" type="text/css" />
   </head>
-  <body ng-controller="tagsController">
+  <body ng-controller="searchController">
     <div ng-show="showVersionChangesQuestion || showVersionChanges" class="version_changes">
       <h2 class="version_header">Version 1.1.0</h2>
       <div ng-show="!showVersionChanges">
