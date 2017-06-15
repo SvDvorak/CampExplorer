@@ -1,7 +1,6 @@
+<img src="http://campexplorer.io/campexplorer.svg" alt="Logo" style="width: 14em;display: block;margin-left: auto;margin-right: auto" />
+
 # Camp Explorer
-
-![Logo](http://campexplorer.io/campexplorer.svg)
-
 This repository contains the code for the Camp Explorer website and Chrome extension. On Bandcamp you're only able to search for albums using a single tag but this extension enables you to search for albums with any number of matching tags.
 
 ![Camp Explorer](http://i.imgur.com/IAnsx3i.png)
