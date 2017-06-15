@@ -214,3 +214,8 @@ ul {
 	.info h3 {
 		margin-bottom: 0px;
 	}
+
+[ng-click]
+{
+    cursor: pointer;
+}

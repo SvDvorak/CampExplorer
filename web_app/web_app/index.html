@@ -1,7 +1,7 @@
 <!doctype html>
 <html ng-app="multiTagApp">
   <head>
-    <title>Bandcamp Tag Search</title>
+    <title>Camp Explorer</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="angular.min.js"></script>
     <script src="view-model.js"></script>
@@ -50,7 +50,11 @@
     <div class="sidebar" tw-click-outside="showInfo = false">
       <div class="shortcuts">
         <a ng-click="showInfo = !showInfo"><img src="info.svg" /></a>
-        <a href="mailto:bandcamptagsearch@gmail.com"><img src="mail.svg" /></a>
+        <script language="JavaScript">
+          var username = "hellocampexplorer";
+          var hostname = "gmail.com";
+          document.write("<a href='" + "mail" + "to:" + username + "@" + hostname + "'><img src='mail.svg' /></a>");
+        </script>
         <a href="https://github.com/SvDvorak/BandcampMultitagSearch"><img src="mark-github.svg" /></a>
       </div>
       <div class="info" ng-hide="!showInfo">
