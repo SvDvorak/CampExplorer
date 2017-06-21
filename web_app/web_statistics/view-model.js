@@ -12,14 +12,30 @@ statistics.controller('statisticsController', [ "$scope", "$http", function ($sc
 
     var CreateAdminOptions = endpoint => { };
 
-    var callAdminService = function(tile, endpoint, data) {
+    var adminServiceGet = function(tile, endpoint, data) {
         return $http({
             method: "get",
             url: "http://" + $scope.adress + ":" + $scope.port + "/admin/" + endpoint,
-            data: data
+            data: JSON.stringify(data),
+            headers: {'Content-Type': 'application/json'}
         })
         .then(response => {
-            console.log(endpoint + " " + response.data);
+            return response.data != "" ? JSON.parse(response.data) : "";
+        })
+        .then(data => tile.body = data)
+        .then(() => $scope.serverIsUp = true)
+        .catch(() => $scope.serverIsUp = false);
+    };
+
+    var adminServicePost = function(tile, endpoint, data) {
+        var json = JSON.stringify(data);
+        return $http({
+            method: "post",
+            url: "http://" + $scope.adress + ":" + $scope.port + "/admin/" + endpoint,
+            data: json,
+            headers: {'Content-Type': 'application/json'}
+        })
+        .then(response => {
             return response.data != "" ? JSON.parse(response.data) : "";
         })
         .then(data => tile.body = data)
@@ -28,23 +44,27 @@ statistics.controller('statisticsController', [ "$scope", "$http", function ($sc
     };
 
     var cachedTagsFunc = function() {
-        callAdminService(this, "tagcount");
+        adminServiceGet(this, "tagcount");
     }
 
     var tagsInQueue = function() {
-        callAdminService(this, "tagsinqueue");
+        adminServiceGet(this, "tagsinqueue");
     }
 
     var currentlyCaching = function() {
-        callAdminService(this, "currentlycachingtag");
+        adminServiceGet(this, "currentlycachingtag");
     }
 
     var numberOfAlbums = function() {
-        callAdminService(this, "albumcount");
+        adminServiceGet(this, "albumcount");
     }
 
-    var requestRate = function(requestSinceInHours) {
-        callAdminService(this, "requestrate", JSON.stringify({ requestSinceInHours }));
+    var requestRateLastHour = function() {
+        adminServicePost(this, "requestrate", { sinceInHours: 1 });
+    }
+
+    var requestRateLastDay = function() {
+        adminServicePost(this, "requestrate", { sinceInHours: 24 });
     }
 
     var serverStatus = function() { this.body = $scope.serverIsUp ? "Online and ready =D" : "Server is down =(" };
@@ -55,8 +75,8 @@ statistics.controller('statisticsController', [ "$scope", "$http", function ($sc
         { header: "Tags in queue", body: 0, update: tagsInQueue },
         { header: "Currently caching", body: "", update: currentlyCaching },
         { header: "Number of albums", body: "", update: numberOfAlbums },
-        { header: "Requests last hour", body: "", update: () => requestRate(1) },
-        { header: "Requests last 24 hours", body: "", update: () => requestRate(24) }];
+        { header: "Requests last hour", body: "", update: requestRateLastHour },
+        { header: "Requests last 24 hours", body: "", update: requestRateLastDay }];
     
     $scope.tiles.forEach(tile => tile.update());
     $scope.tiles.forEach(tile => setInterval(() => tile.update(), 1000));

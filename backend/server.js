@@ -92,7 +92,7 @@ module.exports = {
                 .catch(e => server.sendJSONSuccess(response, 0));
         });
 
-        app.get("/admin/requestrate", function(request, response) {
+        app.post("/admin/requestrate", function(request, response) {
             server.cleanRequestHistory();
             var results = server.requests.filter(x => server.timeProvider.hoursSince(x) < request.body.sinceInHours);
             server.sendJSONSuccess(response, results.length);
