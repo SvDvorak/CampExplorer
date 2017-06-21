@@ -12,35 +12,29 @@ statistics.controller('statisticsController', [ "$scope", "$http", function ($sc
 
     var CreateAdminOptions = endpoint => { };
 
-    var adminServiceGet = function(tile, endpoint, data) {
-        return $http({
-            method: "get",
-            url: "http://" + $scope.adress + ":" + $scope.port + "/admin/" + endpoint,
-            data: JSON.stringify(data),
-            headers: {'Content-Type': 'application/json'}
-        })
-        .then(response => {
-            return response.data != "" ? JSON.parse(response.data) : "";
-        })
+    var callAdminService = function(tile, request) {
+        return $http(request)
+        .then(response => response.data != "" ? JSON.parse(response.data) : "")
         .then(data => tile.body = data)
         .then(() => $scope.serverIsUp = true)
         .catch(() => $scope.serverIsUp = false);
     };
 
+    var adminServiceGet = function(tile, endpoint) {
+        return callAdminService(tile, {
+            method: "get",
+            url: "http://" + $scope.adress + ":" + $scope.port + "/admin/" + endpoint,
+        });
+    };
+
     var adminServicePost = function(tile, endpoint, data) {
         var json = JSON.stringify(data);
-        return $http({
+        return callAdminService(tile, {
             method: "post",
             url: "http://" + $scope.adress + ":" + $scope.port + "/admin/" + endpoint,
             data: json,
             headers: {'Content-Type': 'application/json'}
-        })
-        .then(response => {
-            return response.data != "" ? JSON.parse(response.data) : "";
-        })
-        .then(data => tile.body = data)
-        .then(() => $scope.serverIsUp = true)
-        .catch(() => $scope.serverIsUp = false);
+        });
     };
 
     var cachedTagsFunc = function() {
