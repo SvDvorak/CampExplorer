@@ -75,18 +75,28 @@ describe("Server state", function() {
             .testFinished(done);
     });
 
-    it("returns number of requests performed in last 5 minutes", function(done) {
-        cacheAtTimeInMinutes(10)
-            .then(() => cacheAtTimeInMinutes(7))
-            .then(() => cacheAtTimeInMinutes(4))
-            .then(() => cacheAtTimeInMinutes(4))
-            .then(() => stateRequests.getRequestRate())
+    it("returns number of requests performed in number of hours", function(done) {
+        cacheAtTimeInHours(5)
+            .then(() => cacheAtTimeInHours(4))
+            .then(() => cacheAtTimeInHours(0.7))
+            .then(() => cacheAtTimeInHours(0.5))
+            .then(() => stateRequests.getRequestRate(1))
             .then(requests => expect(requests).toBe(2))
             .testFinished(done);
     });
 
-    var cacheAtTimeInMinutes = function(minutes) {
-        timeProvider.setTime(moment().subtract(minutes, "minutes"));
+    it("only keeps last 24 hours in request history", function(done) {
+        cacheAtTimeInHours(30)
+            .then(() => cacheAtTimeInHours(29))
+            .then(() => cacheAtTimeInHours(23))
+            .then(() => cacheAtTimeInHours(20))
+            .then(() => stateRequests.getRequestRate(30))
+            .then(requests => expect(requests).toBe(2))
+            .testFinished(done);
+    });
+
+    var cacheAtTimeInHours = function(hours) {
+        timeProvider.setTime(moment().subtract(hours, "hours"));
         return localRequest([ "tag" ])
     };
 

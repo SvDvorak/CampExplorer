@@ -22,7 +22,6 @@ module.exports = {
         this.timeProvider = timeProvider;
         this.log = log;
         this.requests = [];
-        this.requestRate = 5;
         this.isRunning = true;
 
         log("Waiting for database connection")
@@ -94,8 +93,9 @@ module.exports = {
         });
 
         app.get("/admin/requestrate", function(request, response) {
-            server.requests = server.requests.filter(x => server.timeProvider.minutesSince(x) < server.requestRate);
-            server.sendJSONSuccess(response, server.requests.length);
+            server.cleanRequestHistory();
+            var results = server.requests.filter(x => server.timeProvider.hoursSince(x) < request.body.sinceInHours);
+            server.sendJSONSuccess(response, results.length);
         });
 
 
@@ -137,6 +137,11 @@ module.exports = {
     sendJSONSuccess: function(response, data) {
         response.status(200);
         response.send(JSON.stringify(data));
+    },
+
+    cleanRequestHistory: function() {
+        var hourLimit = 24;
+        this.requests = this.requests.filter(x => this.timeProvider.hoursSince(x) < hourLimit);
     },
 
     stop: function() {

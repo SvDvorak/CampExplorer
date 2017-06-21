@@ -15,5 +15,9 @@ TimeProvider.prototype = {
 
     minutesSince: function(time) {
         return moment().diff(time, 'minutes');
+    },
+
+    hoursSince: function(time) {
+        return moment().diff(time, 'hours');
     }
 }
