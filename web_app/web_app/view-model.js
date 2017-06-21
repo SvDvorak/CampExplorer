@@ -13,7 +13,7 @@ function Tag(name) {
 }
 
 tagsearch.controller('searchController', function ($scope) {
-    $scope.adress = "localhost";
+    $scope.adress = "campexplorer.io";
     $scope.port = 3000;
 
     $scope.albums = [];
