@@ -7,7 +7,7 @@ function Tag(name) {
 
 statistics.controller('statisticsController', [ "$scope", "$http", function ($scope, $http) {
     $scope.adress = "campexplorer.io";
-    $scope.port = 3000;
+    $scope.port = 80;
     $scope.serverIsUp = false;
 
     var CreateAdminOptions = endpoint => { };

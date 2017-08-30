@@ -14,7 +14,7 @@ function Tag(name) {
 
 tagsearch.controller('searchController', function ($scope) {
     $scope.adress = "campexplorer.io";
-    $scope.port = 3000;
+    $scope.port = 80;
 
     $scope.albums = [];
     $scope.isSearching = false;

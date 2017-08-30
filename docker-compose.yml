@@ -28,7 +28,7 @@ services:
       NODE_ENV: development
     ports:
       - '5858:5858'
-      - '3000:3000'
+      - '80:3000'
       - '9200'
     volumes:
       - .:/home/app/tagsearch
