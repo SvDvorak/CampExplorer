@@ -4,6 +4,15 @@ services:
     container_name: node_template
     build: .
     image: node_server
+  routing:
+    container_name: routing
+    build: routing/.
+    image: routing
+    ports:
+      - '80:80'
+    depends_on:
+      - web
+      - tagsearch
   web:
     container_name: tagsearch_web
     image: node_server
@@ -14,7 +23,7 @@ services:
     environment:
       NODE_ENV: production
     ports:
-      - '80:3001'
+      - '80:80'
   tagsearch:
     container_name: tagsearch_backend
     image: node_server
@@ -25,7 +34,7 @@ services:
     environment:
       NODE_ENV: production
     ports:
-      - '80:3000'
+      - '80:80'
       - '9200'
   database:
     container_name: tagsearch_database
