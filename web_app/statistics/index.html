@@ -1,0 +1,19 @@
+<!doctype html>
+<html ng-app="statistics">
+  <head>
+    <title>Camp Explorer statistics</title>
+    <script src="./../angular.min.js"></script>
+    <script src="view-model.js"></script>
+    <link rel="stylesheet" href="style.css" type="text/css" />
+  </head>
+  <body ng-controller="statisticsController">
+    <ul class="tiles">
+      <li class="tile" ng-repeat="tile in tiles track by $index">
+          <div>
+            <p class="tile_header">{{ tile.header }}</p>
+            <p class="tile_body">{{ tile.body }}</p>
+          </div>
+      </li>
+    </ul>
+  </body>
+</html>

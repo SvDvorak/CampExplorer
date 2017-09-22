@@ -1,9 +1,9 @@
 version: '2'
 services:
-  tagsearch:
-    container_name: tagsearch_backend
-    build: .
-    command: ./node_modules/.bin/jasmine JASMINE_CONFIG_PATH=backend/spec/jasmine.json
+  backend:
+    container_name: search_service
+    build: backend/.
+    command: node_modules/.bin/jasmine JASMINE_CONFIG_PATH=spec/jasmine.json
     environment:
       NODE_ENV: development
     ports:

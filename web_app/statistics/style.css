@@ -1,0 +1,57 @@
+@font-face { font-family: LiberationSans; src: url('chrome-extension://__MSG_@@extension_id__/fonts/LiberationSans-Regular.ttf'); } 
+@font-face { font-family: LiberationSans; font-weight: bold; src: url('chrome-extension://__MSG_@@extension_id__/fonts/LiberationSans-Bold.ttf');}
+
+/* Angular Bootstrap fixes */
+.nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
+
+html {
+	/* width: 394px; */
+}
+
+body {
+	font-family: "Helvetica Neue", LiberationSans, Arial, sans-serif;
+	font-size: 100%;
+	margin: 20px;
+	margin-bottom: 0px;
+	background: #FAFAFA;
+}
+
+#status {
+	/* avoid an excessively wide status text */
+	white-space: pre;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	max-width: 400px;
+}
+
+ul {
+	list-style-type: none;
+	padding: 0;
+}
+
+p {
+	color: antiquewhite
+}
+
+.tiles {
+	display: flex;
+	flex-flow: row wrap;
+}
+
+	.tile {
+		background: mediumseagreen;
+		width: 180px;
+		height: 180px;
+		margin: 10px;
+		padding: 20px;
+	}
+
+		.tile_header {
+			font-size: 18px;
+			margin-top: 0px;
+			margin-bottom: 5px;
+		}
+
+		.tile_body {
+			font-size: 30px;
+		}

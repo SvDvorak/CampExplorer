@@ -5,7 +5,7 @@ var moment = require('moment');
 require("./extensions");
 
 module.exports = Database = function() {
-    this.hostAddress = "tagsearch_database:9200";
+    this.hostAddress = "search_database:9200";
 }
 
 var createUpsertOperation = function(album) {
