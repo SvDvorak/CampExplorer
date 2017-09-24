@@ -115,6 +115,7 @@ Database.prototype = {
             .search({
                 index: "tagsearch",
                 type: "tags",
+                size: tags.length,
                 body: {
                     query: {
                         terms: {

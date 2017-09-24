@@ -3,7 +3,6 @@ require("./extensions");
 
 module.exports = Seeder = function(bandcampApi, log) {
 	this.bandcampApi = bandcampApi;
-	this.alreadySeeded = {}
 	this.log = log;
 };
 

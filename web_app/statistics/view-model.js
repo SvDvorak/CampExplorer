@@ -6,7 +6,7 @@ function Tag(name) {
 }
 
 statistics.controller('statisticsController', [ "$scope", "$http", function ($scope, $http) {
-    $scope.adress = "localhost";
+    $scope.adress = "campexplorer.io";
     $scope.port = 80;
     $scope.serverIsUp = false;
 

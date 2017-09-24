@@ -34,6 +34,7 @@ module.exports = {
         if(config.startSeed) {
             startPromise
                 .then(() => seeder.seed(config.startSeed))
+                .then(tags => server.database.getUnsavedTags(tags))
                 .then(tags => server.updater.updateTags(tags));
         }
 
