@@ -23,6 +23,7 @@ tagsearch.controller('searchController', function ($scope) {
     $scope.tags = [];
     $scope.latestRequestId = 0;
 
+    $scope.currentVersion = "1.0.0";
     $scope.showVersionChangesQuestion = false;
 
     $scope.userSearchCount = 0;
@@ -82,13 +83,13 @@ tagsearch.controller('searchController', function ($scope) {
   	};
 
     function showVersionChangeIfUpgraded() {
-        var currentVersion = chrome.app.getDetails().version;
+        $scope.currentVersion = chrome.app.getDetails().version;
         var previousVersion = localStorage['version']
-        if (currentVersion != previousVersion) {
+        if ($scope.currentVersion != previousVersion) {
             if (typeof previousVersion != 'undefined') {
                 $scope.showVersionChangesQuestion = true;
             }
-            localStorage['version'] = currentVersion;
+            localStorage['version'] = $scope.currentVersion;
         }
     }
 

@@ -35,9 +35,15 @@ body {
 		color: #264E59;
 	}
 
-	.version_text {
+	.version_text,
+	.version_text p {
 		font-size: 13px;
 		color: #264E59;
+	}
+
+	.version_text ul {
+		list-style-type: square;
+		margin-left: 15px;
 	}
 
 	.version_changes span {
@@ -91,6 +97,23 @@ body {
 		text-decoration: none;
 	}
 
+.header {
+	display: flex;
+	flex-direction: row;
+	width: 100%;
+	align-items: center;
+	margin: 10px 12px;
+}
+	.logo {
+		height: 2em;
+	}
+
+	.title {
+		font-size: 1em;
+		font-weight: normal;
+		color: #408194;
+		margin: 0 0 0 10px;
+	}
 
 .input {
 	margin: 10px 10px;
