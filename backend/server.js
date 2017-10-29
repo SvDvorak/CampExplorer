@@ -35,7 +35,8 @@ module.exports = {
             startPromise
                 .then(() => seeder.seed(config.startSeed))
                 .then(tags => server.database.getUnsavedTags(tags))
-                .then(tags => server.updater.updateTags(tags));
+                .then(tags => server.updater.updateTags(tags))
+                .then(() => log("Seeding finished"));
         }
 
         return startPromise.then(() => server.setupEndpointService());
