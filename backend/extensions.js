@@ -21,3 +21,14 @@ Array.prototype.BCgroup = function(prop) {
       return grouped;
   }, {});
 }
+
+Array.prototype.chunk = function(size) {
+    var list = this.slice();
+    var arrays = [];
+
+    while (list.length > 0) {
+        arrays.push(list.splice(0, size));
+    }
+
+    return arrays;
+}

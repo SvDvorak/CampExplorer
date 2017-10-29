@@ -111,23 +111,27 @@ Database.prototype = {
             });
     },
     getUnsavedTags: function(tags) {
-        return this.createClient()
-            .search({
-                index: "tagsearch",
-                type: "tags",
-                size: tags.length,
-                body: {
-                    query: {
-                        terms: {
-                            _id: tags
+        var chunkedTags = tags.chunk(2);
+        return Promise.reduce(chunkedTags, (total, chunk) => {
+            return this.createClient()
+                .search({
+                    index: "tagsearch",
+                    type: "tags",
+                    size: chunk.length,
+                    body: {
+                        query: {
+                            terms: {
+                                _id: chunk
+                            }
                         }
                     }
-                }
-            })
-            .then(results => {
-                var savedTags = results.hits.hits.map(x => x._id);
-                return tags.filter(tag => savedTags.indexOf(tag) == -1)
-            });
+                })
+                .then(results => {
+                    var savedTags = results.hits.hits.map(x => x._id);
+                    var unsavedTags = chunk.filter(tag => savedTags.indexOf(tag) == -1);
+                    return total.concat(unsavedTags);
+                });
+        }, []);
     },
     getTagWithOldestUpdate: function() {
         return this.createClient()
