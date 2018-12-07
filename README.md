@@ -9,7 +9,7 @@ This repository contains the code for the Camp Explorer website and Chrome exten
   <img src="http://i.imgur.com/IAnsx3i.png" alt="Screenshot" />
 </p>
 
-## Usage
+## Client usage
 Type in a search criteria and press add. Repeat for all criterias you want to find albums for. Click the x to the right of the added search criteria to remove it.
 
 When you find an interesting album, click on it to jump to its page.
@@ -17,13 +17,19 @@ When you find an interesting album, click on it to jump to its page.
 Note that search criterias that have not been cached previously might take a while for the server to cache up.
 
 ## Implementation
-The app is made up of two clients (web and Chrome app) and one Node.js server. Docker is used for running and managing the server.
+The app is made up of two clients (web and Chrome app). The chrome app is served by nginx. The backend api uses Node.js. And Docker is used for running and managing the whole thing.
 
 When user requests a tag the server searches either returns the cached results or if they don't exist it puts the request in queue to be searched and cached. Cache is saved to an ElasticSearch database that also handles the filtering on request.
 
 The server continously recaches tags in order of oldest first with a minute delay until it starts next tag. It's possible to start the server with an initial seed-tag. It then caches up all albums for the seed and then caches all the tags that each of those albums had. Note that this will take a few hours.
 
 Statistics of the server is also hosted to see the state of caching, just add /statistics to see it.
+
+## Steps to run locally
+
+1) Install Docker if you don't already have it
+2) Run `docker-compose up`. This will require usage of port 80 but you can change that in the docker-compose.yml configuration.
+3) Go to localhost
 
 ## Known Issues
 - It isn't possible to get all albums from Bandcamp so some albums might be missing.
