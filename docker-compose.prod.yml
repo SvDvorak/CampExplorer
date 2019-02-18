@@ -1,11 +1,9 @@
 version: '2'
 services:
   node-server:
-    container_name: routing
+    container_name: search_routing
     build: .
     image: routing
-    ports:
-      - '80:80'
     depends_on:
       - backend
   backend:
@@ -17,7 +15,6 @@ services:
     environment:
       NODE_ENV: production
     ports:
-      - '3000:3000'
       - '9200'
   database:
     container_name: search_database
@@ -29,3 +26,9 @@ services:
       - database:/usr/share/elasticsearch/data
 volumes:
   database: { }
+
+# Uses external network with routing
+networks:
+  default:
+    external:
+      name: production
