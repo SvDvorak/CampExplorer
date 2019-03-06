@@ -1,5 +1,4 @@
-docker-compose down
+docker-compose -f docker-compose.prod.yml down
 git pull
 bash server_configuration.sh
-docker-compose build
-docker-compose -f docker-compose.prod.yml up -d
+docker-compose -f docker-compose.prod.yml up -d --build
