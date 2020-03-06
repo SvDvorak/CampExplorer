@@ -23,7 +23,7 @@ statistics.controller('statisticsController', [ "$scope", "$http", function ($sc
     var adminServiceGet = function(tile, endpoint) {
         return callAdminService(tile, {
             method: "get",
-            url: "http://" + $scope.adress + ":" + $scope.port + "/admin/" + endpoint,
+            url: "https://" + $scope.adress + ":" + $scope.port + "/admin/" + endpoint,
         });
     };
 
@@ -31,7 +31,7 @@ statistics.controller('statisticsController', [ "$scope", "$http", function ($sc
         var json = JSON.stringify(data);
         return callAdminService(tile, {
             method: "post",
-            url: "http://" + $scope.adress + ":" + $scope.port + "/admin/" + endpoint,
+            url: "https://" + $scope.adress + ":" + $scope.port + "/admin/" + endpoint,
             data: json,
             headers: {'Content-Type': 'application/json'}
         });
