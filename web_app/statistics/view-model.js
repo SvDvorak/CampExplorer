@@ -7,7 +7,6 @@ function Tag(name) {
 
 statistics.controller('statisticsController', [ "$scope", "$http", function ($scope, $http) {
     $scope.adress = "campexplorer.io";
-    $scope.port = 80;
     $scope.serverIsUp = false;
 
     var CreateAdminOptions = endpoint => { };
@@ -23,7 +22,7 @@ statistics.controller('statisticsController', [ "$scope", "$http", function ($sc
     var adminServiceGet = function(tile, endpoint) {
         return callAdminService(tile, {
             method: "get",
-            url: "https://" + $scope.adress + ":" + $scope.port + "/admin/" + endpoint,
+            url: "//" + $scope.adress + "/admin/" + endpoint,
         });
     };
 
@@ -31,7 +30,7 @@ statistics.controller('statisticsController', [ "$scope", "$http", function ($sc
         var json = JSON.stringify(data);
         return callAdminService(tile, {
             method: "post",
-            url: "https://" + $scope.adress + ":" + $scope.port + "/admin/" + endpoint,
+            url: "//" + $scope.adress + "/admin/" + endpoint,
             data: json,
             headers: {'Content-Type': 'application/json'}
         });

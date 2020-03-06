@@ -122,7 +122,7 @@ tagsearch.controller('searchController', function ($scope) {
         };
 
         var xhr = new XMLHttpRequest();
-        xhr.open("POST", "https://" + $scope.adress + ":" + $scope.port + "/v1/albums", true);
+        xhr.open("POST", "//" + $scope.adress + "/v1/albums", true);
         xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         xhr.onreadystatechange = () => {
             $scope.$apply(() => { $scope.serverUnreachable = false });
