@@ -4,7 +4,7 @@
 	"name": "Camp Explorer",
 	"short_name": "CampExplorer",
 	"description": "A Bandcamp search tool",
-	"version": "2.0.0",
+	"version": "2.1.0",
 	"author": "Andreas Wilcox",
 
 	"web_accessible_resources": [
@@ -22,7 +22,7 @@
   	},
 	"permissions": [
 		"storage",
-		"http://campexplorer.io",
+		"https://campexplorer.io/",
 		"http://bandcamp.com/",
 		"https://bandcamp.com/",
 		"https://*.bcbits.com/"

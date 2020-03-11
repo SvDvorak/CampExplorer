@@ -9,8 +9,6 @@
     <title>Camp Explorer</title>
     <script src="angular.min.js"></script>
     <script src="popup.js"></script>
-    <!-- Logs visit so I can keep track of page usage. Saves no identifiable information. Check out code at https://github.com/SvDvorak/PageStatistics -->
-    <script src="https://pagestatistics.anwilc.com/logVisit.js" page="CampExplorerApp"></script>
     <link rel="stylesheet" href="spinner.css" type="text/css" />
     <link rel="stylesheet" href="style.css" type="text/css" />
   </head>
@@ -27,13 +25,7 @@
       <div ng-show="showVersionChanges">
         <div class="version_text">
           <p>Improvements:</p>
-          <ul>
-            <li>Improved number of results returned by up to 10x</li>
-            <li>Instantaneous results for already searched tags</li>
-            <li>Changed name from Bandcamp Tag Search to Camp Explorer</li>
-            <li>Added logo and title in popup</li>
-          </ul>
-          <p>Note that any new tag no one has searched for will take a little while to load (up to about a minute).</p>
+          <p>Changed so requests are more secure using HTTPS instead of HTTP.</p>
           </br>
         </div>
         <span ng-click="showVersionChanges = false" class="close_changes">Gotcha</span>

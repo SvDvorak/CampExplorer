@@ -23,7 +23,7 @@ tagsearch.controller('searchController', function ($scope) {
     $scope.tags = [];
     $scope.latestRequestId = 0;
 
-    $scope.currentVersion = "1.0.0";
+    $scope.currentVersion = "2.1.0";
     $scope.showVersionChangesQuestion = false;
 
     $scope.userSearchCount = 0;
@@ -44,6 +44,8 @@ tagsearch.controller('searchController', function ($scope) {
     });
 
     showVersionChangeIfUpgraded();
+
+    logVisit();
 
   	$scope.addInputTag = function() {
         if($scope.tags.length >= 10) {
@@ -93,6 +95,25 @@ tagsearch.controller('searchController', function ($scope) {
         }
     }
 
+    // Logs visit so I can keep track of page usage. Saves no identifiable information. Check out code at https://github.com/SvDvorak/PageStatistics
+    function logVisit() {
+      var page = "CampExplorerApp";
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", "https://pagestatistics.anwilc.com/visit", true);
+      xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+      xhr.onreadystatechange = () => {
+          if(xhr.readyState === 4 && xhr.status == 200)
+              console.log("Logged visit with " + page);
+      }
+      xhr.onerror = err => {
+          console.log("Unable to log visit to statistics service: " + err);
+      }
+
+      xhr.send(JSON.stringify({
+          "page": page
+      }));
+    }
+
     $scope.neverShowSuggestion = function() {
         $scope.canShowReviewSuggestion = false;
         chrome.storage.local.set({ canShowReviewSuggestion: false });
@@ -122,7 +143,7 @@ tagsearch.controller('searchController', function ($scope) {
         };
 
         var xhr = new XMLHttpRequest();
-        xhr.open("POST", "//" + $scope.adress + "/v1/albums", true);
+        xhr.open("POST", "https://" + $scope.adress + "/v1/albums", true);
         xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         xhr.onreadystatechange = () => {
             $scope.$apply(() => { $scope.serverUnreachable = false });

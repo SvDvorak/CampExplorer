@@ -16,6 +16,9 @@ Note that search criterias that have not been cached previously might take a whi
 - It isn't possible to get all albums from Bandcamp so some albums might be missing.
 
 <h3>Release Notes</h3>
+2.1.0
+- Changed so requests are more secure using HTTPS instead of HTTP.
+
 2.0.0
 - New web-client
 - Major changes to how searching works compared to older version of Chrome app, should give a 10x increase in results and return them much faster if they've already been cached.
