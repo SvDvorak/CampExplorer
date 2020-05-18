@@ -37,7 +37,7 @@ Statistics of the server is also hosted to see the state of caching, just add /s
 ## Release Notes
 2.0.0
 - New web-client
-- Added updrade message to app
+- Added upgrade message to app
 - Major changes to how searching works compared to older version of Chrome app, should give a 10x increase in results and return them much faster if they've already been cached.
 
 1.0.3
