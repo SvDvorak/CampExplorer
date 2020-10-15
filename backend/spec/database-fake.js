@@ -1,5 +1,5 @@
 var Promise = require("bluebird");
-require("../extensions");
+const { BCtags } = require("../extensions");
 
 module.exports = DatabaseFake = function() {
     this.savedTags = [];
@@ -36,14 +36,14 @@ DatabaseFake.prototype = {
     getAlbumsByTags: function(count, tags) {
         this.getAlbumsCalls.push({ tags: tags });
         databaseFake = this;
-        return Promise.resolve(tags
-          .map(tag => databaseFake.getAlbumsByTag(tag) || [])
-          .flatten()
-          .BCgroup("link")
-          .BCvalues()
-          .filter(x => x.length == tags.length)
-          .map(x => x[0])
-          .slice(0, count));
+        return Promise.resolve(
+            BCtags(tags
+            .map(tag => databaseFake.getAlbumsByTag(tag) || [])
+            .flatten()
+            .BCgroup("link"))
+            .filter(x => x.length == tags.length)
+            .map(x => x[0])
+            .slice(0, count));
     },
     getAlbumsByTag: function(tag) {
         var filtered = this.saveAlbumsCalls.filter(call => call.tag == tag)[0].albums;

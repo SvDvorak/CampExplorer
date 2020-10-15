@@ -6,10 +6,8 @@ function Tag(name) {
 }
 
 statistics.controller('statisticsController', [ "$scope", "$http", function ($scope, $http) {
-    $scope.adress = "campexplorer.io";
-    $scope.serverIsUp = false;
-
-    var CreateAdminOptions = endpoint => { };
+    $scope.adress = "localhost";
+    $scope.serverIsUp = undefined;
 
     var callAdminService = function(tile, request) {
         return $http(request)
@@ -60,7 +58,13 @@ statistics.controller('statisticsController', [ "$scope", "$http", function ($sc
         adminServicePost(this, "requestrate", { sinceInHours: 24 });
     }
 
-    var serverStatus = function() { this.body = $scope.serverIsUp ? "Online and ready =D" : "Server is down =(" };
+    var serverStatus = function() {
+        if($scope.serverIsUp == undefined)
+            this.body = "Waiting for response";
+        else if($scope.serverIsUp)
+            this.body = "Online and ready =D";
+        else
+            this.body = "Server is down =(" };
 
     $scope.tiles = [
         { header: "Server status", body: "Online and ready =D", update: serverStatus },
@@ -72,7 +76,7 @@ statistics.controller('statisticsController', [ "$scope", "$http", function ($sc
         { header: "Requests last 24 hours", body: "", update: requestRateLastDay }];
     
     $scope.tiles.forEach(tile => tile.update());
-    $scope.tiles.forEach(tile => setInterval(() => tile.update(), 1000));
+    $scope.tiles.forEach(tile => setInterval(() => tile.update(), 5000));
 
   	$scope.addInputTag = function() {
   	    var newTag = $scope.newTag.replace(" ", "-");

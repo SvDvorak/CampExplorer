@@ -13,7 +13,7 @@ function Tag(name) {
 }
 
 tagsearch.controller('searchController', function ($scope) {
-    $scope.adress = "campexplorer.io";
+    $scope.adress = "localhost";
 
     $scope.albums = [];
     $scope.isSearching = false;
@@ -88,6 +88,7 @@ tagsearch.controller('searchController', function ($scope) {
         };
 
         var xhr = new XMLHttpRequest();
+        console.log("//" + $scope.adress + "/v1/albums");
         xhr.open("POST", "//" + $scope.adress + "/v1/albums", true);
         xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         xhr.onreadystatechange = () => {

@@ -1,11 +1,11 @@
 var Config = require("./config");
-var elasticsearch = require('elasticsearch');
+const { Client } = require('@elastic/elasticsearch');
 var Promise = require('bluebird');
 var moment = require('moment');
 require("./extensions");
 
 module.exports = Database = function() {
-    this.hostAddress = "search_database:9200";
+    this.hostAddress = "http://search_database:9200";
 }
 
 var createUpsertOperation = function(album) {
@@ -14,7 +14,7 @@ var createUpsertOperation = function(album) {
         { 
             script: {
                 lang: "painless",
-                inline: "if(!ctx._source.tags.contains(params.new_tag)) { ctx._source.tags.add(params.new_tag); }",
+                source: "if(!ctx._source.tags.contains(params.new_tag)) { ctx._source.tags.add(params.new_tag); }",
                 params: {
                     new_tag: album.tags[0]
                 }
@@ -26,33 +26,56 @@ var createUpsertOperation = function(album) {
 
 var maxConnectionAttemptTime = 60*1000;
 
-var tryConnection = function(client, resolve, reject, time) {
+var tryConnection = async function(client, time) {
     if(time > maxConnectionAttemptTime) {
-        reject(new Error("Unable to connect to database"));
+        throw new Error("Unable to connect to database");
     }
 
-    client.ping()
-        .then(() => resolve())
-        .catch(() => {
-            Promise
-                .delay(1000)
-                .then(() => tryConnection(client, resolve, reject, time + 1000));
-        });
+    try {
+        await client.ping();
+        await Promise.delay(3000); // Just to make sure indexes are up and ready
+    }
+    catch(error) {
+        await Promise.delay(1500);
+        await tryConnection(client, time + 1000);
+    }
 };
 
-var tagsearchMappings = {
-    index: "tagsearch",
+// var tagsearchMappings = {
+//     index: "tagsearch",
+//     body: {
+//         mappings : {
+//             albums : {
+//                 properties : {
+//                     tags : { type: "keyword", index: "not_analyzed" }
+//                 }
+//             },
+//             tags : {
+//                 properties : {
+//                     lastUpdated : { type:"date", format: "basic_date_time_no_millis" }
+//                 }
+//             }
+//         }
+//     }
+// }
+
+var albumsIndexMappings = {
+    index: "albums",
     body: {
         mappings : {
-            albums : {
-                properties : {
-                    tags : { type: "keyword", index: "not_analyzed" }
-                }
-            },
-            tags : {
-                properties : {
-                    lastUpdated : { type:"date", format: "basic_date_time_no_millis" }
-                }
+            properties : {
+                tags : { type: "keyword", index: true }
+            }
+        }
+    }
+}
+
+var tagsIndexMappings = {
+    index: "tags",
+    body: {
+        mappings : {
+            properties : {
+                lastUpdated : { type: "date", format: "basic_date_time_no_millis" }
             }
         }
     }
@@ -60,36 +83,47 @@ var tagsearchMappings = {
 
 Database.prototype = {
     createClient: function() {
-        return new elasticsearch.Client({
-            host: this.hostAddress
+        return new Client({
+            node: this.hostAddress
         })
     },
-    waitForConnection: function() {
-        var client = new elasticsearch.Client({
-            host: this.hostAddress,
+    waitForConnection: async function() {
+        var client = new Client({
+            node: this.hostAddress,
             log: []
         });
-        return new Promise((resolve, reject) => tryConnection(client, resolve, reject, 0));
+        //return new Promise((resolve, reject) => reject());
+        // return await client.ping({}, { requestTimeout: maxConnectionAttemptTime });
+            // .catch(() => {
+            //     new Error("Unable to connect to database");
+            // });
+        await tryConnection(client, 0);
     },
-    createIfNeeded: function() {
+    createIfNeeded: async function() {
         var client = this.createClient();
-        return client.indices.exists({
-            index: "tagsearch"
-        })
-        .then(indexExists => { 
-            if(!indexExists){
-                return client.indices.create(tagsearchMappings)
-                    .then(() => "Index does not exist, created index mappings");
-            }
-            
-            return Promise.resolve("Index already exists, no need to create");
-        });
+        const { body: albumsIndexExists } = await client.indices.exists({ index: "albums" });
+        const { body: tagsIndexExists } = await client.indices.exists({ index: "tags" });
+
+        if(albumsIndexExists && tagsIndexExists)
+            return "Index already exists, no need to create";
+
+        let message = "";
+        if(!albumsIndexExists){
+            await client.indices.create(albumsIndexMappings);
+            message += "Albums index does not exist, creating mappings. ";
+        }
+        if(!tagsIndexExists){
+            await client.indices.create(tagsIndexMappings);
+            message += "Tags index does not exist, creating mappings. ";
+        }
+
+        return message;
     },
     saveTag: function(tag) {
-        return this.createClient()
+        return this
+            .createClient()
             .index({
-                index: "tagsearch",
-                type: "tags",
+                index: "tags",
                 id: tag,
                 body: {
                     lastUpdated: moment().format("YYYYMMDDTHHmmssZ")
@@ -105,18 +139,17 @@ Database.prototype = {
 
         return this.createClient()
             .bulk({
-                index: "tagsearch",
-                type: "albums",
+                index: "albums",
                 body: albums.map(album => createUpsertOperation(album)).flatten()
             });
     },
     getUnsavedTags: function(tags) {
         var chunkedTags = tags.chunk(2);
         return Promise.reduce(chunkedTags, (total, chunk) => {
-            return this.createClient()
+            return this
+                .createClient()
                 .search({
-                    index: "tagsearch",
-                    type: "tags",
+                    index: "tags",
                     size: chunk.length,
                     body: {
                         query: {
@@ -127,17 +160,17 @@ Database.prototype = {
                     }
                 })
                 .then(results => {
-                    var savedTags = results.hits.hits.map(x => x._id);
+                    var savedTags = results.body.hits.hits.map(x => x._id);
                     var unsavedTags = chunk.filter(tag => savedTags.indexOf(tag) == -1);
                     return total.concat(unsavedTags);
                 });
         }, []);
     },
-    getTagWithOldestUpdate: function() {
-        return this.createClient()
+    getTagWithOldestUpdate: async function() {
+        const results = await this
+            .createClient()
             .search({
-                index: "tagsearch",
-                type: "tags",
+                index: "tags",
                 body: {
                     query: { match_all: { } },
                     size: 1,
@@ -148,17 +181,17 @@ Database.prototype = {
                         }
                     ]
                 }
-            })
-        .then(results => results.hits.hits.map(x => x._id)[0]);
+            });
+        return results.body.hits.hits.map(x => x._id)[0]
     },
-    getAlbumsByTags: function(count, tags) {
+    getAlbumsByTags: async function(count, tags) {
         var terms = tags.map(tag => {
             return { term: { tags: tag } }
         });
-        return this.createClient()
+        const results = await this
+            .createClient()
             .search({
-                index: "tagsearch",
-                type: "albums",
+                index: "albums",
                 body: {
                     query: {
                         bool: {
@@ -167,23 +200,23 @@ Database.prototype = {
                     },
                     size: count
                 }
-            })
-            .then(results => results.hits.hits.map(x => x._source));
+            });
+        return results.body.hits.hits.map(x => x._source);
     },
-    getTagCount: function() {
-        return this.createClient()
+    getTagCount: async function() {
+        const { body } = await this
+            .createClient()
             .count({
-                index: "tagsearch",
-                type: "tags"
+                index: "tags",
             })
-            .then(data => data.count);
+        return body.count;
     },
-    getAlbumCount: function() {
-        return this.createClient()
+    getAlbumCount: async function() {
+        const { body } = await this
+            .createClient()
             .count({
-                index: "tagsearch",
-                type: "albums"
-            })
-            .then(data => data.count);
+                index: "albums",
+            });
+        return body.count;
     }
 }

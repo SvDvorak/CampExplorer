@@ -1,5 +1,6 @@
 var Promise = require("bluebird");
-require("./extensions");
+const { debug } = require("request-promise");
+const { BCtags, timeout } = require("./extensions");
 
 module.exports = Seeder = function(bandcampApi, log) {
 	this.bandcampApi = bandcampApi;
@@ -7,41 +8,33 @@ module.exports = Seeder = function(bandcampApi, log) {
 };
 
 Seeder.prototype = {
-	seed: function(tag) {
+	seed: async function(tag) {
 		var seeder = this;
 		seeder.log("Seeding tags for all albums under " + tag);
 
-		return seeder.bandcampApi.getAlbumsForTag(tag)
-			.then(newAlbums => seeder.updateTagsForAllAlbums(newAlbums.slice(0, 500), [ tag ]));
+		let newAlbums = await seeder.bandcampApi.getAlbumsForTag(tag);
+		return await seeder.updateTagsForAllAlbums(newAlbums.slice(0, 500), tag);
 	},
 
-	updateTagsForAllAlbums: function(albums, previousTags) {
+	updateTagsForAllAlbums: async function(albums, startTag) {
 		var seeder = this;
 
-		if(albums.length <= 0) {
-			return Promise.resolve(previousTags.getUnique().BCvalues());
+		let tags = [ startTag ];
+
+		for(const albumWithTags of albums) {
+			try {
+				const newTags = await seeder.bandcampApi.getTagsForAlbum(albumWithTags);
+				await timeout(300);
+				tags = tags.concat(newTags);
+			}
+			catch(error) {
+					seeder.log(`Unable to get tags for ${albumWithTags.name} with band id ${albumWithTags.bandId} and album id ${albumWithTags.id} because ${error}`);
+					seeder.log("Continuing with next tag");
+			}
 		}
 
-		var albumWithTags = albums[albums.length - 1];
-
-		return seeder.bandcampApi
-			.getTagsForAlbum(albumWithTags)
-			.then(newTags => {
-				tags = previousTags.concat(newTags);
-				return seeder.updateNextAlbum(albums, tags);
-			})
-			.catch(e => {
-				seeder.log("Unable to get tags for " + albumWithTags.name + " with id " + albumWithTags.id + " because " + e);
-				seeder.log("Continuing with next tag");
-				return seeder.updateNextAlbum(albums, previousTags);
-			});
+		return BCtags(tags.getUnique());
 	},
-
-	updateNextAlbum: function(albums, tags) {
-		var newCount = albums.length - 1;
-		albums.splice(newCount, 1);
-		return this.updateTagsForAllAlbums(albums, tags);
-	}
 };
 
 Array.prototype.getUnique = function() {

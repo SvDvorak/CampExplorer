@@ -55,6 +55,8 @@ CacheUpdater.prototype = {
     },
 
     currentlyCachingTag: function() {
+        if(this.inProgress == undefined)
+            return "";
         return this.inProgress;
     },
 

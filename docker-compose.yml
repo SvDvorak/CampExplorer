@@ -13,7 +13,7 @@ services:
     build: backend/.
     depends_on:
       - database
-    command: node_modules/.bin/nodemon --debug=0.0.0.0:5858 start-server.js
+    command: node_modules/.bin/nodemon --inspect=0.0.0.0:5858 start-server.js
     environment:
       NODE_ENV: development
     ports:
@@ -24,8 +24,10 @@ services:
       - /home/app/campexplorer/node_modules
   database:
     container_name: search_database
-    image: docker.elastic.co/elasticsearch/elasticsearch:5.2.2
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.8.0
     ports:
       - '9200:9200'
+    environment:
+      discovery.type: single-node
     volumes:
       - ./backend/database/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
