@@ -1,9 +1,9 @@
-var Promise = require("bluebird");
 const { debug } = require("request-promise");
 const { BCtags, timeout } = require("./extensions");
 
-module.exports = Seeder = function(bandcampApi, log) {
+module.exports = Seeder = function(bandcampApi, timeout, log) {
 	this.bandcampApi = bandcampApi;
+	this.timeout = timeout;
 	this.log = log;
 };
 
@@ -24,7 +24,7 @@ Seeder.prototype = {
 		for(const albumWithTags of albums) {
 			try {
 				const newTags = await seeder.bandcampApi.getTagsForAlbum(albumWithTags);
-				await timeout(300);
+				await seeder.timeout(250);
 				tags = tags.concat(newTags);
 			}
 			catch(error) {

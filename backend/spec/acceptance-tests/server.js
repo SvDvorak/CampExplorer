@@ -9,18 +9,18 @@ describe("Server with cache", function() {
     var bandcamp;
     var database;
 
-    beforeEach(function(done) {
+    beforeEach(async () => {
         testServer = new TestServer();
         bandcamp = testServer.bandcamp;
         database = testServer.database;
-        testServer.start().then(done);
+        await testServer.start();
     });
 
-    afterEach(function(done) {
-        testServer.stop().then(done);
+    afterEach(async () => {
+        await testServer.stop();
     });
 
-    it("returns complete album", function(done) {
+    it("returns complete album", async () => {
         var album = new Album(
             "987654321",
             "Album name",
@@ -31,22 +31,20 @@ describe("Server with cache", function() {
 
         bandcamp.setAlbumsForTag("tag", [ album ]);
 
-        localRequest(["tag"])
-            .then(() => localRequest([ "tag" ]))
-            .then(albums => {
-                expect(albums.length).toBe(1);
-                var singleAlbum = albums[0];
-                expect(singleAlbum.id).toBe("987654321");
-                expect(singleAlbum.name).toBe("Album name");
-                expect(singleAlbum.artist).toBe("Artist name");
-                expect(singleAlbum.image).toBe("www.imagelink.com");
-                expect(singleAlbum.link).toBe("www.albumlink.com");
-                expect(singleAlbum.bandId).toBe("123456789");
-            })
-            .testFinished(done);
+        await localRequest(["tag"]);
+        const albums = await localRequest([ "tag" ]);
+
+        expect(albums.length).toBe(1);
+        var singleAlbum = albums[0];
+        expect(singleAlbum.id).toBe("987654321");
+        expect(singleAlbum.name).toBe("Album name");
+        expect(singleAlbum.artist).toBe("Artist name");
+        expect(singleAlbum.image).toBe("www.imagelink.com");
+        expect(singleAlbum.link).toBe("www.albumlink.com");
+        expect(singleAlbum.bandId).toBe("123456789");
     });
 
-    it("returns albums with all requested tags", function(done) {
+    it("returns albums with all requested tags", async () => {
         bandcamp.setAlbumsForTag("tag1", [
             linkOnlyAlbum("AllTagsAlbum"),
             linkOnlyAlbum("SingleTagAlbum")
@@ -56,77 +54,64 @@ describe("Server with cache", function() {
             linkOnlyAlbum("AllTagsAlbum"),
             ]);
 
-        localRequest(["tag1", "tag2"])
-            .then(() => localRequest([ "tag1", "tag2" ]))
-            .then(albums => {
-                expect(albums.length).toBe(1);
-                expect(albums[0].link).toBe("AllTagsAlbum");
-            })
-            .testFinished(done);
+        await localRequest(["tag1", "tag2"])
+        const albums = await localRequest([ "tag1", "tag2" ]);
+
+        expect(albums.length).toBe(1);
+        expect(albums[0].link).toBe("AllTagsAlbum");
     });
 
-    it("returns tags format incorrect when tags malformed", function(done) {
+    it("returns tags format incorrect when tags malformed", async () => {
         bandcamp.setAlbumsForTag("tag", [ linkOnlyAlbum("Album") ]);
 
-
-        localRequest()
-            .then(() => done.fail("Request with malformed data should not return successfully"))
-            .catch(data => {
-                expect(data.statusCode).toBe(400);
-                expect(JSON.parse(data.error).error).toBe("Unable to parse request data");
-            })
-            .testFinished(done);
+        try {
+            await localRequest();
+            throw "Request with malformed data should not return successfully";
+        }
+        catch(e) {
+            expect(e.statusCode).toBe(400);
+            expect(JSON.parse(e.error).error).toBe("Unable to parse request data");
+        }
     });
 
-    it("returns tag not cached when requesting uncached tag, caches and returns tag albums on subsequent request", function(done) {
+    it("returns tag not cached when requesting uncached tag, caches and returns tag albums on subsequent request", async () => {
         bandcamp.setAlbumsForTag("musictag", [
             linkOnlyAlbum("Album")
             ]);
 
-        localRequest([ "musicTag" ])
-            .then(response => {
-                expect(response.error).toBe("Tags not loaded, try again later");
-                expect(response.data).toEqual([ "musictag" ]);
-            })
-            .then(() => localRequest([ "musicTag" ]))
-            .then(albums => expect(albums[0].link).toBe("Album"))
-            .testFinished(done);
+        const response = await localRequest([ "musicTag" ]);
+        expect(response.error).toBe("Tags not loaded, try again later");
+        expect(response.data).toEqual([ "musictag" ]);
+        const albums = await localRequest([ "musicTag" ]);
+        expect(albums[0].link).toBe("Album");
     });
 
-    it("returns a maximum of 90 albums", function(done) {
-        var albums = generateAlbums(500)
-
-        bandcamp.setAlbumsForTag("tag", albums);
-        localRequest([ "tag" ])
-            .then(() => localRequest([ "tag" ]))
-            .then(albums => expect(albums.length).toBe(90))
-            .testFinished(done);
+    it("returns a maximum of 90 albums", async () => {
+        bandcamp.setAlbumsForTag("tag", generateAlbums(500));
+        await localRequest([ "tag" ]);
+        const albums = await localRequest([ "tag" ]);
+        expect(albums.length).toBe(90);
     });
 
-    it("limits request to 10 tags", function(done) {
+    it("limits request to 10 tags", async () => {
         var tags = [...Array(11).keys()].map(x => "tag" + x);
 
-        localRequest(tags)
-            .then(() => expect(bandcamp.tagsRequested).toEqual(tags.slice(0, 10)))
-            .testFinished(done);
+        await localRequest(tags);
+        expect(bandcamp.tagsRequested).toEqual(tags.slice(0, 10));
     });
 
-    it("lower cases all tag parameters before use", function(done) {
+    it("lower cases all tag parameters before use", async () => {
         bandcamp.setAlbumsForTag("tag", [ linkOnlyAlbum("Album") ]);
 
-        localRequest(["TAG"])
-            .then(() => localRequest([ "TAG" ]))
-            .then(albums => expect(albums.length).toBe(1))
-            .testFinished(done);
+        await localRequest(["TAG"]);
+        const albums = await localRequest([ "TAG" ]);
+        expect(albums.length).toBe(1);
     });
 
-    it("returns empty result without using database when calling without tags", function(done) {
-        localRequest([ ])
-            .then(albums => {
-                expect(albums.length).toBe(0);
-                expect(database.getAlbumsCalls.length).toBe(0);
-            })
-            .testFinished(done);
+    it("returns empty result without using database when calling without tags", async () => {
+        const albums = await localRequest([ ])
+        expect(albums.length).toBe(0);
+        expect(database.getAlbumsCalls.length).toBe(0);
     });
 
     var linkOnlyAlbum = function(linkText) {

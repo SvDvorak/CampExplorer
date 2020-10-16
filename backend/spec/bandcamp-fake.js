@@ -1,5 +1,3 @@
-var Promise = require("bluebird");
-
 module.exports = BandcampFake = function(log) {
     this.albums = [];
     this.tags = [];
@@ -9,7 +7,7 @@ module.exports = BandcampFake = function(log) {
 }
 
 BandcampFake.prototype = {
-    getAlbumsForTag: function (tag) {
+    getAlbumsForTag: async function (tag) {
         this.tagsRequested.push(tag);
         var albums = this.albums[tag] || [];
 
@@ -29,7 +27,7 @@ BandcampFake.prototype = {
         this.albums[tag] = tagAlbums;
     },
 
-    getTagsForAlbum: function (album) {
+    getTagsForAlbum: async function (album) {
         var tags = this.tags[album.name] || [];
         return new Promise((resolve, reject) => {
             if(this.delay > 0) {

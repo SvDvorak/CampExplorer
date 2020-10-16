@@ -22,17 +22,17 @@
   },
   "homepage": "www.campexplorer.io",
   "dependencies": {
-    "@elastic/elasticsearch": "^7.8.0",
+    "@elastic/elasticsearch": "^7.9.1",
     "bluebird": "^3.7.2",
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
-    "moment": "^2.27.0",
+    "moment": "^2.29.1",
     "request": "^2.88.2",
     "request-promise": "^3.0.0",
     "xmlhttprequest": "^1.8.0"
   },
   "devDependencies": {
-    "jasmine": "^2.99.0",
+    "jasmine": "^3.6.2",
     "nodemon": "^1.19.4"
   }
 }
