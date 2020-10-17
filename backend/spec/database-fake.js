@@ -46,8 +46,10 @@ DatabaseFake.prototype = {
             .slice(0, count));
     },
     getAlbumsByTag: function(tag) {
-        var filtered = this.saveAlbumsCalls.filter(call => call.tag == tag)[0].albums;
-        return filtered;
+        var filtered = this.saveAlbumsCalls.filter(call => call.tag == tag);
+        if(filtered.length > 0)
+            return filtered[0].albums;
+        return [];
     },
 
     getTagCount: function() {

@@ -1,5 +1,5 @@
 const { debug } = require("request-promise");
-const { BCtags, timeout } = require("./extensions");
+const { BCtags } = require("./extensions");
 
 module.exports = Seeder = function(bandcampApi, timeout, log) {
 	this.bandcampApi = bandcampApi;

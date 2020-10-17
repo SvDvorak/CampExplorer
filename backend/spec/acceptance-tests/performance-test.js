@@ -4,21 +4,21 @@ var RockAlbums = require("./albums-rock");
 var localRequest = require("./local-request");
 require("../test-finished");
 
-describe("Server performance", function() {
+describe("Server performance", () => {
     var testServer;
     var bandcamp;
 
-    beforeEach(function(done) {
+    beforeEach(async () => {
         testServer = new TestServer();
         bandcamp = testServer.bandcamp;
-        testServer.start().then(done);
+        await testServer.start();
     });
 
-    afterEach(function(done) {
-        testServer.stop().then(done);
+    afterEach(async () => {
+        await testServer.stop();
     });
 
-    it("should be fast enough to match two popular tags within a tenth of a second", function(done) {
+    it("should be fast enough to match two popular tags within a tenth of a second", async () => {
     	bandcamp.setAlbumsForTag("pop", PopAlbums);
     	bandcamp.setAlbumsForTag("rock", RockAlbums);
 
@@ -27,13 +27,10 @@ describe("Server performance", function() {
         var maxCallTime = 100;
 
         // Cache them once first
-    	localRequest([ "pop", "rock" ])
-            .then(() => startTime = new Date())
-            .then(() => localRequest([ "pop", "rock" ]))
-            .then(albums => {
-                expect(albums.length).toBe(expectedResultCount)
-                expect(startTime - new Date()).toBeLessThan(maxCallTime);
-            })
-            .testFinished(done);
+    	await localRequest([ "pop", "rock" ]);
+        startTime = new Date();
+        const albums = await localRequest([ "pop", "rock" ]);
+        expect(albums.length).toBe(expectedResultCount)
+        expect(startTime - new Date()).toBeLessThan(maxCallTime);
     });
 });

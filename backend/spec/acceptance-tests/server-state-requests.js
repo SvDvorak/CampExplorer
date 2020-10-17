@@ -1,4 +1,3 @@
-var Promise = require("bluebird");
 var Config = require("./config");
 var request = require('request-promise');
 

@@ -4,7 +4,7 @@ var localRequest = require("./local-request");
 var generateAlbums = require("../generate-albums");
 require("../test-finished");
 
-describe("Server with cache", function() {
+describe("Server with cache", () => {
     var testServer;
     var bandcamp;
     var database;
@@ -94,10 +94,10 @@ describe("Server with cache", function() {
     });
 
     it("limits request to 10 tags", async () => {
-        var tags = [...Array(11).keys()].map(x => "tag" + x);
+        var tags = [...Array(15).keys()].map(x => "tag" + x);
 
-        await localRequest(tags);
-        expect(bandcamp.tagsRequested).toEqual(tags.slice(0, 10));
+        const response = await localRequest(tags);
+        expect(response.data).toEqual(tags.slice(0, 10));
     });
 
     it("lower cases all tag parameters before use", async () => {

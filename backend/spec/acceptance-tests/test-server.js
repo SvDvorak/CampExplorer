@@ -10,13 +10,14 @@ var Config = require("./config");
 
 module.exports = TestServer = function() {
     this.server = require(sourceFolder + "server");
-    this.noLog = function(text) { };
+    this.noLog = text => { };
+    this.noTimeout = async time => { };
     this.config = new Config();
     this.bandcamp = new BandcampFake(this.noLog);
     this.database = new DatabaseFake();
     this.updater = new CacheUpdater(this.bandcamp, this.database, this.noLog);
     this.recacher = new Recacher(this.database, this.updater, this.noLog);
-    this.seeder = new Seeder(this.bandcamp, this.noLog);
+    this.seeder = new Seeder(this.bandcamp, this.noTimeout, this.noLog);
     this.timeProvider = new TimeProvider();
 };
 
