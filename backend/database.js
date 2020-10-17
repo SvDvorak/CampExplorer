@@ -1,8 +1,8 @@
 var Config = require("./config");
 const { Client } = require('@elastic/elasticsearch');
-var Promise = require('bluebird');
 var moment = require('moment');
 require("./extensions");
+const { timeout } = require("./extensions");
 
 module.exports = Database = function() {
     this.hostAddress = "http://search_database:9200";
@@ -33,10 +33,10 @@ var tryConnection = async function(client, time) {
 
     try {
         await client.ping();
-        await Promise.delay(3000); // Just to make sure indexes are up and ready
+        await timeout(3000); // Just to make sure indexes are up and ready
     }
     catch(error) {
-        await Promise.delay(1500);
+        await timeout(1500);
         await tryConnection(client, time + 1000);
     }
 };
@@ -119,8 +119,8 @@ Database.prototype = {
 
         return message;
     },
-    saveTag: function(tag) {
-        return this
+    saveTag: async function(tag) {
+        await this
             .createClient()
             .index({
                 index: "tags",
@@ -130,23 +130,23 @@ Database.prototype = {
                 }
             });
     },
-    saveAlbums: function(tag, albums) {
+    saveAlbums: async function(tag, albums) {
         if(albums.length == 0) {
-            return Promise.resolve();
+            return;
         }
 
         albums.forEach(album => { album.tags = [ tag ]});
 
-        return this.createClient()
+        await this.createClient()
             .bulk({
                 index: "albums",
                 body: albums.map(album => createUpsertOperation(album)).flatten()
             });
     },
-    getUnsavedTags: function(tags) {
+    getUnsavedTags: async function(tags) {
         var chunkedTags = tags.chunk(2);
-        return Promise.reduce(chunkedTags, (total, chunk) => {
-            return this
+        return Promise.reduce(chunkedTags, async (total, chunk) => {
+            const results = await this
                 .createClient()
                 .search({
                     index: "tags",
@@ -159,11 +159,9 @@ Database.prototype = {
                         }
                     }
                 })
-                .then(results => {
-                    var savedTags = results.body.hits.hits.map(x => x._id);
-                    var unsavedTags = chunk.filter(tag => savedTags.indexOf(tag) == -1);
-                    return total.concat(unsavedTags);
-                });
+                var savedTags = results.body.hits.hits.map(x => x._id);
+                var unsavedTags = chunk.filter(tag => savedTags.indexOf(tag) == -1);
+                return total.concat(unsavedTags);
         }, []);
     },
     getTagWithOldestUpdate: async function() {

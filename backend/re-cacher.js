@@ -8,14 +8,17 @@ module.exports = Recacher = function(database, updater, log) {
 };
 
 Recacher.prototype = {
-	execute: function() {
+	execute: async function() {
 		if(!this.updater.isIdle()) {
-			return Promise.resolve();
+			return;
 		}
 
-		var recacher = this;
-		return this.database.getTagWithOldestUpdate()
-			.then(tag => recacher.updater.updateTags([ tag ]))
-			.catch(e => recacher.log("Failed recaching because " + e));
+		try {
+			const tag = await this.database.getTagWithOldestUpdate();
+			await this.updater.updateTags([ tag ]);
+		}
+		catch(e) {
+				this.log("Failed recaching because " + e);
+		}
 	},
 };

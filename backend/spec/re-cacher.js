@@ -6,10 +6,9 @@ require("./test-finished");
 describe("Recacher", function() {
     var database;
     var updater;
-    var finishedCall;
     var sut;
 
-    beforeEach(function() {
+    beforeEach(async function() {
         database = new DatabaseFake();
         updater = {
             calledUpdates: [],
@@ -25,53 +24,50 @@ describe("Recacher", function() {
         sut.cacheDelay = 0.001;
     });
 
-    var execute = function() { return sut.execute(); }
+    var execute = async function() { await sut.execute(); }
 
-    var expectUpdateCallCountToBe = function(callCount) {
+    var expectUpdateCallCountToBe = async (callCount) => {
         return () => expect(updater.calledUpdates.length).toEqual(callCount);
     };
     
-    var expectUpdateTagsToBe = function(tags) {
+    var expectUpdateTagsToBe = async (tags) => {
         return () => expect(updater.calledUpdates).toEqual(tags);
     };
 
-    it("does nothing if no tags exist in database", function(done) {
-        execute()
-            .then(expectUpdateCallCountToBe(0))
-            .finally(done);
+    it("does nothing if no tags exist in database", async () => {
+        await execute();
+        expectUpdateCallCountToBe(0);
     });
 
-    it("caches tag with oldest last update in database", function(done) {
+    it("caches tag with oldest last update in database", async () => {
         database.savedTags.push("tag");
 
-        execute()
-            .then(expectUpdateTagsToBe(["tag"]))
-            .testFinished(done);
+        await execute();
+        expectUpdateTagsToBe(["tag"]);
     });
 
-    it("does not cache when updater has tags in queue already", function(done) {
+    it("does not cache when updater has tags in queue already", async () => {
         database.savedTags.push("tag1");
         database.savedTags.push("tag2");
 
         updater.queue = [ "tag3", "tag4" ];
 
-        execute()
-            .then(expectUpdateCallCountToBe(0))
-            .testFinished(done);
+        await execute();
+        expectUpdateCallCountToBe(0);
     });
 
-    it("logs and returns normally when recaching fails", function(done) {
+    it("logs and returns normally when recaching fails", async () => {
         database.savedTags.push("tag1");
 
         updater.updateTags = () => {
             throw new Error("error");
         };
 
-        execute()
-            .then(() => done())
-            .catch(() => {
-                fail("didn't handle errors from dependencies");
-                done();
-            });
+        try {
+            await execute();
+        }
+        catch(e) {
+            fail("didn't handle errors from dependencies");
+        }
     });
 });

@@ -49,7 +49,7 @@ module.exports = {
         app.use(bodyParser.json());
         app.use(allowCrossDomain);
 
-        app.post("/v1/albums", function (request, response) {
+        app.post("/v1/albums", async (request, response) => {
             if (request.body.constructor !== Array) {
                 response.status(400);
                 response.send({ error: "Unable to parse request data" });
@@ -63,35 +63,42 @@ module.exports = {
                 return;
             }
 
-            server.sendAlbumsForLoadedTags(response, requestedTags)
-                .catch(error => server.log(error));
+            try {
+                await server.sendAlbumsForLoadedTags(response, requestedTags);
+            }
+            catch(error) {
+                server.log(error);
+            }
 
             server.requests.push(server.timeProvider.now());
         });
 
-        app.get("/admin/tagcount", function (request, response) {
-            server.database
-                .getTagCount()
-                .then(tagCount => server.sendJSONSuccess(response, tagCount))
-                .catch(e => server.sendJSONSuccess(response, 0));
+        app.get("/admin/tagcount", async (request, response) => {
+            try {
+                const tagCount = await server.database.getTagCount();
+                server.sendJSONSuccess(response, tagCount);
+            }
+            catch(error) {
+                server.sendJSONSuccess(response, 0);
+            }
         });
 
-        app.get("/admin/tagsinqueue", function (request, response) {
+        app.get("/admin/tagsinqueue", async (request, response) => {
             server.sendJSONSuccess(response, server.updater.queueLength());
         });
 
-        app.get("/admin/currentlycachingtag", function (request, response) {
+        app.get("/admin/currentlycachingtag", async (request, response) => {
             server.sendJSONSuccess(response, server.updater.currentlyCachingTag());
         });
 
-        app.get("/admin/albumcount", function (request, response) {
+        app.get("/admin/albumcount", async (request, response) => {
             server.database
                 .getAlbumCount()
                 .then(albumCount => server.sendJSONSuccess(response, albumCount))
                 .catch(e => server.sendJSONSuccess(response, 0));
         });
 
-        app.post("/admin/requestrate", function (request, response) {
+        app.post("/admin/requestrate", async (request, response) => {
             server.cleanRequestHistory();
             var results = server.requests.filter(x => server.timeProvider.hoursSince(x) < request.body.sinceInHours);
             server.sendJSONSuccess(response, results.length);
@@ -106,29 +113,24 @@ module.exports = {
         });
     },
 
-    sendAlbumsForLoadedTags: function (response, requestedTags) {
-        var server = this;
-        return this.database
-            .getUnsavedTags(requestedTags)
-            .then(unsavedTags => {
-                if (unsavedTags.length > 0) {
-                    return server.sendTagsNotLoaded(response, unsavedTags);
-                }
-                else {
-                    return server.database
-                        .getAlbumsByTags(90, requestedTags)
-                        .then(albums => server.sendJSONSuccess(response, albums));
-                }
-            })
+    sendAlbumsForLoadedTags: async function(response, requestedTags) {
+        const unsavedTags = await this.database.getUnsavedTags(requestedTags);
+        if (unsavedTags.length > 0) {
+            await this.sendTagsNotLoaded(response, unsavedTags);
+        }
+        else {
+            const albums = await this.database.getAlbumsByTags(90, requestedTags)
+            this.sendJSONSuccess(response, albums);
+        }
     },
 
-    sendTagsNotLoaded: function (response, unsavedTags) {
+    sendTagsNotLoaded: async function (response, unsavedTags) {
         response.status(202);
         response.send({
             error: "Tags not loaded, try again later",
             data: unsavedTags
         });
-        return this.updater.updateTags(unsavedTags);
+        this.updater.updateTags(unsavedTags);
     },
 
     sendJSONSuccess: function (response, data) {

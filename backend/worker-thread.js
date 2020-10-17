@@ -1,4 +1,3 @@
-var Promise = require("bluebird");
 
 module.exports = WorkerThread = function(worker, delay) {
     this.worker = worker;

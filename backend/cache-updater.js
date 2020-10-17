@@ -1,69 +1,71 @@
 var Promise = require("bluebird");
 
-module.exports = CacheUpdater = function(albumApi, database, log) {
+module.exports = CacheUpdater = function (albumApi, database, log) {
 	this.albumApi = albumApi;
-    this.database = database;
+	this.database = database;
 	this.log = log;
 	this.queue = [];
 	this.inProgress = undefined;
-    this.updatingPromise = Promise.resolve();
+	this.updatingPromise = Promise.resolve();
 }
 
-CacheUpdater.prototype = { 
-	updateTags: function(tags) {
-        var updater = this;
+CacheUpdater.prototype = {
+	updateTags: async function (tags) {
+		var updater = this;
 
-        updater.queue = updater.queue.concat(
-            tags.filter(tag => { return updater.queue.indexOf(tag) == -1; }));
+		updater.queue = updater.queue.concat(
+			tags.filter(tag => { return updater.queue.indexOf(tag) == -1; }));
 
-        if(this.inProgress == undefined) {
-            this.updatingPromise = new Promise((resolve, reject) => updater.updateTagsRecursive(resolve));
-        }
-
-        return Promise.resolve(this.updatingPromise);
+		if (this.isIdle()) {
+			await updater.updateTagsRecursive();
+		}
 	},
 
-    updateTagsRecursive: function(resolve) { 
-        var updater = this;
-        var database = this.database;
-        var albumApi = this.albumApi;
+	updateTagsRecursive: async function () {
+		var updater = this;
+		var database = this.database;
+		var albumApi = this.albumApi;
 
-        if(this.queue.length == 0) {
-            resolve();
-            return;
-        }
+		this.isUpdating = true;
 
-        var tag = this.queue[0];
-        this.inProgress = tag;
-        albumApi.getAlbumsForTag(tag)
-            .then(albums => database.saveAlbums(tag, albums))
-            .then(() => database.saveTag(tag))
-            .catch(ex => updater.log("Unable to update " + tag + " because " + JSON.stringify(ex)))
-            .finally(() => {
-                updater.inProgress = undefined
-                updater.removeFromQueue(tag);
-                updater.updateTagsRecursive(resolve);
-            });
-    },
+		while (this.queue.length > 0) {
+			const tag = this.queue[0];
+			this.inProgress = tag;
+			try {
+				const albums = await albumApi.getAlbumsForTag(tag);
+				await database.saveAlbums(tag, albums);
+				await database.saveTag(tag);
+			}
+			catch (error) {
+				updater.log("Unable to update " + tag + " because " + JSON.stringify(error));
+			}
+			finally {
+				updater.inProgress = undefined
+				updater.removeFromQueue(tag);
+			}
+		}
 
-    isIdle: function() {
-        return !this.updatingPromise.isPending();
-    },
+		this.isUpdating = false;
+	},
 
-    queueLength: function() {
-        return this.queue.length;
-    },
+	isIdle: function () {
+		return !this.isUpdating;
+	},
 
-    currentlyCachingTag: function() {
-        if(this.inProgress == undefined)
-            return "";
-        return this.inProgress;
-    },
+	queueLength: function () {
+		return this.queue.length;
+	},
 
-    removeFromQueue: function(tag) {
-        var i = this.queue.indexOf(tag);
-        if(i != -1) {
-            this.queue.splice(i, 1);
-        }
-    },
+	currentlyCachingTag: function () {
+		if (this.inProgress == undefined)
+			return "";
+		return this.inProgress;
+	},
+
+	removeFromQueue: function (tag) {
+		var i = this.queue.indexOf(tag);
+		if (i != -1) {
+			this.queue.splice(i, 1);
+		}
+	},
 };
