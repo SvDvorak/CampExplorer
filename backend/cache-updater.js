@@ -1,4 +1,4 @@
-var Promise = require("bluebird");
+const { debugLog } = require("./extensions");
 
 module.exports = CacheUpdater = function (albumApi, database, log) {
 	this.albumApi = albumApi;
@@ -6,7 +6,6 @@ module.exports = CacheUpdater = function (albumApi, database, log) {
 	this.log = log;
 	this.queue = [];
 	this.inProgress = undefined;
-	this.updatingPromise = Promise.resolve();
 }
 
 CacheUpdater.prototype = {
@@ -32,6 +31,7 @@ CacheUpdater.prototype = {
 			const tag = this.queue[0];
 			this.inProgress = tag;
 			try {
+				debugLog(this.log, `Updating tag ${tag}`);
 				const albums = await albumApi.getAlbumsForTag(tag);
 				await database.saveAlbums(tag, albums);
 				await database.saveTag(tag);

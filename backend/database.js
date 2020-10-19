@@ -145,8 +145,10 @@ Database.prototype = {
     },
     getUnsavedTags: async function(tags) {
         var chunkedTags = tags.chunk(2);
-        return Promise.reduce(chunkedTags, async (total, chunk) => {
-            const results = await this
+        var total = [];
+        db = this;
+        for(const chunk of chunkedTags) {
+            const results = await db
                 .createClient()
                 .search({
                     index: "tags",
@@ -159,10 +161,12 @@ Database.prototype = {
                         }
                     }
                 })
-                var savedTags = results.body.hits.hits.map(x => x._id);
-                var unsavedTags = chunk.filter(tag => savedTags.indexOf(tag) == -1);
-                return total.concat(unsavedTags);
-        }, []);
+            var savedTags = results.body.hits.hits.map(x => x._id);
+            var unsavedTags = chunk.filter(tag => savedTags.indexOf(tag) == -1);
+            total = total.concat(unsavedTags);
+        }
+
+        return total;
     },
     getTagWithOldestUpdate: async function() {
         const results = await this

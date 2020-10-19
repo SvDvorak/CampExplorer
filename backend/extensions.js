@@ -1,3 +1,4 @@
+const Config = require("./config");
 
 Array.prototype.flatten = function() {
     return []
@@ -26,6 +27,8 @@ Array.prototype.chunk = function(size) {
     return arrays;
 }
 
+var config = new Config();
+
 module.exports = {
     BCtags: function(list) {
         return Object.keys(list).map(function (key) {
@@ -34,5 +37,10 @@ module.exports = {
     },
     timeout: function(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
+    },
+    debugLog: function(logFunc, message) {
+        if(config.isDebug) {
+            logFunc("DEBUG: " + message);
+        }
     }
 }

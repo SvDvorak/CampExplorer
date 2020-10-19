@@ -5,6 +5,7 @@ var Recacher = require("./re-cacher");
 var Seeder = require("./seeder");
 var TimeProvider = require("./time-provider");
 var Config = require("./config");
+const { timeout } = require("./extensions");
 
 var logFunction = function(text) { console.log(new Date().toISOString() + ": " + text) };
 var config = new Config();
@@ -12,7 +13,7 @@ var bandcamp = new BandcampApi(logFunction);
 var database = new Database();
 var updater = new CacheUpdater(bandcamp, database, logFunction);
 var recacher = new Recacher(database, updater, logFunction);
-var seeder = new Seeder(bandcamp, logFunction);
+var seeder = new Seeder(bandcamp, timeout, logFunction);
 var timeProvider = new TimeProvider();
 
 startServer();
