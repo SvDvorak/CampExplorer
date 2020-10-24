@@ -33,6 +33,7 @@ CacheUpdater.prototype = {
 			try {
 				debugLog(this.log, `Updating tag ${tag}`);
 				const albums = await albumApi.getAlbumsForTag(tag);
+				debugLog(this.log, `Retrieved ${albums.length} albums`);
 				await database.saveAlbums(tag, albums);
 				await database.saveTag(tag);
 			}

@@ -78,7 +78,7 @@ describe("Cache updater", function () {
 
 	var createGetMethodThatFailsFor = function (previousMethod, callCount) {
 		var calls = 0;
-		return tag => {
+		return async function(tag) {
 			var promise = previousMethod.bind(bandcamp)(tag);
 			if (calls < callCount) {
 				calls++;

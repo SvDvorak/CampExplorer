@@ -18,7 +18,7 @@ services:
       - '9200'
   database:
     container_name: search_database
-    image: docker.elastic.co/elasticsearch/elasticsearch:5.2.2
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.8.0
     ports:
       - '9200:9200'
     volumes:

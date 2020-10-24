@@ -76,7 +76,7 @@ statistics.controller('statisticsController', [ "$scope", "$http", function ($sc
         { header: "Requests last 24 hours", body: "", update: requestRateLastDay }];
     
     $scope.tiles.forEach(tile => tile.update());
-    $scope.tiles.forEach(tile => setInterval(() => tile.update(), 5000));
+    $scope.tiles.forEach(tile => setInterval(() => tile.update(), 60000));
 
   	$scope.addInputTag = function() {
   	    var newTag = $scope.newTag.replace(" ", "-");

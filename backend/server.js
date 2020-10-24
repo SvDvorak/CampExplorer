@@ -1,4 +1,5 @@
 var Promise = require("bluebird");
+const { debugLog } = require("./extensions");
 var WorkerThread = require("./worker-thread");
 
 var allowCrossDomain = function (req, response, next) {
@@ -57,6 +58,8 @@ module.exports = {
             }
 
             var requestedTags = request.body.slice(0, 10).map(x => x.toLowerCase());
+
+            debugLog(this.log, `User requesting albums for ${requestedTags}`);
 
             if (requestedTags.length == 0) {
                 server.sendJSONSuccess(response, []);
