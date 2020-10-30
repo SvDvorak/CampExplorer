@@ -1,5 +1,4 @@
 var Promise = require("bluebird");
-var BandcampFake = require("./bandcamp-fake");
 var DatabaseFake = require("./database-fake");
 var CacheUpdater = require("../cache-updater");
 require("./test-finished");
@@ -17,11 +16,14 @@ describe("Cache updater", function () {
 			tagAlbums: {},
 			getAlbumsForTag: function (tag) {
 				tagsRequested.push(tag);
-				return Promise.resolve(this.tagAlbums[tag]);
+				if(tag in this.tagAlbums)
+					return Promise.resolve(this.tagAlbums[tag]);
+				return Promise.resolve([]);
 			}
 		};
 		database = new DatabaseFake();
 		sut = new CacheUpdater(bandcamp, database, logText => logCalls.push(logText));
+		logCalls = [];
 	});
 
 	it("does nothing but return when tags are empty", async () => {
