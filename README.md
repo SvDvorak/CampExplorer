@@ -5,6 +5,8 @@
 # Camp Explorer
 This repository contains the code for the Camp Explorer website and Chrome extension. On Bandcamp you're only able to search for albums using a single tag but this extension enables you to search for albums with any number of matching tags.
 
+Live page: https://campexplorer.io/
+
 <p align="center">
   <img src="http://i.imgur.com/IAnsx3i.png" alt="Screenshot" />
 </p>
