@@ -50,13 +50,13 @@ describe("Worker Thread", function() {
         }, 60);
     });
 
-    it("stops work when calling stop", function(done) {
+    it("stops work thread after current iteration when calling stop", function(done) {
         sut.start();
         sut.stop();
 
         setTimeout(() => {
-            expect(worker.calls).toEqual(0);
+            expect(worker.calls).toEqual(1);
             done();
-        }, 20);
+        }, 100);
     });
 });

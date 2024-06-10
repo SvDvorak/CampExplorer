@@ -3,7 +3,7 @@ services:
   backend:
     container_name: search_service
     build: backend/.
-    command: node_modules/.bin/jasmine JASMINE_CONFIG_PATH=spec/jasmine.json
+    command: node_modules/.bin/jasmine JASMINE_CONFIG_PATH=spec/support/jasmine.json
     environment:
       NODE_ENV: development
     ports:

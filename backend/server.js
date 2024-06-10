@@ -146,7 +146,7 @@ module.exports = {
         this.requests = this.requests.filter(x => this.timeProvider.hoursSince(x) < hourLimit);
     },
 
-    stop: function () {
+    stop: async function () {
         if (this.isRunning) {
             this.isRunning = false;
             this.recacher.stop();

@@ -11,7 +11,9 @@ module.exports = {
             json: json
         };
 
-        return Promise.resolve(request(options)).then(data => JSON.parse(data));
+        return Promise
+            .resolve(request(options))
+            .then(data => JSON.parse(data));
     },
 
     getCachedTags: function() {

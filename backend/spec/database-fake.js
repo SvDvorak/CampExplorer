@@ -28,9 +28,6 @@ DatabaseFake.prototype = {
         return Promise.resolve(tags.filter(tag => savedTags.indexOf(tag) == -1));
     },
     getTagWithOldestUpdate: function() {
-        if(this.savedTags.length == 0) {
-            return Promise.reject("No tags in database");
-        }
         return Promise.resolve(this.savedTags[0]);
     },
     getAlbumsByTags: function(count, tags) {
@@ -53,17 +50,9 @@ DatabaseFake.prototype = {
     },
 
     getTagCount: function() {
-        if(this.savedTags.length == 0)
-        {
-            return Promise.reject("No tags exception");
-        }
         return Promise.resolve(this.savedTags.length);
     },
     getAlbumCount: function() {
-        if(this.savedTags.length == 0)
-        {
-            return Promise.reject("No tags exception");
-        }
         return Promise.resolve(this.saveAlbumsCalls.map(calls => calls.albums).flatten().length);
     },
 };

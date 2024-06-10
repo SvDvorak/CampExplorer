@@ -16,11 +16,11 @@ CacheUpdater.prototype = {
 			tags.filter(tag => { return updater.queue.indexOf(tag) == -1; }));
 
 		if (this.isIdle()) {
-			await updater.updateTagsRecursive();
+			await updater.updateTagsLoop();
 		}
 	},
 
-	updateTagsRecursive: async function () {
+	updateTagsLoop: async function () {
 		var updater = this;
 		var database = this.database;
 		var albumApi = this.albumApi;

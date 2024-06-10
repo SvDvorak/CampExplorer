@@ -33,7 +33,7 @@ TestServer.prototype = {
             this.noLog);
 	},
 
-	stop: function() {
-        return this.server.stop();
+	stop: async function() {
+        await this.server.stop();
 	}
 }

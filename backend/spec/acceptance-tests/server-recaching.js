@@ -8,11 +8,13 @@ describe("Recaching server", () => {
     var testServer;
     var bandcamp;
 
+    let recacheMilliseconds = 15.0;
+
     beforeEach(async () => {
         testServer = new TestServer();
         bandcamp = testServer.bandcamp;
         bandcamp.delay = 1;
-        testServer.config.recacheIntervalInSeconds = 15.0/1000.0;
+        testServer.config.recacheIntervalInSeconds = recacheMilliseconds/1000.0;
         await testServer.start();
     });
 
@@ -24,14 +26,17 @@ describe("Recaching server", () => {
         bandcamp.setAlbumsForTag("tag", [ new Album("0", "Album1") ]);
 
         await localRequest(["tag"]);
-        await timeout(40);
-        expect(bandcamp.tagsRequested.length).toBe(2);
+        let wait = 40;
+        await timeout(wait);
+        expect(bandcamp.tagsRequested.length).toBe(1 + (Math.floor(wait / recacheMilliseconds)));
     });
 
     it("stops recaching when stopping server", async () => {
         await localRequest(["tag"]);
+
         await testServer.stop();
         await timeout(70);
-        expect(bandcamp.tagsRequested.length).toBe(1);
+        // We can't easily stop the async update loop so it will finish one last update before exiting
+        expect(bandcamp.tagsRequested.length).toBe(2);
     });
 });

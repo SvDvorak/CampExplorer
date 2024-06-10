@@ -1,6 +1,7 @@
 var TestServer = require("./test-server");
 var localRequest = require("./local-request");
 var stateRequests = require("./server-state-requests");
+const { timeout } = require("../../extensions");
 var moment = require("moment");
 require("../test-finished");
 
@@ -24,6 +25,8 @@ describe("Server state", () => {
         const expectedTags = [ "funk", "rock", "ambient", "metal", "soundtrack" ];
 
     	await cacheTags(expectedTags);
+        // We async loop through all queued tags so we gotta wait a little bit for it to finish
+        await timeout(20);
         const tagCount = await stateRequests.getCachedTags();
         expect(parseInt(tagCount)).toBe(expectedTags.length);
     });
