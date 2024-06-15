@@ -34,7 +34,10 @@ tagsearch.controller('searchController', function ($scope) {
             return;
         }
 
-  	    var newTag = $scope.newTag.replace(/[, ]/g, "-");
+  	    var newTag = $scope.newTag
+            .replace("&", "")
+            .replace(/\s+/g, " ")
+            .replace(/[, ]/g, "-");
   	    $scope.addTag(newTag);
   	    $scope.newTag = null;
         $scope.updateUserSearchCount();
