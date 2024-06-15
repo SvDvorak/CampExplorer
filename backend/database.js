@@ -17,9 +17,15 @@ var createUpsertOperation = function(album) {
         { 
             script: {
                 lang: "painless",
-                source: "if(!ctx._source.tags.contains(params.new_tag)) { ctx._source.tags.add(params.new_tag); }",
+                source: `
+                    if (!ctx._source.tags.contains(params.new_tag)) {
+                        ctx._source.tags.add(params.new_tag);
+                    }
+                    ctx._source.image = params.new_image;
+                `,
                 params: {
-                    new_tag: album.tags[0]
+                    new_tag: album.tags[0],
+                    new_image: album.image
                 }
             },
             upsert: album
@@ -47,24 +53,6 @@ var tryConnection = async function(client) {
     if(!success)
         throw new Error("Unable to connect to database");
 };
-
-// var tagsearchMappings = {
-//     index: "tagsearch",
-//     body: {
-//         mappings : {
-//             albums : {
-//                 properties : {
-//                     tags : { type: "keyword", index: "not_analyzed" }
-//                 }
-//             },
-//             tags : {
-//                 properties : {
-//                     lastUpdated : { type:"date", format: "basic_date_time_no_millis" }
-//                 }
-//             }
-//         }
-//     }
-// }
 
 var albumsIndexMappings = {
     index: "albums",
