@@ -38,7 +38,7 @@ CacheUpdater.prototype = {
 				await database.saveTag(tag);
 			}
 			catch (error) {
-				updater.log("Unable to update " + tag + " because " + JSON.stringify(error));
+				updater.log(`Unable to update ${tag} because ${error}`);
 			}
 			finally {
 				updater.inProgress = undefined

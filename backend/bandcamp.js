@@ -18,7 +18,7 @@ var AlbumsRequest = function (tag, successCallback, errorCallback) {
 }
 
 Bandcamp.prototype = {
-	getAlbumsForTag: function (tag) {
+	getAlbumsForTag: async function (tag) {
 		var api = this;
 		return new Promise((resolve, reject) => api.getAlbumsForTagRecursive(new AlbumsRequest(tag, resolve, reject)));
 	},
@@ -31,11 +31,13 @@ Bandcamp.prototype = {
 			var statusCode = response != undefined ? response.statusCode : "undefined";
 
 			if (error || statusCode != 200) {
-				if (statusCode == 503 && albumsRequest.errorCount < 3) {
+				if ((statusCode == 503 || statusCode == 429) && albumsRequest.errorCount < 10) {
+					let waitTime = 1000 * (albumsRequest.errorCount + 1);
+					api.log(`Error ${statusCode} - Too many requests: Retrieving ${albumsRequest.tag} page ${albumsRequest.page} - error count ${albumsRequest.errorCount}. Will retry in ${waitTime}`)
 					albumsRequest.errorCount += 1;
 					setTimeout(
 						function () { api.getAlbumsForTagRecursive(albumsRequest); },
-						100 * albumsRequest.errorCount);
+						waitTime);
 					return;
 				}
 
@@ -61,7 +63,8 @@ Bandcamp.prototype = {
 				albumsRequest.successCallback(albumsRequest.albums);
 			}
 			else {
-				api.getAlbumsForTagRecursive(albumsRequest);
+				// A slight delay to minimize 429: Too Many Requests
+				setTimeout(function() { api.getAlbumsForTagRecursive(albumsRequest); }, 300);
 			}
 		});
 	},

@@ -6,6 +6,9 @@ const { timeout } = require("./extensions");
 
 module.exports = Database = function() {
     this.hostAddress = "http://search_database:9200";
+    this.client = new Client({
+        node: this.hostAddress
+    });
 }
 
 var createUpsertOperation = function(album) {
@@ -26,19 +29,23 @@ var createUpsertOperation = function(album) {
 
 var maxConnectionAttemptTime = 60*1000;
 
-var tryConnection = async function(client, time) {
-    if(time > maxConnectionAttemptTime) {
-        throw new Error("Unable to connect to database");
+var tryConnection = async function(client) {
+    var time = 0;
+    var success = false;
+    while(!success && time < maxConnectionAttemptTime) {
+        try {
+            await client.ping();
+            await timeout(3000); // Just to make sure indexes are up and ready
+            success = true;
+        }
+        catch(error) {
+            await timeout(1500);
+            time += 1000;
+        }
     }
 
-    try {
-        await client.ping();
-        await timeout(3000); // Just to make sure indexes are up and ready
-    }
-    catch(error) {
-        await timeout(1500);
-        await tryConnection(client, time + 1000);
-    }
+    if(!success)
+        throw new Error("Unable to connect to database");
 };
 
 // var tagsearchMappings = {
@@ -82,46 +89,34 @@ var tagsIndexMappings = {
 }
 
 Database.prototype = {
-    createClient: function() {
-        return new Client({
-            node: this.hostAddress
-        })
-    },
     waitForConnection: async function() {
         var client = new Client({
             node: this.hostAddress,
             log: []
         });
-        //return new Promise((resolve, reject) => reject());
-        // return await client.ping({}, { requestTimeout: maxConnectionAttemptTime });
-            // .catch(() => {
-            //     new Error("Unable to connect to database");
-            // });
-        await tryConnection(client, 0);
+        await tryConnection(client);
     },
     createIfNeeded: async function() {
-        var client = this.createClient();
-        const { body: albumsIndexExists } = await client.indices.exists({ index: "albums" });
-        const { body: tagsIndexExists } = await client.indices.exists({ index: "tags" });
+        const { body: albumsIndexExists } = await this.client.indices.exists({ index: "albums" });
+        const { body: tagsIndexExists } = await this.client.indices.exists({ index: "tags" });
 
         if(albumsIndexExists && tagsIndexExists)
             return "Index already exists, no need to create";
 
         let message = "";
         if(!albumsIndexExists){
-            await client.indices.create(albumsIndexMappings);
+            await this.client.indices.create(albumsIndexMappings);
             message += "Albums index does not exist, creating mappings. ";
         }
         if(!tagsIndexExists){
-            await client.indices.create(tagsIndexMappings);
+            await this.client.indices.create(tagsIndexMappings);
             message += "Tags index does not exist, creating mappings. ";
         }
 
         return message;
     },
     saveTag: async function(tag) {
-        await this
-            .createClient()
+        await this.client
             .index({
                 index: "tags",
                 id: tag,
@@ -137,7 +132,7 @@ Database.prototype = {
 
         albums.forEach(album => { album.tags = [ tag ]});
 
-        await this.createClient()
+        await this.client
             .bulk({
                 index: "albums",
                 body: albums.map(album => createUpsertOperation(album)).flatten()
@@ -146,10 +141,8 @@ Database.prototype = {
     getUnsavedTags: async function(tags) {
         var chunkedTags = tags.chunk(2);
         var total = [];
-        db = this;
         for(const chunk of chunkedTags) {
-            const results = await db
-                .createClient()
+            const results = await this.client
                 .search({
                     index: "tags",
                     size: chunk.length,
@@ -169,8 +162,7 @@ Database.prototype = {
         return total;
     },
     getTagWithOldestUpdate: async function() {
-        const results = await this
-            .createClient()
+        const results = await this.client
             .search({
                 index: "tags",
                 body: {
@@ -190,8 +182,7 @@ Database.prototype = {
         var terms = tags.map(tag => {
             return { term: { tags: tag } }
         });
-        const results = await this
-            .createClient()
+        const results = await this.client
             .search({
                 index: "albums",
                 body: {
@@ -206,16 +197,14 @@ Database.prototype = {
         return results.body.hits.hits.map(x => x._source);
     },
     getTagCount: async function() {
-        const { body } = await this
-            .createClient()
+        const { body } = await this.client
             .count({
                 index: "tags",
             })
         return body.count;
     },
     getAlbumCount: async function() {
-        const { body } = await this
-            .createClient()
+        const { body } = await this.client
             .count({
                 index: "albums",
             });
