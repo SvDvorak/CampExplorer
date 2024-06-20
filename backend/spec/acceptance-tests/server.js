@@ -1,8 +1,7 @@
 var TestServer = require("./test-server");
-var Album = require("../../api-types");
-var localRequest = require("./local-request");
+var Album = require("../../album-type");
+const { localRequest, failRequest, localCacheRequest } = require("./local-request");
 var generateAlbums = require("../generate-albums");
-require("../test-finished");
 
 describe("Server with cache", () => {
     var testServer;
@@ -31,7 +30,7 @@ describe("Server with cache", () => {
 
         bandcamp.setAlbumsForTag("tag", [ album ]);
 
-        await localRequest(["tag"]);
+        await localCacheRequest([ "tag" ]);
         const albums = await localRequest([ "tag" ]);
 
         expect(albums.length).toBe(1);
@@ -44,7 +43,7 @@ describe("Server with cache", () => {
         expect(singleAlbum.bandId).toBe("123456789");
     });
 
-    it("returns albums with all requested tags", async () => {
+    it("returns albums with tag when including tags", async () => {
         bandcamp.setAlbumsForTag("tag1", [
             linkOnlyAlbum("AllTagsAlbum"),
             linkOnlyAlbum("SingleTagAlbum")
@@ -54,23 +53,40 @@ describe("Server with cache", () => {
             linkOnlyAlbum("AllTagsAlbum"),
             ]);
 
-        await localRequest(["tag1", "tag2"])
+        await localCacheRequest([ "tag1", "tag2" ]);
         const albums = await localRequest([ "tag1", "tag2" ]);
 
         expect(albums.length).toBe(1);
         expect(albums[0].link).toBe("AllTagsAlbum");
     });
 
+    it("returns albums not with tag when excluding tags", async () => {
+        bandcamp.setAlbumsForTag("tag1", [
+            linkOnlyAlbum("AllTagsAlbum"),
+            linkOnlyAlbum("SingleTagAlbum")
+            ]);
+
+        bandcamp.setAlbumsForTag("tag2", [
+            linkOnlyAlbum("AllTagsAlbum"),
+            ]);
+
+        await localCacheRequest([ "tag1", "tag2" ])
+        const albums = await localRequest([ "tag1" ], [ "tag2" ]);
+
+        expect(albums.length).toBe(1);
+        expect(albums[0].link).toBe("SingleTagAlbum");
+    });
+
     it("returns tags format incorrect when tags malformed", async () => {
         bandcamp.setAlbumsForTag("tag", [ linkOnlyAlbum("Album") ]);
 
         try {
-            await localRequest();
+            await failRequest();
             throw "Request with malformed data should not return successfully";
         }
         catch(e) {
             expect(e.statusCode).toBe(400);
-            expect(JSON.parse(e.error).error).toBe("Unable to parse request data");
+            expect(e.error.error).toBe("Unable to parse request data");
         }
     });
 

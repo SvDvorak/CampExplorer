@@ -1,7 +1,6 @@
 var Promise = require("bluebird");
 var DatabaseFake = require("./database-fake");
 var CacheUpdater = require("../cache-updater");
-require("./test-finished");
 
 describe("Cache updater", function () {
 	var bandcamp;

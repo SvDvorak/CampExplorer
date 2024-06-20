@@ -167,16 +167,25 @@ Database.prototype = {
         return results.body.hits.hits.map(x => x._id)[0]
     },
     getAlbumsByTags: async function(count, tags) {
-        var terms = tags.map(tag => {
-            return { term: { tags: tag } }
+        var includeTerms = [];
+        var excludeTerms = [];
+
+        tags.forEach(tag => {
+            if (tag.operation === "include") {
+                includeTerms.push({ term: { tags: tag.name } });
+            }
+            else if (tag.operation === "exclude") {
+                excludeTerms.push({ term: { tags: tag.name } });
+            }
         });
-        const results = await this.client
-            .search({
+
+        const results = await this.client.search({
                 index: "albums",
                 body: {
                     query: {
                         bool: {
-                            must: terms
+                            must: includeTerms,
+                            must_not: excludeTerms
                         }
                     },
                     size: count

@@ -1,9 +1,8 @@
 var TestServer = require("./test-server");
-var localRequest = require("./local-request");
+const { localRequest } = require("./local-request");
 var stateRequests = require("./server-state-requests");
 const { timeout } = require("../../extensions");
 var moment = require("moment");
-require("../test-finished");
 
 describe("Server state", () => {
     var testServer;

@@ -1,8 +1,7 @@
 var TestServer = require("./test-server");
-var Album = require("../../api-types");
-var localRequest = require("./local-request");
+var Album = require("../../album-type");
+const { localRequest } = require("./local-request");
 const { timeout } = require("../../extensions");
-require("../test-finished");
 
 describe("Recaching server", () => {
     var testServer;
@@ -28,7 +27,7 @@ describe("Recaching server", () => {
         await localRequest(["tag"]);
         let wait = 40;
         await timeout(wait);
-        expect(bandcamp.tagsRequested.length).toBe(1 + (Math.floor(wait / recacheMilliseconds)));
+        expect(bandcamp.tagsRequested.length).toBe(Math.floor(wait / recacheMilliseconds));
     });
 
     it("stops recaching when stopping server", async () => {

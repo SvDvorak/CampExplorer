@@ -1,8 +1,7 @@
 var TestServer = require("./test-server");
 var PopAlbums = require("./albums-pop");
 var RockAlbums = require("./albums-rock");
-var localRequest = require("./local-request");
-require("../test-finished");
+const { localRequest, localCacheRequest } = require("./local-request");
 
 describe("Server performance", () => {
     var testServer;
@@ -27,7 +26,7 @@ describe("Server performance", () => {
         var maxCallTime = 100;
 
         // Cache them once first
-    	await localRequest([ "pop", "rock" ]);
+    	await localCacheRequest([ "pop", "rock" ]);
         startTime = new Date();
         const albums = await localRequest([ "pop", "rock" ]);
         expect(albums.length).toBe(expectedResultCount)

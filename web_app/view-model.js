@@ -7,7 +7,8 @@ var tagsearch = angular.module('tagsearch', ['tw.directives.clickOutside'])
     }
 ]);
 
-function Tag(name) {
+function InputTag(operation, name) {
+    this.operation = operation;
     this.name = name;
     this.isCaching = false;
 }
@@ -25,39 +26,29 @@ tagsearch.controller('searchController', function ($scope) {
     $scope.showVersionChangesQuestion = false;
 
     $scope.userSearchCount = 0;
-    $scope.canShowReviewSuggestion = true;
-    $scope.showReviewSuggestionNow = false;
-    $scope.reviewSuggestionSearchCount = 50;
 
-  	$scope.addInputTag = function() {
+  	$scope.includeTag = function() {
+        $scope.addInputTag(new InputTag("include", $scope.newTag));
+   	};
+
+  	$scope.excludeTag = function() {
+        $scope.addInputTag(new InputTag("exclude", $scope.newTag));
+   	};
+
+    $scope.addInputTag = function(inputTag) {
         if($scope.tags.length >= 10) {
             return;
         }
 
-  	    var newTag = $scope.newTag
+  	    inputTag.name = inputTag.name
             .replace("&", "")
             .replace(/\s+/g, " ")
             .replace(/[, ]/g, "-");
-  	    $scope.addTag(newTag);
-  	    $scope.newTag = null;
-        $scope.updateUserSearchCount();
-   	};
-
-   	$scope.addTag = function(tag) {
-  	    if($scope.tags.map(x => x.name).indexOf(tag) == -1) {
-    	      $scope.tags.push(new Tag(tag));
+  	    if($scope.tags.map(x => x.name).indexOf(inputTag.name) == -1) {
+    	      $scope.tags.push(inputTag);
     	      $scope.searchTags();
   	    }
-  	};
-
-    $scope.updateUserSearchCount = function() {
-        $scope.userSearchCount += 1;
-
-        if($scope.canShowReviewSuggestion &&
-          $scope.userSearchCount % $scope.reviewSuggestionSearchCount == 0)
-        {
-            $scope.showReviewSuggestionNow = true;
-        }
+  	    $scope.newTag = null;
     };
 
    	$scope.removeTag = function(tag) {
@@ -73,7 +64,8 @@ tagsearch.controller('searchController', function ($scope) {
         var requestId = $scope.latestRequestId;
 
         $scope.isSearching = true;
-		$scope.makeRequest($scope.tags.map(x => x.name), requestId, function(albums) {
+        console.log($scope.tags);
+		$scope.makeRequest($scope.tags.map(x => ({ operation: x.operation, name: x.name })), requestId, function(albums) {
             $scope.$apply(() => {
                 $scope.albums = albums;
                 $scope.isCachingTags = false;
@@ -84,6 +76,7 @@ tagsearch.controller('searchController', function ($scope) {
   	};
 
   	$scope.makeRequest = function(tags, requestId, onDone) {
+        console.log(tags);
         var retryCall = () => {
             setTimeout(() => {
                 $scope.makeRequest(tags, requestId, onDone);

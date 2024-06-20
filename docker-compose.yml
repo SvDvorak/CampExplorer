@@ -8,6 +8,8 @@ services:
       - '80:80'
     depends_on:
       - backend
+    volumes:
+      - ./web_app:/var/www/web_app
   backend:
     container_name: search_service
     build: backend/.

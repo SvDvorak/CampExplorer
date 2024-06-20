@@ -21,11 +21,14 @@
       <div>
         <form class="input">
           <input class="input_tag" type="text" ng-model="newTag" placeholder="Tag..." />
-          <input class="input_add" type="submit" ng-click="addInputTag()" value="Add" />
+          <input class="input_add" type="submit" ng-click="includeTag()" value="+" />
+          <input class="input_add" type="submit" ng-click="excludeTag()" value="-" />
         </form>
       </div>
       <ul class="tags">
         <li class="tag" ng-repeat="tag in tags">
+          <span class="tag_included" ng-show="tag.operation == 'include'">+</span>
+          <span class="tag_excluded" ng-show="tag.operation == 'exclude'">-</span>
           <a href="https://bandcamp.com/tag/{{ tag.name }}" target="_blank" class="tag_name">{{ tag.name }}</a>
           <span class="tag_caching" ng-show="tag.isCaching">- not cached</span>
           <span class="tag_remove" ng-click="removeTag(tag)">X</span>

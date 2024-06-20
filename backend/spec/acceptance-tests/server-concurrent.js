@@ -1,8 +1,7 @@
 var TestServer = require("./test-server");
-var Album = require("../../api-types");
-var localRequest = require("./local-request");
+var Album = require("../../album-type");
+const { localRequest, localCacheRequest } = require("./local-request");
 const { timeout } = require("../../extensions");
-require("../test-finished");
 
 describe("Concurrent tag caching server", () => {
     var testServer;
@@ -56,7 +55,7 @@ describe("Concurrent tag caching server", () => {
         bandcamp.setTagsForAlbum(album1, [ "tag_sub1" ]);
 
         await testServer.start();
-        await localRequest(["tag_sub1"]); // Cache once first
+        await localCacheRequest(["tag_sub1"]);
         const albums = await localRequest(["tag_sub1"]);
         expect(albums.length).toBe(1);
         expect(albums[0].name).toEqual(album2.name);

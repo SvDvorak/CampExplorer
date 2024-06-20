@@ -1,5 +1,6 @@
 var Promise = require("bluebird");
 const { debugLog } = require("./extensions");
+var TagCriteria = require("./tag-criteria");
 var WorkerThread = require("./worker-thread");
 
 var allowCrossDomain = function (req, response, next) {
@@ -57,17 +58,19 @@ module.exports = {
                 return;
             }
 
-            var requestedTags = request.body.slice(0, 10).map(x => x.toLowerCase());
+            var tagCriterias = request.body
+                .slice(0, 10)
+                .map(x => new TagCriteria(x.operation, x.name.toLowerCase()));
 
-            debugLog(this.log, `User requesting albums for ${requestedTags}`);
+            debugLog(this.log, `User requesting albums for ${tagCriterias}`);
 
-            if (requestedTags.length == 0) {
+            if (tagCriterias.length == 0) {
                 server.sendJSONSuccess(response, []);
                 return;
             }
 
             try {
-                await server.sendAlbumsForLoadedTags(response, requestedTags);
+                await server.sendAlbumsForLoadedTags(response, tagCriterias);
             }
             catch(error) {
                 server.log(error);
@@ -117,7 +120,7 @@ module.exports = {
     },
 
     sendAlbumsForLoadedTags: async function(response, requestedTags) {
-        const unsavedTags = await this.database.getUnsavedTags(requestedTags);
+        const unsavedTags = await this.database.getUnsavedTags(requestedTags.map(x => x.name));
         if (unsavedTags.length > 0) {
             await this.sendTagsNotLoaded(response, unsavedTags);
         }

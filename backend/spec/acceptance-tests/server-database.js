@@ -1,6 +1,5 @@
 var TestServer = require("./test-server");
 const { timeout } = require("../../extensions");
-require("../test-finished");
 
 describe("Server using database", () => {
     var testServer;

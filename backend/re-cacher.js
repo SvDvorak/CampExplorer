@@ -1,4 +1,3 @@
-var Promise = require("bluebird");
 
 module.exports = Recacher = function(database, updater, log) {
 	this.database = database;

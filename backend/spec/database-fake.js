@@ -25,25 +25,32 @@ DatabaseFake.prototype = {
     },
     getUnsavedTags: function(tags) {
         savedTags = this.savedTags;
-        return Promise.resolve(tags.filter(tag => savedTags.indexOf(tag) == -1));
+        return Promise.resolve(tags.filter(tag => savedTags.indexOf(tag) == -1).map(x => x));
     },
     getTagWithOldestUpdate: function() {
         return Promise.resolve(this.savedTags[0]);
     },
     getAlbumsByTags: function(count, tags) {
         this.getAlbumsCalls.push({ tags: tags });
-        databaseFake = this;
+        var included = this.getAllByTags(tags.filter(x => x.operation == "include"));
+        var excluded = this.getAllByTags(tags.filter(x => x.operation == "exclude"));
+
         return Promise.resolve(
-            BCtags(tags
+            included.filter(x => !excluded.some(y => x.link === y.link))
+            .slice(0, count));
+    },
+    getAllByTags: function(tags) {
+        databaseFake = this;
+        return BCtags(tags
             .map(tag => databaseFake.getAlbumsByTag(tag) || [])
             .flatten()
             .BCgroup("link"))
             .filter(x => x.length == tags.length)
-            .map(x => x[0])
-            .slice(0, count));
+            .map(x => x[0]);
     },
     getAlbumsByTag: function(tag) {
-        var filtered = this.saveAlbumsCalls.filter(call => call.tag == tag);
+        var filtered = this.saveAlbumsCalls.filter(call => call.tag == tag.name);
+
         if(filtered.length > 0)
             return filtered[0].albums;
         return [];

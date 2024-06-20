@@ -1,7 +1,6 @@
 var Seeder = require("../seeder");
 var BandcampFake = require("./bandcamp-fake");
 var generateAlbums = require("./generate-albums");
-require("./test-finished");
 
 describe("Seeder", () => {
 

@@ -10,8 +10,8 @@ var Config = require("./config");
 
 module.exports = TestServer = function() {
     this.server = require(sourceFolder + "server");
-    this.noLog = text => { };
-    this.noTimeout = async time => { };
+    this.noLog = _ => { };
+    this.noTimeout = async _ => { };
     this.config = new Config();
     this.bandcamp = new BandcampFake(this.noLog);
     this.database = new DatabaseFake();

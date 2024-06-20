@@ -77,11 +77,4 @@ statistics.controller('statisticsController', [ "$scope", "$http", function ($sc
     
     $scope.tiles.forEach(tile => tile.update());
     $scope.tiles.forEach(tile => setInterval(() => tile.update(), 60000));
-
-  	$scope.addInputTag = function() {
-  	    var newTag = $scope.newTag.replace(" ", "-");
-  	    $scope.addTag(newTag);
-  	    $scope.newTag = null;
-        $scope.updateUserSearchCount();
-   	};
 }]);
