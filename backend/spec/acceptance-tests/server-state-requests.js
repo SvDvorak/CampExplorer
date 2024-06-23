@@ -20,16 +20,20 @@ module.exports = {
         return this.createRequest("GET", "tagcount");
     },
 
-    getQueuedTags: function() {
-        return this.createRequest("GET", "tagsinqueue");
+    getQueuedOperations: function() {
+        return this.createRequest("GET", "operationsinqueue");
     },
 
-    getCurrentlyCachingTag: function() {
-        return this.createRequest("GET", "currentlycachingtag");
+    getCurrentlyCaching: function() {
+        return this.createRequest("GET", "currentlycaching");
     },
 
     getAlbumCount: function() {
         return this.createRequest("GET", "albumcount");
+    },
+
+    getAlbumCountWithoutUpdatedTags: function() {
+        return this.createRequest("GET", "albumsWithoutUpdatedTags");
     },
 
     getRequestRate: function(numberOfHours) {

@@ -1,7 +1,8 @@
 var BandcampApi = require("./bandcamp");
 var Database = require("./database");
 var CacheUpdater = require("./cache-updater");
-var Recacher = require("./re-cacher");
+var TagRecacher = require("./tag-re-cacher");
+var AlbumRecacher = require("./album-re-cacher");
 var Seeder = require("./seeder");
 var TimeProvider = require("./time-provider");
 var Config = require("./config");
@@ -12,7 +13,8 @@ var config = new Config();
 var bandcamp = new BandcampApi(logFunction);
 var database = new Database();
 var updater = new CacheUpdater(bandcamp, database, logFunction);
-var recacher = new Recacher(database, updater, logFunction);
+var tagRecacher = new TagRecacher(database, updater, logFunction);
+var albumRecacher = new AlbumRecacher(database, updater, logFunction);
 var seeder = new Seeder(bandcamp, timeout, logFunction);
 var timeProvider = new TimeProvider();
 
@@ -25,7 +27,8 @@ async function startServer() {
 				config,
 				database,
 				updater,
-				recacher,
+				albumRecacher,
+				tagRecacher,
 				seeder,
 				timeProvider,
 				logFunction);

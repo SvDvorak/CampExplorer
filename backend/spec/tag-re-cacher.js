@@ -1,7 +1,7 @@
-var Recacher = require("../re-cacher");
+var Recacher = require("../tag-re-cacher");
 var DatabaseFake = require("./database-fake");
 
-describe("Recacher", function() {
+describe("Tag recacher", function() {
     var database;
     var updater;
     var sut;
@@ -11,9 +11,8 @@ describe("Recacher", function() {
         updater = {
             calledUpdates: [],
             queue: [],
-            updateTags: function(tags, callback) {
+            updateTags: async function(tags) {
                 this.calledUpdates = this.calledUpdates.concat(tags);
-                callback();
             },
             isIdle: function() { return this.queue.length == 0; }
         };
@@ -24,12 +23,12 @@ describe("Recacher", function() {
 
     var execute = async function() { await sut.execute(); }
 
-    var expectUpdateCallCountToBe = async (callCount) => {
-        return () => expect(updater.calledUpdates.length).toEqual(callCount);
+    var expectUpdateCallCountToBe = async function(callCount) {
+        expect(updater.calledUpdates.length).toEqual(callCount);
     };
     
-    var expectUpdateTagsToBe = async (tags) => {
-        return () => expect(updater.calledUpdates).toEqual(tags);
+    var expectUpdateTagsToBe = async function(tags) {
+        expect(updater.calledUpdates).toEqual(tags);
     };
 
     it("does nothing if no tags exist in database", async () => {

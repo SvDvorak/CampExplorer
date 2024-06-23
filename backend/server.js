@@ -15,12 +15,13 @@ module.exports = {
     listenerApp: {},
     recacher: {},
 
-    start: async function (config, database, updater, recacher, seeder, timeProvider, log) {
+    start: async function (config, database, updater, albumRecacher, tagRecacher, seeder, timeProvider, log) {
         var server = this;
         this.config = config;
         this.database = database;
         this.updater = updater;
-        this.recacher = new WorkerThread(recacher, config.recacheIntervalInSeconds * 1000);
+        this.tagRecacher = new WorkerThread(tagRecacher, config.tagRecacheIntervalInSeconds * 1000);
+        this.albumRecacher = new WorkerThread(albumRecacher, config.albumRecacheIntervalInSeconds * 1000);
         this.timeProvider = timeProvider;
         this.log = log;
         this.requests = [];
@@ -89,17 +90,24 @@ module.exports = {
             }
         });
 
-        app.get("/admin/tagsinqueue", async (request, response) => {
+        app.get("/admin/operationsinqueue", async (request, response) => {
             server.sendJSONSuccess(response, server.updater.queueLength());
         });
 
-        app.get("/admin/currentlycachingtag", async (request, response) => {
-            server.sendJSONSuccess(response, server.updater.currentlyCachingTag());
+        app.get("/admin/currentlycaching", async (request, response) => {
+            server.sendJSONSuccess(response, server.updater.currentlyCaching());
         });
 
         app.get("/admin/albumcount", async (request, response) => {
             server.database
                 .getAlbumCount()
+                .then(albumCount => server.sendJSONSuccess(response, albumCount))
+                .catch(e => server.sendJSONSuccess(response, 0));
+        });
+
+        app.get("/admin/albumsWithoutUpdatedTags", async (request, response) => {
+            server.database
+                .getAlbumCountWithoutUpdatedTags()
                 .then(albumCount => server.sendJSONSuccess(response, albumCount))
                 .catch(e => server.sendJSONSuccess(response, 0));
         });
@@ -113,7 +121,8 @@ module.exports = {
 
         return new Promise((resolve, reject) => {
             server.listenerApp = app.listen(this.config.port, function () {
-                server.recacher.start();
+                server.tagRecacher.start();
+                server.albumRecacher.start();
                 resolve();
             });
         });
@@ -152,7 +161,8 @@ module.exports = {
     stop: async function () {
         if (this.isRunning) {
             this.isRunning = false;
-            this.recacher.stop();
+            this.tagRecacher.stop();
+            this.albumRecacher.stop();
             var server = this;
             return new Promise((resolve, reject) => {
                 server.listenerApp.close(resolve);

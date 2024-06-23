@@ -1,4 +1,3 @@
-var Config = require("./config");
 const { Client } = require('@elastic/elasticsearch');
 var moment = require('moment');
 require("./extensions");
@@ -18,14 +17,24 @@ var createUpsertOperation = function(album) {
             script: {
                 lang: "painless",
                 source: `
-                    if (!ctx._source.tags.contains(params.new_tag)) {
-                        ctx._source.tags.add(params.new_tag);
+                    if (ctx._source.tags == null) {
+                        ctx._source.tags = params.new_tags;
+                    } else {
+                        for (tag in params.new_tags) {
+                            if (!ctx._source.tags.contains(tag)) {
+                                ctx._source.tags.add(tag);
+                            }
+                        }
                     }
                     ctx._source.image = params.new_image;
+                    if(ctx._source.hasTagsBeenUpdated == false) {
+                        ctx._source.hasTagsBeenUpdated = params.new_hasTagsBeenUpdated;
+                    }
                 `,
                 params: {
-                    new_tag: album.tags[0],
-                    new_image: album.image
+                    new_tags: album.tags,
+                    new_image: album.image,
+                    new_hasTagsBeenUpdated: album.hasTagsBeenUpdated
                 }
             },
             upsert: album
@@ -59,7 +68,8 @@ var albumsIndexMappings = {
     body: {
         mappings : {
             properties : {
-                tags : { type: "keyword", index: true }
+                tags : { type: "keyword", index: true },
+                hasTagsBeenUpdated : { type: "boolean" }
             }
         }
     }
@@ -104,27 +114,41 @@ Database.prototype = {
         return message;
     },
     saveTag: async function(tag) {
-        await this.client
-            .index({
-                index: "tags",
-                id: tag,
-                body: {
-                    lastUpdated: moment().format("YYYYMMDDTHHmmssZ")
-                }
-            });
+        await this.saveTags([tag]);
     },
-    saveAlbums: async function(tag, albums) {
+    saveTags: async function(tags) {
+        const saveTagOperations = tags.map(tag => [
+            { index: { _index: "tags", _id: tag } },
+            { lastUpdated: moment().format("YYYYMMDDTHHmmssZ") }
+        ]).flatten();
+
+        await this.client.bulk({ body: saveTagOperations });
+    },
+    saveTagAlbums: async function(tag, albums) {
         if(albums.length == 0) {
             return;
         }
 
         albums.forEach(album => { album.tags = [ tag ]});
 
-        await this.client
-            .bulk({
-                index: "albums",
-                body: albums.map(album => createUpsertOperation(album)).flatten()
-            });
+        await this.client.bulk({
+            index: "albums",
+            body: albums.map(album => createUpsertOperation(album)).flatten()
+        });
+    },
+    saveAlbum: async function(album, tags) {
+        if (!album) {
+            return;
+        }
+
+        album.tags = tags;
+
+        await this.client.bulk({
+            index: "albums",
+            // We want changes to persist immediately, as we'll be getting album without updated tags very shortly again
+            refresh: 'true',
+            body: createUpsertOperation(album).flatten()
+        });
     },
     getUnsavedTags: async function(tags) {
         var chunkedTags = tags.chunk(2);
@@ -193,6 +217,25 @@ Database.prototype = {
             });
         return results.body.hits.hits.map(x => x._source);
     },
+    getAlbumWithoutUpdatedTags: async function() {
+        const results = await this.client.search({
+            index: "albums",
+            body: {
+                query: {
+                    term: {
+                        hasTagsBeenUpdated: false
+                    }
+                },
+                size: 1 // Limit the result to 1 album
+            }
+        });
+
+        if (results.body.hits.hits.length > 0) {
+            return results.body.hits.hits[0]._source;
+        } else {
+            return null;
+        }
+    },
     getTagCount: async function() {
         const { body } = await this.client
             .count({
@@ -204,6 +247,20 @@ Database.prototype = {
         const { body } = await this.client
             .count({
                 index: "albums",
+            });
+        return body.count;
+    },
+    getAlbumCountWithoutUpdatedTags: async function() {
+        const { body } = await this.client
+            .count({
+                index: "albums",
+                body: {
+                    query: {
+                        term: {
+                            hasTagsBeenUpdated: false
+                        }
+                    }
+                }
             });
         return body.count;
     }

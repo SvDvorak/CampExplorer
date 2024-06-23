@@ -4,7 +4,8 @@ const { BCtags } = require("../extensions");
 module.exports = DatabaseFake = function() {
     this.savedTags = [];
     this.getAlbumsCalls = [];
-    this.saveAlbumsCalls = [];
+    this.saveTagAlbumsCalls = [];
+    this.saveAlbumCalls = [];
     this.connectionPromise = Promise.resolve();
 }
 
@@ -19,8 +20,16 @@ DatabaseFake.prototype = {
         this.savedTags.push(tag);
         return Promise.resolve();
     },
-    saveAlbums: function(tag, albums) {
-        this.saveAlbumsCalls.push({ tag: tag, albums: albums });
+    saveTags: function(tags) {
+        this.savedTags = this.savedTags.concat(tags);
+        return Promise.resolve();
+    },
+    saveTagAlbums: function(tag, albums) {
+        this.saveTagAlbumsCalls.push({ tag: tag, albums: albums });
+        return Promise.resolve();
+    },
+    saveAlbum: function(album, tags) {
+        this.saveAlbumCalls.push({ album: album, tags: tags });
         return Promise.resolve();
     },
     getUnsavedTags: function(tags) {
@@ -49,17 +58,25 @@ DatabaseFake.prototype = {
             .map(x => x[0]);
     },
     getAlbumsByTag: function(tag) {
-        var filtered = this.saveAlbumsCalls.filter(call => call.tag == tag.name);
+        var filtered = this.saveTagAlbumsCalls.filter(call => call.tag == tag.name);
 
         if(filtered.length > 0)
             return filtered[0].albums;
         return [];
     },
-
+    getAlbumWithoutUpdatedTags: function() {
+        return Promise.resolve(this.saveTagAlbumsCalls[0].albums[0]);
+    },
     getTagCount: function() {
         return Promise.resolve(this.savedTags.length);
     },
     getAlbumCount: function() {
-        return Promise.resolve(this.saveAlbumsCalls.map(calls => calls.albums).flatten().length);
+        return Promise.resolve(this.saveTagAlbumsCalls.map(calls => calls.albums).flatten().length);
     },
+    getAlbumCountWithoutUpdatedTags: async function() {
+        return Promise.resolve(this.saveTagAlbumsCalls
+            .map(calls => calls.albums)
+            .flatten()
+            .filter(x => !x.hasTagsBeenUpdated).length);
+    }
 };

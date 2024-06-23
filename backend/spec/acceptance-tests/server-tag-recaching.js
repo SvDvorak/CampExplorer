@@ -3,7 +3,7 @@ var Album = require("../../album-type");
 const { localRequest } = require("./local-request");
 const { timeout } = require("../../extensions");
 
-describe("Recaching server", () => {
+describe("Tag recaching server", () => {
     var testServer;
     var bandcamp;
 
@@ -13,7 +13,8 @@ describe("Recaching server", () => {
         testServer = new TestServer();
         bandcamp = testServer.bandcamp;
         bandcamp.delay = 1;
-        testServer.config.recacheIntervalInSeconds = recacheMilliseconds/1000.0;
+        testServer.config.tagRecacheIntervalInSeconds = recacheMilliseconds/1000.0;
+        testServer.config.albumRecacheIntervalInSeconds = 99999;
         await testServer.start();
     });
 

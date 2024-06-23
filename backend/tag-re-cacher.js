@@ -1,12 +1,11 @@
 
-module.exports = Recacher = function(database, updater, log) {
+module.exports = TagRecacher = function(database, updater, log) {
 	this.database = database;
 	this.updater = updater;
-	this.tagIndex = 0;
 	this.log = log;
 };
 
-Recacher.prototype = {
+TagRecacher.prototype = {
 	execute: async function() {
 		if(!this.updater.isIdle()) {
 			return;
@@ -14,7 +13,9 @@ Recacher.prototype = {
 
 		try {
 			const tag = await this.database.getTagWithOldestUpdate();
-			await this.updater.updateTags([ tag ]);
+			if(tag != undefined) {
+				await this.updater.updateTags([ tag ]);
+			}
 		}
 		catch(e) {
 				this.log("Failed recaching because " + e);

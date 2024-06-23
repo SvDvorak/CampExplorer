@@ -38,16 +38,20 @@ statistics.controller('statisticsController', [ "$scope", "$http", function ($sc
         adminServiceGet(this, "tagcount");
     }
 
-    var tagsInQueue = function() {
-        adminServiceGet(this, "tagsinqueue");
+    var operationsInQueue = function() {
+        adminServiceGet(this, "operationsinqueue");
     }
 
     var currentlyCaching = function() {
-        adminServiceGet(this, "currentlycachingtag");
+        adminServiceGet(this, "currentlycaching");
     }
 
     var numberOfAlbums = function() {
         adminServiceGet(this, "albumcount");
+    }
+
+    var albumsWithoutUpdatedTags = function() {
+        adminServiceGet(this, "albumsWithoutUpdatedTags");
     }
 
     var requestRateLastHour = function() {
@@ -69,9 +73,10 @@ statistics.controller('statisticsController', [ "$scope", "$http", function ($sc
     $scope.tiles = [
         { header: "Server status", body: "Online and ready =D", update: serverStatus },
         { header: "Cached tags", body: 0, update: cachedTagsFunc },
-        { header: "Tags in queue", body: 0, update: tagsInQueue },
+        { header: "Operations in queue", body: 0, update: operationsInQueue },
         { header: "Currently caching", body: "", update: currentlyCaching },
         { header: "Number of albums", body: "", update: numberOfAlbums },
+        { header: "Not updated albums", body: "", update: albumsWithoutUpdatedTags },
         { header: "Requests last hour", body: "", update: requestRateLastHour },
         { header: "Requests last 24 hours", body: "", update: requestRateLastDay }];
     

@@ -2,6 +2,7 @@ module.exports = BandcampFake = function(log) {
     this.albums = [];
     this.tags = [];
     this.tagsRequested = [];
+    this.albumsRequested = [];
     this.inProgress = [];
     this.delay = 0;
 }
@@ -13,9 +14,7 @@ BandcampFake.prototype = {
 
         return new Promise((resolve, reject) => {
             if(this.delay > 0) {
-                setTimeout(function() {
-                    resolve(albums);
-                }, this.delay);
+                setTimeout(function() { resolve(albums); }, this.delay);
             }
             else {
                 resolve(albums);
@@ -28,6 +27,8 @@ BandcampFake.prototype = {
     },
 
     getTagsForAlbum: async function (album) {
+        this.albumsRequested.push(album);
+
         var tags = this.tags[album.name] || [];
         return new Promise((resolve, reject) => {
             if(this.delay > 0) {

@@ -55,7 +55,7 @@ AlbumsRequest.prototype = {
 	tooManyRequestsMessage: function() {
 		return `Retrieving albums for ${this.tag} on page ${this.page}`;
 	},
-	retrievalFailed: function(error, statusCode) {
+	retrievalFailed: function(error, statusCode, data) {
 		this.reject(new Error(
 			"Album retrieval failed on page " + this.page +
 			"\nStatuscode: " + statusCode +
@@ -65,6 +65,7 @@ AlbumsRequest.prototype = {
 
 var TagsRequest = function(album, resolve, reject) {
 	this.album = album;
+	this.errorCount = 0;
 	this.isDone = false;
 	this.resolve = resolve;
 	this.reject = reject;
@@ -82,11 +83,17 @@ TagsRequest.prototype = {
 	tooManyRequestsMessage: function() {
 		return `Retrieving tags for ${this.album.artist} with album ${this.album.name}`;
 	},
-	retrievalFailed: function(error, statusCode) {
+	retrievalFailed: function(error, statusCode, data) {
+		if(data != null && data.error == true && data.error_message.startsWith("No such tralbum")) {
+			this.reject(new Error("Album has been deleted"))
+			return;
+		}
+
 		this.reject(new Error(
-			"Tags retrieval failed for " + album +
+			"Tags retrieval failed for " + JSON.stringify(this.album) +
 			"\nStatuscode: " + statusCode +
-			"\nError: " + error));
+			"\nError: " + error +
+			"\nData: " + JSON.stringify(data)));
 	}
 }
 
@@ -108,7 +115,7 @@ Bandcamp.prototype = {
 		request(dataRequest.createOptions(), function (error, response, data) {
 			var statusCode = response != undefined ? response.statusCode : "undefined";
 
-			if (error || statusCode != 200) {
+			if (error || statusCode != 200 || data.error == true) {
 				if ((statusCode == 503 || statusCode == 429) && dataRequest.errorCount < 10) {
 					dataRequest.errorCount += 1;
 					let waitTime = 1000 * dataRequest.errorCount;
@@ -119,7 +126,7 @@ Bandcamp.prototype = {
 					return;
 				}
 
-				dataRequest.retrievalFailed(error, statusCode);
+				dataRequest.retrievalFailed(error, statusCode, data);
 				return;
 			}
 

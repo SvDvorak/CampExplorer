@@ -1,7 +1,8 @@
+const database = require("./database");
 const { debugLog } = require("./extensions");
 
-module.exports = CacheUpdater = function (albumApi, database, log) {
-	this.albumApi = albumApi;
+module.exports = CacheUpdater = function (bandcampApi, database, log) {
+	this.bandcampApi = bandcampApi;
 	this.database = database;
 	this.log = log;
 	this.queue = [];
@@ -9,41 +10,41 @@ module.exports = CacheUpdater = function (albumApi, database, log) {
 }
 
 CacheUpdater.prototype = {
-	updateTags: async function (tags) {
-		var updater = this;
-
-		updater.queue = updater.queue.concat(
-			tags.filter(tag => { return updater.queue.indexOf(tag) == -1; }));
-
-		if (this.isIdle()) {
-			await updater.updateTagsLoop();
-		}
+	createUpdateTagOperation: function(tag) {
+		return new UpdateTagOperation(tag, this.bandcampApi, this.database, this.log); 
+	},
+	createUpdateAlbumOperation: function(album) {
+		return new UpdateAlbumOperation(album, this.bandcampApi, this.database, this.log); 
 	},
 
-	updateTagsLoop: async function () {
+	updateTags: async function(tags) {
 		var updater = this;
-		var database = this.database;
-		var albumApi = this.albumApi;
+		this.queueUpOperation(tags.map(x => updater.createUpdateTagOperation(x)));
+
+		await updater.updateLoop();
+	},
+
+	updateAlbum: async function(album) {
+		var updater = this;
+		var operation = updater.createUpdateAlbumOperation(album);
+		this.queueUpOperation([operation]);
+
+		await updater.updateLoop();
+	},
+
+	updateLoop: async function () {
+		if (!this.isIdle()) {
+			return;
+		}
 
 		this.isUpdating = true;
 
 		while (this.queue.length > 0) {
-			const tag = this.queue[0];
-			this.inProgress = tag;
-			try {
-				debugLog(this.log, `Updating tag ${tag}`);
-				const albums = await albumApi.getAlbumsForTag(tag);
-				debugLog(this.log, `Retrieved ${albums.length} albums`);
-				await database.saveAlbums(tag, albums);
-				await database.saveTag(tag);
-			}
-			catch (error) {
-				updater.log(`Unable to update ${tag} because ${error}`);
-			}
-			finally {
-				updater.inProgress = undefined
-				updater.removeFromQueue(tag);
-			}
+			const operation = this.queue[0];
+			this.inProgress = operation;
+			await operation.execute();
+			this.inProgress = undefined;
+			this.removeFromQueue(operation);
 		}
 
 		this.isUpdating = false;
@@ -53,20 +54,83 @@ CacheUpdater.prototype = {
 		return !this.isUpdating;
 	},
 
+	queueUpOperation: function(newOperations) {
+		var updater = this;
+		updater.queue = updater.queue.concat(
+			newOperations.filter(x => !updater.queue.some(y => x.isSameOperation(y))));
+	},
+
 	queueLength: function () {
 		return this.queue.length;
 	},
 
-	currentlyCachingTag: function () {
+	currentlyCaching: function () {
 		if (this.inProgress == undefined)
 			return "";
-		return this.inProgress;
+		return this.inProgress.getName();
 	},
 
-	removeFromQueue: function (tag) {
-		var i = this.queue.indexOf(tag);
+	removeFromQueue: function (operation) {
+		var i = this.queue.indexOf(operation);
 		if (i != -1) {
 			this.queue.splice(i, 1);
 		}
 	},
 };
+
+UpdateTagOperation = function(tag, bandcampApi, database, log) {
+	this.tag = tag;
+	this.bandcampApi = bandcampApi;
+	this.database = database;
+	this.log = log;
+}
+
+UpdateTagOperation.prototype = {
+	execute: async function() {
+		try {
+			debugLog(this.log, `Updating tag ${this.tag}`);
+			const albums = await this.bandcampApi.getAlbumsForTag(this.tag);
+			debugLog(this.log, `Retrieved ${albums.length} albums`);
+			await this.database.saveTagAlbums(this.tag, albums);
+			await this.database.saveTag(this.tag);
+		}
+		catch (error) {
+			this.log(`Unable to update ${this.tag} because ${error}`);
+		}
+	},
+	getName: function() {
+		return "T: " + this.tag;
+	},
+	isSameOperation: function(other) {
+		return other instanceof UpdateTagOperation && this.tag == other.tag;
+	}
+}
+
+UpdateAlbumOperation = function(album, bandcampApi, database, log) {
+	this.album = album;
+	this.bandcampApi = bandcampApi;
+	this.database = database;
+	this.log = log;
+}
+
+UpdateAlbumOperation.prototype = {
+	execute: async function() {
+		try {
+			debugLog(this.log, `Updating album ${this.album.name}`);
+			const newTags = await this.bandcampApi.getTagsForAlbum(this.album);
+			debugLog(this.log, `Retrieved ${newTags.length} tags for album`);
+			this.album.hasTagsBeenUpdated = true;
+			await this.database.saveAlbum(this.album, newTags);
+			// Deliberately not updating tags, because we want a full tag search when that tag is first asked for
+		}
+		catch (error) {
+			this.log(`Unable to update ${this.album.name} because ${error}`);
+		}
+	},
+	getName: function() {
+		return "A: " + this.album.name;
+	},
+	isSameOperation: function(other) {
+		return other instanceof UpdateAlbumOperation && this.album.link == other.tag;
+	}
+}

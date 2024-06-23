@@ -5,6 +5,7 @@ module.exports = Album = function(id, name, artist, image, link, bandId) {
   this.image = image;
   this.link = link;
   this.bandId = bandId;
+  this.hasTagsBeenUpdated = false;
 }
 
 Album.prototype.toString = function() {

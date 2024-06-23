@@ -1,6 +1,7 @@
 var Promise = require("bluebird");
 var DatabaseFake = require("./database-fake");
 var CacheUpdater = require("../cache-updater");
+var Album = require("../album-type");
 
 describe("Cache updater", function () {
 	var bandcamp;
@@ -12,12 +13,19 @@ describe("Cache updater", function () {
 	beforeEach(async function () {
 		tagsRequested = [];
 		bandcamp = {
-			tagAlbums: {},
+			tagAlbums: [],
+			albums: [],
 			getAlbumsForTag: function (tag) {
 				tagsRequested.push(tag);
 				if(tag in this.tagAlbums)
 					return Promise.resolve(this.tagAlbums[tag]);
 				return Promise.resolve([]);
+			},
+			setTagsForAlbum: function(album, tags) {
+				this.albums[album.name] = tags;
+			},
+			getTagsForAlbum: function(album) {
+				return this.albums[album.name];
 			}
 		};
 		database = new DatabaseFake();
@@ -42,10 +50,23 @@ describe("Cache updater", function () {
 
 		await sut.updateTags(expectedTags);
 		expect(database.savedTags).toEqual(expectedTags);
-		expect(database.saveAlbumsCalls).toEqual(expectedAlbums);
+		expect(database.saveTagAlbumsCalls).toEqual(expectedAlbums);
 	});
 
-	it("ignores tags that are already queued", async () => {
+	it("retrieves all tags for album and saves tags to that album", async () => {
+		var album = new Album(0, "Album0");
+		var tags = ["tag1", "tag2"];
+		bandcamp.setTagsForAlbum(album, tags);
+
+		await sut.updateAlbum(album);
+
+		expect(database.saveAlbumCalls.length).toBe(1);
+		expect(database.saveAlbumCalls[0].album.name).toBe(album.name);
+		expect(database.saveAlbumCalls[0].album.hasTagsBeenUpdated).toBe(true);
+		expect(database.saveAlbumCalls[0].tags).toBe(tags);
+	});
+
+	it("ignores operations that are already queued", async () => {
 		sut.updateTags(["tag"]);
 		sut.updateTags(["tag"]);
 
@@ -53,7 +74,7 @@ describe("Cache updater", function () {
 		expect(sut.queueLength()).toBe(1);
 	});
 
-	it("removes tag from queue when finished updating", async () => {
+	it("removes operation from queue when finished updating", async () => {
 		await sut.updateTags(["tag"]);
 		expect(sut.queueLength()).toBe(0);
 	});
@@ -69,7 +90,7 @@ describe("Cache updater", function () {
 		expect(database.savedTags).toEqual(expectedTags);
 	});
 
-	it("logs and skips tag when update fails", async () => {
+	it("logs and skips operation when tag update fails", async () => {
 		bandcamp.getAlbumsForTag = createGetMethodThatFailsFor(bandcamp.getAlbumsForTag, 1)
 
 		await sut.updateTags(["tag1"]);

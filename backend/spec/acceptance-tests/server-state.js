@@ -3,15 +3,20 @@ const { localRequest } = require("./local-request");
 var stateRequests = require("./server-state-requests");
 const { timeout } = require("../../extensions");
 var moment = require("moment");
+var Config = require("./config");
 
 describe("Server state", () => {
     var testServer;
     var bandcamp;
+    var database;
     var timeProvider;
 
     beforeEach(async () => {
-        testServer = new TestServer();
+        var config = new Config();
+        config.albumRecacheIntervalInSeconds = 0.5;
+        testServer = new TestServer(config);
         bandcamp = testServer.bandcamp;
+        database = testServer.database;
         timeProvider = testServer.timeProvider;
         await testServer.start();
     });
@@ -41,18 +46,18 @@ describe("Server state", () => {
         bandcamp.delay = 9999;
 
     	await cacheTags(expectedQueuedTags)
-        const tagsInQueue = await stateRequests.getQueuedTags();
-        expect(parseInt(tagsInQueue)).toBe(expectedQueuedTags.length);
+        const operationsInQueue = await stateRequests.getQueuedOperations();
+        expect(parseInt(operationsInQueue)).toBe(expectedQueuedTags.length);
     });
 
-    it("returns currently caching tag", async () => {
+    it("returns currently caching operation", async () => {
         var expectedCachingTag = "pop";
 
         bandcamp.delay = 9999;
 
     	await cacheTags([ expectedCachingTag ]);
-        const cachingTag = await stateRequests.getCurrentlyCachingTag();
-        expect(cachingTag).toBe(expectedCachingTag);
+        const cachingTag = await stateRequests.getCurrentlyCaching();
+        expect(cachingTag).toBe("T: " + expectedCachingTag);
     });
 
     it("returns number of albums cached", async () => {
@@ -61,9 +66,20 @@ describe("Server state", () => {
         var expectedAlbums = [ { name: "Album1" }, { name: "Album2" }, { name: "Album3" }];
         bandcamp.setAlbumsForTag(tag, expectedAlbums);
 
-        await cacheTags([ tag ])
+        await cacheTags([ tag ]);
         const albumCount = await stateRequests.getAlbumCount();
         expect(albumCount).toBe(expectedAlbums.length);
+    });
+
+    it("returns number of albums cached without updated tags", async () => {
+        var tag = "pop";
+        var expectedAlbums = [ { name: "Album1" }, { name: "Album2" }, { name: "Album3" }];
+        database.saveTagAlbums(tag, expectedAlbums);
+
+        await timeout(500);
+
+        const albumCount = await stateRequests.getAlbumCountWithoutUpdatedTags();
+        expect(albumCount).toBe(2);
     });
 
     it("returns zero as album count when database has no index or type for tags", async () => {
